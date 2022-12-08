@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<ruleset name="stello Symfony Rulset"
+         xmlns="http://pmd.sf.net/ruleset/1.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0
+              http://pmd.sf.net/ruleset_xml_schema.xsd"
+         xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+    <description>
+        Rulset for Stello in symfony project
+    </description>
+    <rule ref="rulesets/unusedcode.xml">
+        <exclude name="UnusedLocalVariable" />
+        <exclude name="UnusedFormalParameter" />
+    </rule>
+    <rule ref="rulesets/unusedcode.xml/UnusedLocalVariable">
+        <properties>
+            <property name="exceptions" value="_" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/cleancode.xml">
+        <exclude name="ErrorControlOperator" />
+        <exclude name="ElseExpression" />
+        <exclude name="StaticAccess" />
+        <exclude name="BooleanArgumentFlag" />
+        <exclude name="IfStatementAssignment" />
+        <exclude name="MissingImport" />
+    </rule>
+    <rule ref="rulesets/codesize.xml">
+        <exclude name="CyclomaticComplexity" />
+        <exclude name="TooManyPublicMethods" />
+        <exclude name="TooManyFields" />
+        <exclude name="ExcessiveClassComplexity" />
+        <exclude name="ExcessivePublicCount" />
+        <exclude name="NPathComplexity" />
+    </rule>
+    <rule ref="rulesets/codesize.xml/ExcessiveClassComplexity">
+        <properties>
+            <property name="maximum" value="80" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/codesize.xml/TooManyFields">
+        <properties>
+            <property name="maxfields" value="25" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/codesize.xml/CyclomaticComplexity">
+        <priority>1</priority>
+        <properties>
+            <property name="reportLevel" value="50" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/codesize.xml/TooManyPublicMethods">
+        <properties>
+            <property name="maxmethods" value="30" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/codesize.xml/ExcessivePublicCount">
+        <properties>
+            <property name="minimum" value="50" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/controversial.xml" />
+    <rule ref="rulesets/design.xml">
+        <exclude name="NumberOfChildren" />
+        <exclude name="CouplingBetweenObjects" />
+    </rule>
+    <rule ref="rulesets/design.xml/NumberOfChildren">
+        <properties>
+            <property name="minimum" value="30" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/design.xml/CouplingBetweenObjects">
+        <properties>
+            <property name="maximum" value="45" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/naming.xml">
+        <exclude name="ShortVariable" />
+        <exclude name="ShortClassName" />
+        <exclude name="LongClassName" />
+        <exclude name="LongVariable" />
+        <exclude name="ShortMethodName" />
+    </rule>
+    <rule ref="rulesets/naming.xml/ShortVariable">
+        <properties>
+            <property name="exceptions" value="em,id,to,io" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/naming.xml/ShortClassName">
+        <properties>
+            <property name="exceptions" value="Id" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/naming.xml/ShortMethodName">
+        <properties>
+            <property name="exceptions" value="up" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/naming.xml/LongVariable">
+        <properties>
+            <property name="maximum" value="40" />
+        </properties>
+    </rule>
+</ruleset>

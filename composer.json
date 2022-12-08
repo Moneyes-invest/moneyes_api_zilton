@@ -1,35 +1,18 @@
 {
-    "name": "symfony/skeleton",
     "type": "project",
-    "license": "MIT",
-    "description": "A minimal Symfony project recommended to create bare bones applications",
+    "license": "proprietary",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.1.13",
+        "php": ">=8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "api-platform/core": "^3.0",
-        "doctrine/annotations": "^1.0",
-        "doctrine/doctrine-bundle": "^2.7",
-        "doctrine/doctrine-migrations-bundle": "^3.2",
-        "doctrine/orm": "^2.13",
-        "nelmio/cors-bundle": "^2.2",
-        "phpdocumentor/reflection-docblock": "^5.3",
-        "phpstan/phpdoc-parser": "^1.15",
-        "symfony/asset": "6.2.*",
+        "phpmd/phpmd": "^2.13",
         "symfony/console": "6.2.*",
         "symfony/dotenv": "6.2.*",
-        "symfony/expression-language": "6.2.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.2.*",
-        "symfony/property-access": "6.2.*",
-        "symfony/property-info": "6.2.*",
         "symfony/runtime": "6.2.*",
-        "symfony/security-bundle": "6.2.*",
-        "symfony/serializer": "6.2.*",
-        "symfony/twig-bundle": "6.2.*",
-        "symfony/validator": "6.2.*",
         "symfony/yaml": "6.2.*"
     },
     "config": {
@@ -76,8 +59,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.2.*",
-            "docker": true
+            "require": "6.2.*"
         }
     }
 }
