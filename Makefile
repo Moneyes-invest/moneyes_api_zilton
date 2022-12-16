@@ -71,7 +71,6 @@ db: vendor
 	$(SYMFONY) doctrine:database:drop --force || true
 	$(SYMFONY) doctrine:database:create
 	$(SYMFONY) doctrine:migrations:migrate --no-interaction --allow-no-migration
-	$(SYMFONY) doctrine:fixtures:load --group=import --append
 
 migration: ## Generate a new doctrine migration
 migration: vendor

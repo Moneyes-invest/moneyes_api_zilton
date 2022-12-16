@@ -63,10 +63,10 @@ jobs:
                 id: phpcpd
                 continue-on-error: true
                 run: make apply-phpcpd
-            -   name: Lint
-                id: lint
-                continue-on-error: true
-                run: make lint
+#            -   name: Lint
+#                id: lint
+#                continue-on-error: true
+#                run: make lint
             -   name: DB validate schema
                 id: db-validate-schema
                 continue-on-error: true
