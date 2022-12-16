@@ -1,11 +1,10 @@
 DOCKER_COMPOSE	= docker compose
 
-EXEC_APP        = docker exec app
+EXEC_APP        = docker exec php
 EXEC_PG         = docker exec database
 EXEC_PG_I       = docker exec -i database
 SYMFONY         = $(EXEC_APP) bin/console
 COMPOSER        = $(EXEC_APP) composer
-NPM             = $(EXEC_APP) npm
 
 ##
 ## Project
@@ -99,18 +98,6 @@ vendor: composer.lock
 sync-recipes: vendor
 	$(COMPOSER) sync-recipes --force
 
-package-lock.json: package.json
-	$(NPM) install
-
-node_modules: package-lock.json
-	$(NPM) install
-
-assets: node_modules
-	$(NPM) run dev
-
-assets-watch: node_modules
-	$(NPM) run watch
-
 .PHONY: db migration assets
 
 ##
@@ -134,7 +121,7 @@ db-test: vendor
 	$(SYMFONY) doctrine:migrations:migrate --no-interaction --allow-no-migration --env test
 
 test-fixtures: db-test
-	$(SYMFONY) doctrine:fixtures:load --env test --group=test --append
+#	$(SYMFONY) doctrine:fixtures:load --env test --group=test --append
 
 test: test-fixtures assets
 	$(EXEC_APP) php ./vendor/bin/simple-phpunit --testdox
@@ -163,7 +150,7 @@ tools/phpmd/vendor: composer.lock
 
 .PHONY: phpmd
 phpmd: tools/phpmd/vendor
-	$(EXEC_APP) tools/phpmd/vendor/bin/phpmd $(arguments)
+	$(EXEC_APP) php tools/phpmd/vendor/bin/phpmd $(arguments)
 
 .PHONY: apply-phpmd
 apply-phpmd:
@@ -173,7 +160,7 @@ apply-phpmd:
 update-phpmd:
 	$(COMPOSER) --working-dir=tools/phpmd update
 
-tools/phpcpd/composer.lock: tools/phpcpd/composer.json
+tools/phpcpd/composer.lock: tools/phpcpd/composer.jsons
 	$(COMPOSER) --working-dir=tools/phpcpd update
 
 tools/phpcpd/vendor: composer.lock
@@ -181,7 +168,7 @@ tools/phpcpd/vendor: composer.lock
 
 .PHONY: phpcpd
 phpcpd: tools/phpcpd/vendor
-	$(EXEC_APP) tools/phpcpd/vendor/bin/phpcpd $(arguments)
+	$(EXEC_APP) php tools/phpcpd/vendor/bin/phpcpd $(arguments)
 
 .PHONY: apply-phpcpd
 apply-phpcpd:
@@ -199,7 +186,7 @@ tools/phpstan/vendor: composer.lock
 
 .PHONY: phpstan
 phpstan: tools/phpstan/vendor
-	$(EXEC_APP) tools/phpstan/vendor/bin/phpstan $(arguments)
+	$(EXEC_APP) php tools/phpstan/vendor/bin/phpstan $(arguments)
 
 .PHONY: apply-phpstan
 apply-phpstan:
@@ -217,7 +204,7 @@ tools/php-cs-fixer/vendor: composer.lock
 
 .PHONY: php-cs-fixer
 php-cs-fixer: tools/php-cs-fixer/vendor
-	$(EXEC_APP) tools/php-cs-fixer/vendor/bin/php-cs-fixer $(arguments)
+	$(EXEC_APP) php tools/php-cs-fixer/vendor/bin/php-cs-fixer $(arguments)
 
 .PHONY: check-php-cs
 check-php-cs:
