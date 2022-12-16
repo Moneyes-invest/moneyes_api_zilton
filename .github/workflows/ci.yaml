@@ -83,7 +83,6 @@ jobs:
                         const phpmdState              = '${{ steps.phpmd.outcome }}' == 'success' ? '✅' : '❌';
                         const phpcsfixerState         = '${{ steps.phpcsfixer.outcome }}' == 'success' ? '✅' : '❌';
                         const phpcpdState             = '${{ steps.phpcpd.outcome }}' == 'success' ? '✅' : '❌';
-                        const lintState               = '${{ steps.lint.outcome }}' == 'success' ? '✅' : '❌';
                         const dbValidateSchemaState   = '${{ steps.db-validate-schema.outcome }}' == 'success' ? '✅' : '❌';
 
                         const output = `#### phpunit ️${ phpunitUnitState }
