@@ -1,7 +1,7 @@
 # Moneyes API 
-## Lancer le docker
-`docker-compose up -d --build`
+## Lancer le projet
+`make install`
 ## Se connecter au php
-``composer install``
+``make connect``
 ## URL
 ``http://localhost:8080/``
