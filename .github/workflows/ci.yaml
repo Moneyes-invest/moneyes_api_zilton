@@ -91,7 +91,6 @@ jobs:
                         #### phpmd ️${ phpmdState }
                         #### phpcsfixer ️${ phpcsfixerState }
                         #### phpcpd ️${ phpcpdState }
-                        #### lint ️${ lintState }
                         #### db-validate-schema ️${ dbValidateSchemaState }
                         *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
 
