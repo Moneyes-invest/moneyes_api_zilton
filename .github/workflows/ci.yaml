@@ -101,5 +101,5 @@ jobs:
                           body: output
                         })
             -   name: Check on failures
-                if: steps.phpunit.outcome != 'success' || steps.phpstan.outcome != 'success' || steps.security.outcome != 'success' || steps.phpmd.outcome != 'success' || steps.phpcsfixer.outcome != 'success' || steps.phpcpd.outcome != 'success' || steps.lint.outcome != 'success' || steps.db-validate-schema.outcome != 'success'
+                if: steps.phpunit.outcome != 'success' || steps.phpstan.outcome != 'success' || steps.security.outcome != 'success' || steps.phpmd.outcome != 'success' || steps.phpcsfixer.outcome != 'success' || steps.phpcpd.outcome != 'success' || steps.db-validate-schema.outcome != 'success'
                 run: exit 1
