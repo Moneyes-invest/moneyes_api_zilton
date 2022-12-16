@@ -1,0 +1,105 @@
+name: "Continuous Integration"
+
+on:
+    pull_request:
+
+jobs:
+    tests:
+        name: Tests
+        runs-on: ubuntu-latest
+        concurrency:
+            group: ${{ github.head_ref }}
+            cancel-in-progress: true
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
+            -   name: Pull images
+                run: docker compose pull --ignore-pull-failures || true
+            -   name: Start services
+                run: docker compose up --build -d
+            -   name: Wait for services
+                run: |
+                    while status="$(docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" "$(docker compose ps -q php)")"; do
+                      case $status in
+                        starting) sleep 1;;
+                        healthy) exit 0;;
+                        unhealthy)
+                          docker compose ps
+                          docker compose logs
+                          exit 1
+                        ;;
+                      esac
+                    done
+                    exit 1
+            -   name: Check HTTP reachability
+                run: curl -v -o /dev/null http://localhost:8080
+            -   name: Run PHPUnit tests
+                id: phpunit
+                continue-on-error: true
+                run: make test
+            -   name: Upload test artifacts
+                uses: actions/upload-artifact@v1
+                with:
+                    name: phpunit-logs
+                    path: api/build/logs/phpunit
+                continue-on-error: true
+            -   name: PHPStan
+                id: phpstan
+                continue-on-error: true
+                run: make apply-phpstan
+            -   name: Security
+                id: security
+                continue-on-error: true
+                run: make security
+            -   name: PHP Mess Detector
+                id: phpmd
+                continue-on-error: true
+                run: make apply-phpmd
+            -   name: PHP-cs-fixer
+                id: phpcsfixer
+                continue-on-error: true
+                run: make check-php-cs
+            -   name: PHPCPD
+                id: phpcpd
+                continue-on-error: true
+                run: make apply-phpcpd
+#            -   name: Lint
+#                id: lint
+#                continue-on-error: true
+#                run: make lint
+            -   name: DB validate schema
+                id: db-validate-schema
+                continue-on-error: true
+                run: make db db-validate-schema
+            -   name: Update Pull Request
+                uses: actions/github-script@v6
+                if: github.event_name == 'pull_request'
+                with:
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    script: |
+                        const phpunitUnitState        = '${{ steps.phpunit.outcome }}' == 'success' ? '✅' : '❌';
+                        const phpstanState            = '${{ steps.phpstan.outcome }}' == 'success' ? '✅' : '❌';
+                        const securityState           = '${{ steps.security.outcome }}' == 'success' ? '✅' : '❌';
+                        const phpmdState              = '${{ steps.phpmd.outcome }}' == 'success' ? '✅' : '❌';
+                        const phpcsfixerState         = '${{ steps.phpcsfixer.outcome }}' == 'success' ? '✅' : '❌';
+                        const phpcpdState             = '${{ steps.phpcpd.outcome }}' == 'success' ? '✅' : '❌';
+                        const dbValidateSchemaState   = '${{ steps.db-validate-schema.outcome }}' == 'success' ? '✅' : '❌';
+
+                        const output = `#### phpunit ️${ phpunitUnitState }
+                        #### phpstan ️${ phpstanState }
+                        #### security ️${ securityState }
+                        #### phpmd ️${ phpmdState }
+                        #### phpcsfixer ️${ phpcsfixerState }
+                        #### phpcpd ️${ phpcpdState }
+                        #### db-validate-schema ️${ dbValidateSchemaState }
+                        *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+                        github.rest.issues.createComment({
+                          issue_number: context.issue.number,
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          body: output
+                        })
+            -   name: Check on failures
+                if: steps.phpunit.outcome != 'success' || steps.phpstan.outcome != 'success' || steps.security.outcome != 'success' || steps.phpmd.outcome != 'success' || steps.phpcsfixer.outcome != 'success' || steps.phpcpd.outcome != 'success' || steps.db-validate-schema.outcome != 'success'
+                run: exit 1

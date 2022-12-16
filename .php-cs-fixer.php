@@ -1,8 +1,8 @@
 <?php
 // Inspired by  https://github.com/jolicode/codingstyle
 $header = <<<OEF
-This file is part of the Stello API project.
-(c) Stello <dev@stello.eu>
+This file is part of the Moneyes API project.
+(c) Moneyes
 For the full copyright and license information, please view the LICENSE
 file that was distributed with this source code.
 OEF;
