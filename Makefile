@@ -171,7 +171,7 @@ phpcpd: tools/phpcpd/vendor
 
 .PHONY: apply-phpcpd
 apply-phpcpd:
-	$(MAKE) phpcpd arguments="src --exclude src/Report --exclude src/Entity/Contract/ContractBeneficiary.php --exclude src/Broker/Security/StelloSaleBrokerRoleGuesser.php --exclude src/Broker/Security/StelloManagerBrokerRoleGuesser.php --exclude src/Administrator/Security/AdministratorRoleGuesser.php"
+	$(MAKE) phpcpd arguments="src"
 
 .PHONY: update-phpcpd
 update-phpcpd:
