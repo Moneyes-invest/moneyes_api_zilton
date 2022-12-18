@@ -6,3 +6,5 @@
 ``make connect``
 ## URL
 ``http://localhost:8080/``
+## EasyAdmin
+``http//localhost:8080/admin``

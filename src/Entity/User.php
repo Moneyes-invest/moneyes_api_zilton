@@ -34,14 +34,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $username = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $birthdate = null;
-
     #[ORM\OneToOne(mappedBy: 'id_user', cascade: ['persist', 'remove'])]
     private ?Account $account = null;
-
+    
     #[ORM\OneToMany(mappedBy: 'id_user', targetEntity: Transaction::class)]
     private Collection $transactions;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $birthdate = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $lastname = null;
+    
 
     public function __construct()
     {
@@ -188,4 +195,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    public function setLastname(?string $lastname): self
+    {
+        $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    public function __toString(){
+        return $this->name;
+    }
+
 }

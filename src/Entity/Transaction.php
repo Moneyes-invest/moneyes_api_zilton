@@ -21,6 +21,7 @@ class Transaction
     private ?float $value = null;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Exchange $id_exchange = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
@@ -114,12 +115,12 @@ class Transaction
         return $this;
     }
 
-    public function getOrderDirection(): array
+    public function getOrderDirection(): string
     {
         return $this->order_direction;
     }
 
-    public function setOrderDirection(array $order_direction): self
+    public function setOrderDirection(string $order_direction): self
     {
         $this->order_direction = $order_direction;
 
