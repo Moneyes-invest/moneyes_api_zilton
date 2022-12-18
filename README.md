@@ -8,6 +8,6 @@
 ``http://localhost:8080/``
 ## EasyAdmin
 ``http//localhost:8080/admin``
-## Un fois le dev terminer faire
+## Un fois le dev terminé faire
 ``make pre-commit``
 pour tester et formater le code
