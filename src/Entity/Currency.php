@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Entity;
 
 use App\Repository\CurrencyRepository;
@@ -14,10 +23,15 @@ class Currency
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $code_iso = null;
+    private ?string $codeIso = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private string $name;
+
+    public function __toString(): string
+    {
+        return $this->name;
+    }
 
     public function getId(): ?int
     {
@@ -26,20 +40,16 @@ class Currency
 
     public function getCodeIso(): ?string
     {
-        return $this->code_iso;
+        return $this->codeIso;
     }
 
-    public function setCodeIso(string $code_iso): self
+    public function setCodeIso(string $codeIso): self
     {
-        $this->code_iso = $code_iso;
+        $this->codeIso = $codeIso;
 
         return $this;
     }
 
-    public function __toString(){
-        return $this->name;
-    }
-    
     public function getName(): ?string
     {
         return $this->name;
@@ -51,5 +61,4 @@ class Currency
 
         return $this;
     }
-
 }

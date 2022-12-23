@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Entity;
 
 use App\Repository\TransactionRepository;
@@ -22,21 +31,24 @@ class Transaction
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Exchange $id_exchange = null;
+    private ?Exchange $idExchange = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $id_user = null;
+    private ?User $idUser = null;
 
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Currency $id_currency = null;
+    private ?Currency $idCurrency = null;
 
     #[ORM\Column(length: 255)]
-    private string $order_direction = "";
+    private string $orderDirection = '';
+
+    #[ORM\Column]
+    private int $amount;
 
     public function getId(): ?int
     {
@@ -69,24 +81,24 @@ class Transaction
 
     public function getIdExchange(): ?Exchange
     {
-        return $this->id_exchange;
+        return $this->idExchange;
     }
 
-    public function setIdExchange(?Exchange $id_exchange): self
+    public function setIdExchange(?Exchange $idExchange): self
     {
-        $this->id_exchange = $id_exchange;
+        $this->idExchange = $idExchange;
 
         return $this;
     }
 
     public function getIdUser(): ?User
     {
-        return $this->id_user;
+        return $this->idUser;
     }
 
-    public function setIdUser(?User $id_user): self
+    public function setIdUser(?User $idUser): self
     {
-        $this->id_user = $id_user;
+        $this->idUser = $idUser;
 
         return $this;
     }
@@ -105,24 +117,36 @@ class Transaction
 
     public function getIdCurrency(): ?Currency
     {
-        return $this->id_currency;
+        return $this->idCurrency;
     }
 
-    public function setIdCurrency(?Currency $id_currency): self
+    public function setIdCurrency(?Currency $idCurrency): self
     {
-        $this->id_currency = $id_currency;
+        $this->idCurrency = $idCurrency;
 
         return $this;
     }
 
     public function getOrderDirection(): string
     {
-        return $this->order_direction;
+        return $this->orderDirection;
     }
 
-    public function setOrderDirection(string $order_direction): self
+    public function setOrderDirection(string $orderDirection): self
     {
-        $this->order_direction = $order_direction;
+        $this->orderDirection = $orderDirection;
+
+        return $this;
+    }
+
+    public function getAmount(): ?int
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(int $amount): self
+    {
+        $this->amount = $amount;
 
         return $this;
     }

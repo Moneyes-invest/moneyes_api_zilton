@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Entity;
 
 use App\Repository\UserRepository;
@@ -25,34 +34,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     */
+    /** @var string The hashed password */
     #[ORM\Column]
-    private ?string $password = null;
+    private string $password;
 
     #[ORM\Column(length: 255)]
-    private ?string $username = null;
+    private string $username;
 
-    #[ORM\OneToOne(mappedBy: 'id_user', cascade: ['persist', 'remove'])]
-    private ?Account $account = null;
-    
-    #[ORM\OneToMany(mappedBy: 'id_user', targetEntity: Transaction::class)]
+    #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Transaction::class)]
     private Collection $transactions;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $birthdate = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $name = null;
+    #[ORM\Column(length: 255)]
+    private string $name;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastname = null;
-    
+
+    #[ORM\OneToMany(mappedBy: 'userId', targetEntity: Account::class)]
+    private Collection $account;
 
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
+        $this->account      = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->name;
     }
 
     public function getId(): ?int
@@ -119,7 +131,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
@@ -149,23 +161,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getAccount(): ?Account
-    {
-        return $this->account;
-    }
-
-    public function setAccount(Account $account): self
-    {
-        // set the owning side of the relation if necessary
-        if ($account->getIdUser() !== $this) {
-            $account->setIdUser($this);
-        }
-
-        $this->account = $account;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Transaction>
      */
@@ -186,12 +181,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeTransaction(Transaction $transaction): self
     {
-        if ($this->transactions->removeElement($transaction)) {
-            // set the owning side to null (unless already changed)
-            if ($transaction->getIdUser() === $this) {
-                $transaction->setIdUser(null);
-            }
-        }
+        // if ($this->transactions->removeElement($transaction)) {
+        // TODO : Supprimer une transaction
+        // }
 
         return $this;
     }
@@ -201,7 +193,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->name;
     }
 
-    public function setName(?string $name): self
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -220,8 +212,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function __toString(){
-        return $this->name;
+    /**
+     * @return Collection<int, Account>
+     */
+    public function getAccount(): Collection
+    {
+        return $this->account;
     }
-
 }

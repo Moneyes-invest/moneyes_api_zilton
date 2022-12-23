@@ -1,18 +1,24 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Controller\Admin;
 
-use App\Entity\Exchange;
 use App\Entity\Transaction;
-use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use Symfony\Component\DomCrawler\Field\InputFormField;
 
 class TransactionCrudController extends AbstractCrudController
 {
@@ -21,26 +27,18 @@ class TransactionCrudController extends AbstractCrudController
         return Transaction::class;
     }
 
-
     public function configureFields(string $pageName): iterable
     {
         return [
             IdField::new('id')->hideOnForm(),
-            DateTimeField::new('date'),
+            AssociationField::new('idUser'),
+            AssociationField::new('idCurrency'),
+            AssociationField::new('idExchange'),
+            TextField::new('orderDirection'),
             MoneyField::new('value')->setCurrency('EUR'),
-            AssociationField::new('id_exchange'),
-            AssociationField::new('id_user'),
-            AssociationField::new('id_currency'),
+            NumberField::new('amount'),
+            DateTimeField::new('date'),
             TextField::new('type'),
-            TextField::new('order_direction')
         ];
     }
-
-    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
-    {
-        if (!$entityInstance instanceof Transaction) return;
-
-        parent::persistEntity($entityManager, $entityInstance);
-    }
-
 }

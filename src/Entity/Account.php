@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Entity;
 
 use App\Repository\AccountRepository;
@@ -13,19 +22,18 @@ class Account
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'account', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $id_user = null;
-
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Exchange $id_exchange = null;
+    private ?Exchange $idExchange = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $private_key = null;
+    private ?string $privateKey = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $public_key = null;
+    private ?string $publicKey = null;
+
+    #[ORM\ManyToOne(inversedBy: 'account')]
+    private ?User $idUser = null;
 
     public function getId(): ?int
     {
@@ -34,48 +42,48 @@ class Account
 
     public function getIdUser(): ?User
     {
-        return $this->id_user;
+        return $this->idUser;
     }
 
-    public function setIdUser(User $id_user): self
+    public function setIdUser(User $idUser): self
     {
-        $this->id_user = $id_user;
+        $this->idUser = $idUser;
 
         return $this;
     }
 
     public function getIdExchange(): ?Exchange
     {
-        return $this->id_exchange;
+        return $this->idExchange;
     }
 
-    public function setIdExchange(?Exchange $id_exchange): self
+    public function setIdExchange(?Exchange $idExchange): self
     {
-        $this->id_exchange = $id_exchange;
+        $this->idExchange = $idExchange;
 
         return $this;
     }
 
     public function getPrivateKey(): ?string
     {
-        return $this->private_key;
+        return $this->privateKey;
     }
 
-    public function setPrivateKey(?string $private_key): self
+    public function setPrivateKey(?string $privateKey): self
     {
-        $this->private_key = $private_key;
+        $this->privateKey = $privateKey;
 
         return $this;
     }
 
     public function getPublicKey(): ?string
     {
-        return $this->public_key;
+        return $this->publicKey;
     }
 
-    public function setPublicKey(?string $public_key): self
+    public function setPublicKey(?string $publicKey): self
     {
-        $this->public_key = $public_key;
+        $this->publicKey = $publicKey;
 
         return $this;
     }
