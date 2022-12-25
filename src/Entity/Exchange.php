@@ -13,10 +13,13 @@ namespace App\Entity;
 
 use App\Repository\ExchangeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 
 #[ORM\Entity(repositoryClass: ExchangeRepository::class)]
 class Exchange
 {
+    use TimestampableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

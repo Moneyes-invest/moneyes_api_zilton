@@ -78,6 +78,9 @@
             "ref": "b131e6cbfe1b898a508987851963fff485986285"
         }
     },
+    "knplabs/doctrine-behaviors": {
+        "version": "2.6.2"
+    },
     "nelmio/cors-bundle": {
         "version": "2.2",
         "recipe": {
