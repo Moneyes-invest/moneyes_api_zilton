@@ -14,6 +14,8 @@ namespace App\Entity;
 use App\Repository\ExchangeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: ExchangeRepository::class)]
 class Exchange
@@ -21,9 +23,10 @@ class Exchange
     use TimestampableTrait;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private Uuid $id;
 
     #[ORM\Column(length: 255)]
     private string $label;
@@ -33,7 +36,7 @@ class Exchange
         return $this->label;
     }
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
