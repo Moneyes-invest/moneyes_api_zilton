@@ -11,6 +11,7 @@ declare(strict_types = 1);
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ExchangeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
@@ -20,8 +21,6 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\Entity(repositoryClass: ExchangeRepository::class)]
 class Exchange
 {
-    use TimestampableTrait;
-
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]

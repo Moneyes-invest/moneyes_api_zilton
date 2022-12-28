@@ -21,8 +21,6 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 class Transaction
 {
-    use TimestampableTrait;
-
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]

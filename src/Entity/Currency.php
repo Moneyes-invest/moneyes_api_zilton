@@ -20,8 +20,6 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\Entity(repositoryClass: CurrencyRepository::class)]
 class Currency
 {
-    use TimestampableTrait;
-
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]

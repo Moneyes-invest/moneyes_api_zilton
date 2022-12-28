@@ -31,3 +31,7 @@ yarn-error.log
 /tools/*/vendor/
 /tools/local-php*
 .idea/
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###

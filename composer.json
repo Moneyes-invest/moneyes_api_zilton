@@ -15,6 +15,7 @@
         "doctrine/orm": "^2.13",
         "easycorp/easyadmin-bundle": "^4.4",
         "knplabs/doctrine-behaviors": "^2.6",
+        "lexik/jwt-authentication-bundle": "^2.16",
         "nelmio/cors-bundle": "^2.2",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpmd/phpmd": "^2.13",
