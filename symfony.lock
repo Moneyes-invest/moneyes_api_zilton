@@ -78,6 +78,15 @@
             "ref": "b131e6cbfe1b898a508987851963fff485986285"
         }
     },
+    "gesdinet/jwt-refresh-token-bundle": {
+        "version": "1.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "13fb2b58ec6204211815eb6f4c69e4918e5af617"
+        }
+    },
     "knplabs/doctrine-behaviors": {
         "version": "2.6.2"
     },
