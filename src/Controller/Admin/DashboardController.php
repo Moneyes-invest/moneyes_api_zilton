@@ -62,10 +62,10 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Show Accounts', 'fas fa-eye', Account::class),
         ]);
 
-	    // CRUD Token
-	    yield MenuItem::subMenu('Tokens', 'fas fa-key')->setSubItems([
-		    MenuItem::linkToCrud('Show Tokens', 'fas fa-eye', RefreshToken::class),
-	    ]);
+        // CRUD Token
+        yield MenuItem::subMenu('Tokens', 'fas fa-key')->setSubItems([
+            MenuItem::linkToCrud('Show Tokens', 'fas fa-eye', RefreshToken::class),
+        ]);
 
         // Section pour gérer tous les objets liés à la gestion des investissements
         yield MenuItem::section('Invests');

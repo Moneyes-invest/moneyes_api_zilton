@@ -8,7 +8,7 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
-                property: username
+                property: email
         # jwt:
         #     lexik_jwt:
         #         class: App\Entity\User
@@ -18,16 +18,16 @@ security:
             pattern: ^/api/login
             stateless: true
             json_login:
-                check_path: /api/login # or, if you have defined a route for your login path, the route name you used
+                check_path: api_login_check
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            jwt: ~
+            entry_point: jwt
+            refresh_jwt:
+                check_path: api_refresh_token
         api:
             pattern: ^/api
             stateless: true
-            entry_point: jwt
-            jwt: ~
-            refresh_jwt:
-                check_path: api_refresh_token
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -45,7 +45,8 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/api$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
-        - { path: ^/api/(login|token/refresh), roles: PUBLIC_ACCESS }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: PUBLIC_ACCESS }
         - { path: ^/,       roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/profile, roles: ROLE_USER }
