@@ -14,7 +14,6 @@ security:
         #         class: App\Entity\User
     firewalls:
         login:
-            provider: app_user_provider
             pattern: ^/api/login
             stateless: true
             json_login:
@@ -25,9 +24,12 @@ security:
             entry_point: jwt
             refresh_jwt:
                 check_path: api_refresh_token
+                provider: app_user_provider
         api:
             pattern: ^/api
             stateless: true
+            provider: app_user_provider
+            jwt: ~
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
