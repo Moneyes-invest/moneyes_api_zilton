@@ -36,6 +36,7 @@ class Account
     private ?string $publicKey = null;
 
     #[ORM\ManyToOne(inversedBy: 'account')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $idUser = null;
 
     public function getId(): ?Uuid

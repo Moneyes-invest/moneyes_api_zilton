@@ -12,6 +12,8 @@ declare(strict_types = 1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -20,12 +22,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ApiResource(
-    normalizationContext: ['groups' => ['read:collection']],
+	operations: [
+		new GetCollection(normalizationContext: ['groups'=> ['get:users']]),
+		new Get(normalizationContext: ['groups' => ['get:user', 'get:users', 'get:transaction']]),
+
+	],
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -36,9 +43,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Uuid $id;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['get:users'])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['get:users'])]
     private array $roles = [];
 
     /** @var string The hashed password */
@@ -46,18 +55,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['get:users'])]
     private string $username;
 
     #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Transaction::class)]
+    #[Groups(['get:user'])]
     private Collection $transactions;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['get:users'])]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['get:users'])]
     private string $name;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['get:users'])]
     private ?string $lastname = null;
 
     #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Account::class)]
