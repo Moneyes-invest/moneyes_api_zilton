@@ -12,9 +12,14 @@ declare(strict_types = 1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
+use App\State\UserPasswordHasher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -24,15 +29,22 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ApiResource(
 	operations: [
-		new GetCollection(normalizationContext: ['groups'=> ['get:users']]),
-		new Get(normalizationContext: ['groups' => ['get:user', 'get:users', 'get:transaction']]),
-
-	],
+         		new GetCollection(),
+         		new Post(processor: UserPasswordHasher::class),
+         		new Get(),
+         		new Put(processor: UserPasswordHasher::class),
+         		new Patch(processor: UserPasswordHasher::class),
+         		new Delete(),
+         	],
+	normalizationContext: ['groups' => ['user:read']],
+	denormalizationContext: ['groups' => ['user:create', 'user:update']],
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -40,42 +52,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[Groups(['get:users'])]
     private Uuid $id;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['get:users'])]
+    #[Groups(['user:read', 'user:create', 'user:update'])]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(['get:users'])]
+    #[Groups(['get:users', 'post:user'])]
     private array $roles = [];
 
     /** @var string The hashed password */
     #[ORM\Column]
     private string $password;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['get:users'])]
-    private string $username;
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['get:users', 'post:user'])]
+    private ?string $username = null;
 
     #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Transaction::class)]
     #[Groups(['get:user'])]
     private Collection $transactions;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['get:users'])]
+    #[Groups(['get:users', 'post:user'])]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get:users'])]
+    #[Groups(['user:create'])]
     private string $name;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['get:users'])]
-    private ?string $lastname = null;
+    #[ORM\Column(length: 255)]
+    #[Groups(['user:create'])]
+    private string $lastname;
 
     #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Account::class)]
     private Collection $account;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank(groups: ['user:create'])]
+    #[Groups(['user:create', 'user:update'])]
+    private ?string $plainPassword = null;
 
     public function __construct()
     {
@@ -154,8 +172,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        $this->plainPassword = null;
     }
 
     public function getUsername(): ?string
@@ -244,5 +261,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public static function createFromPayload($username, array $payload)
     {
         // TODO: Implement createFromPayload() method.
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
     }
 }
