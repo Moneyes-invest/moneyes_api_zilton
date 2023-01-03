@@ -11,6 +11,7 @@ declare(strict_types = 1);
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TransactionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,13 +20,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
+#[ApiResource()]
 class Transaction
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    #[Groups('get:transaction')]
+    #[Groups(['get:transaction', 'get:transactions'])]
     private Uuid $id;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -33,34 +35,34 @@ class Transaction
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column]
-    #[Groups('get:transaction')]
+    #[Groups(['get:transaction'])]
     private ?float $value = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups('get:transaction')]
+    #[Groups(['get:transaction'])]
     private ?Exchange $idExchange = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups('get:transaction')]
+    #[Groups(['get:transaction'])]
     private ?User $idUser = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups('get:transaction')]
+    #[Groups(['get:transaction'])]
     private ?string $type = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups('get:transaction')]
+    #[Groups(['get:transaction'])]
     private ?Currency $idCurrency = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups('get:transaction')]
+    #[Groups(['get:transaction'])]
     private string $orderDirection = '';
 
     #[ORM\Column]
-    #[Groups('get:transaction')]
+    #[Groups(['get:transaction'])]
     private int $amount;
 
     public function getId(): ?Uuid

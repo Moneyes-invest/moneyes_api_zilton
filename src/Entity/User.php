@@ -36,10 +36,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: '`user`')]
 #[ApiResource(
 	operations: [
-         		new GetCollection(),
+         		new GetCollection(normalizationContext: ['groups' => ['get:users']]),
          		new Post(processor: UserPasswordHasher::class),
-         		new Get(),
-         		new Put(processor: UserPasswordHasher::class),
+         		new Get(normalizationContext: ['groups' => ['get:users', 'get:user', 'get:transactions']]),
+				new Put(processor: UserPasswordHasher::class),
          		new Patch(processor: UserPasswordHasher::class),
          		new Delete(),
          	],
@@ -56,11 +56,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Uuid $id;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Assert\NotBlank(groups: ['user:create'])]
     #[Groups(['user:read', 'user:create', 'user:update'])]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(['get:users', 'post:user'])]
+    #[Assert\NotBlank(groups: ['user:create'])]
+    #[Groups(['user:create', 'user:update'])]
     private array $roles = [];
 
     /** @var string The hashed password */
@@ -68,23 +70,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['get:users', 'post:user'])]
+    #[Groups(['get:users','user:create', 'user:update'])]
     private ?string $username = null;
 
     #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Transaction::class)]
-    #[Groups(['get:user'])]
+    #[Groups(['get:user', 'get:transactions'])]
     private Collection $transactions;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['get:users', 'post:user'])]
+    #[Groups(['get:user', 'user:create', 'user:update'])]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['user:create'])]
+    #[Assert\NotBlank(groups: ['user:create'])]
+    #[Groups(['get:users', 'user:create', 'user:update'])]
     private string $name;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['user:create'])]
+    #[Assert\NotBlank(groups: ['user:create'])]
+    #[Groups([ 'get:users', 'user:create', 'user:update'])]
     private string $lastname;
 
     #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Account::class)]
