@@ -13,15 +13,12 @@ namespace App\Entity;
 
 use App\Repository\AccountRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: AccountRepository::class)]
 class Account
 {
-    use TimestampableTrait;
-
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -39,6 +36,7 @@ class Account
     private ?string $publicKey = null;
 
     #[ORM\ManyToOne(inversedBy: 'account')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $idUser = null;
 
     public function getId(): ?Uuid

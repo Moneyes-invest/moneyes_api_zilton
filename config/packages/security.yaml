@@ -9,7 +9,27 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        # jwt:
+        #     lexik_jwt:
+        #         class: App\Entity\User
     firewalls:
+        login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: api_login_check
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            jwt: ~
+            entry_point: jwt
+            refresh_jwt:
+                check_path: api_refresh_token
+                provider: app_user_provider
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: app_user_provider
+            jwt: ~
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -26,7 +46,11 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/api$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login/refresh, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: PUBLIC_ACCESS }
+        - { path: ^/,       roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

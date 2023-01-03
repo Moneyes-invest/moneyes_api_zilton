@@ -11,49 +11,58 @@ declare(strict_types = 1);
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TransactionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Knp\DoctrineBehaviors\Model\Timestampable\TimestampableTrait;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
+#[ApiResource()]
 class Transaction
 {
-    use TimestampableTrait;
-
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[Groups(['get:transaction', 'get:transactions'])]
     private Uuid $id;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups('get:transaction')]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column]
+    #[Groups(['get:transaction'])]
     private ?float $value = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get:transaction'])]
     private ?Exchange $idExchange = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get:transaction'])]
     private ?User $idUser = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['get:transaction'])]
     private ?string $type = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get:transaction'])]
     private ?Currency $idCurrency = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['get:transaction'])]
     private string $orderDirection = '';
 
     #[ORM\Column]
+    #[Groups(['get:transaction'])]
     private int $amount;
 
     public function getId(): ?Uuid
@@ -114,7 +123,14 @@ class Transaction
         return $this->type;
     }
 
-    public function setType(string $type): self
+	/**
+	 * Specify transaction type (Spot, Futures, Margin, etc.) Type is different between exchanges and currency.
+	 *
+	 * @param string $type (default = "SPOT" for 0.0.1-pre-alpha)
+	 *
+	 * @return $this
+	 */
+    public function setType(string $type = "SPOT"): self
     {
         $this->type = $type;
 
@@ -138,7 +154,14 @@ class Transaction
         return $this->orderDirection;
     }
 
-    public function setOrderDirection(string $orderDirection): self
+	/**
+	 * Can be "BUY", "SELL" or "TRANSFERT"
+	 *
+	 * @param string $orderDirection
+	 *
+	 * @return $this
+	 */
+    public function setOrderDirection(string $orderDirection = "BUY"): self
     {
         $this->orderDirection = $orderDirection;
 

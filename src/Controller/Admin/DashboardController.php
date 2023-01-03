@@ -14,6 +14,7 @@ namespace App\Controller\Admin;
 use App\Entity\Account;
 use App\Entity\Currency;
 use App\Entity\Exchange;
+use App\Entity\RefreshToken;
 use App\Entity\Transaction;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -59,6 +60,11 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Accounts', 'fas fa-address-book')->setSubItems([
             MenuItem::linkToCrud('Create Account', 'fas fa-plus', Account::class)->setAction(Crud::PAGE_NEW),
             MenuItem::linkToCrud('Show Accounts', 'fas fa-eye', Account::class),
+        ]);
+
+        // CRUD Token
+        yield MenuItem::subMenu('Tokens', 'fas fa-key')->setSubItems([
+            MenuItem::linkToCrud('Show Tokens', 'fas fa-eye', RefreshToken::class),
         ]);
 
         // Section pour gérer tous les objets liés à la gestion des investissements
