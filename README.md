@@ -6,6 +6,7 @@
 ``make connect``
 ## Créer les migrations
 ```bash
+``make connect``
 php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 ```
