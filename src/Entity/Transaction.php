@@ -60,7 +60,7 @@ class Transaction {
 
 	#[ORM\ManyToOne]
 	#[ORM\JoinColumn( nullable: false )]
-	#[Groups( [ 'get:transaction', 'create:transaction' ] )]
+	#[Groups( [ 'get:transaction', 'create:transaction', 'get:exchanges' ] )]
 	private ?Exchange $idExchange = null;
 
 	#[ORM\ManyToOne( inversedBy: 'transactions' )]
