@@ -106,7 +106,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->transactions = new ArrayCollection();
         $this->account      = new ArrayCollection();
-        $this->holdings = new ArrayCollection();
+        $this->holdings     = new ArrayCollection();
     }
 
     public function __toString(): string

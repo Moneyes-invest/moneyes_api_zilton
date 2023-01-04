@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Controller\Admin;
 
 use App\Entity\Holding;
@@ -20,11 +29,11 @@ class HoldingCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-	        AssociationField::new('idUser'),
-	        AssociationField::new('idCurrency'),
-	        AssociationField::new('idExchange'),
-	        NumberField::new('quantity'),
-	        MoneyField::new('averagePurchasePrice')->setCurrency('EUR'),
+            AssociationField::new('idUser'),
+            AssociationField::new('idCurrency'),
+            AssociationField::new('idExchange'),
+            NumberField::new('quantity'),
+            MoneyField::new('averagePurchasePrice')->setCurrency('EUR'),
         ];
     }
 }
