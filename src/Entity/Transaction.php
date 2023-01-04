@@ -49,7 +49,7 @@ class Transaction {
 	private Uuid $id;
 
 	#[ORM\Column( type: Types::DATETIME_MUTABLE )]
-	#[Groups( 'get:transaction', 'create:transaction')]
+	#[Groups( ['get:transaction', 'create:transaction'])]
 	#[Assert\NotBlank( groups: [ 'create:transaction' ] )]
 	private ?\DateTimeInterface $date = null;
 
@@ -71,7 +71,7 @@ class Transaction {
 
 	#[ORM\Column( length: 255 )]
 	#[Groups( [ 'get:transaction' ] )]
-	private ?string $type = null;
+	private ?string $type = "SPOT";
 
 	#[ORM\ManyToOne]
 	#[ORM\JoinColumn( nullable: false )]
