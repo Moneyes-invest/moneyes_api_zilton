@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TransactionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
@@ -26,7 +27,7 @@ class Transaction
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     #[Groups(['get:transaction', 'get:transactions'])]
     private Uuid $id;
 
@@ -123,14 +124,14 @@ class Transaction
         return $this->type;
     }
 
-	/**
-	 * Specify transaction type (Spot, Futures, Margin, etc.) Type is different between exchanges and currency.
-	 *
-	 * @param string $type (default = "SPOT" for 0.0.1-pre-alpha)
-	 *
-	 * @return $this
-	 */
-    public function setType(string $type = "SPOT"): self
+    /**
+     * Specify transaction type (Spot, Futures, Margin, etc.) Type is different between exchanges and currency.
+     *
+     * @param string $type (default = "SPOT" for 0.0.1-pre-alpha)
+     *
+     * @return $this
+     */
+    public function setType(string $type = 'SPOT'): self
     {
         $this->type = $type;
 
@@ -154,14 +155,12 @@ class Transaction
         return $this->orderDirection;
     }
 
-	/**
-	 * Can be "BUY", "SELL" or "TRANSFERT"
-	 *
-	 * @param string $orderDirection
-	 *
-	 * @return $this
-	 */
-    public function setOrderDirection(string $orderDirection = "BUY"): self
+    /**
+     * Can be "BUY", "SELL" or "TRANSFERT".
+     *
+     * @return $this
+     */
+    public function setOrderDirection(string $orderDirection = 'BUY'): self
     {
         $this->orderDirection = $orderDirection;
 

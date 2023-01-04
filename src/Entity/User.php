@@ -24,6 +24,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -31,34 +32,33 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ApiResource(
-	operations: [
-         		new GetCollection(normalizationContext: ['groups' => ['get:users']]),
-         		new Post(processor: UserPasswordHasher::class),
-         		new Get(normalizationContext: ['groups' => ['get:users', 'get:user', 'get:transactions']]),
-				new Put(processor: UserPasswordHasher::class),
-         		new Patch(processor: UserPasswordHasher::class),
-         		new Delete(),
-         	],
-	normalizationContext: ['groups' => ['user:read']],
-	denormalizationContext: ['groups' => ['user:create', 'user:update']],
+    operations: [
+                 new GetCollection(normalizationContext: ['groups' => ['get:users']]),
+                 new Post(processor: UserPasswordHasher::class),
+                 new Get(normalizationContext: ['groups' => ['get:users', 'get:user', 'get:transactions']]),
+                new Put(processor: UserPasswordHasher::class),
+                 new Patch(processor: UserPasswordHasher::class),
+                 new Delete(),
+             ],
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:create', 'user:update']],
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     #[Groups(['get:users'])]
     private Uuid $id;
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank(groups: ['user:create'])]
     #[Groups(['user:read', 'user:create', 'user:update'])]
-    private ?string $email = null;
+    private string $email;
 
     #[ORM\Column]
     #[Assert\NotBlank(groups: ['user:create'])]
@@ -70,8 +70,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['get:users','user:create', 'user:update'])]
-    private ?string $username = null;
+    #[Groups(['get:users', 'user:create', 'user:update'])]
+    private string $username;
 
     #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Transaction::class)]
     #[Groups(['get:user', 'get:transactions'])]
@@ -79,7 +79,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Groups(['get:user', 'user:create', 'user:update'])]
-    private ?\DateTimeInterface $birthdate = null;
+    private \DateTimeInterface $birthdate;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(groups: ['user:create'])]
@@ -88,7 +88,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups([ 'get:users', 'user:create', 'user:update'])]
+    #[Groups(['get:users', 'user:create', 'user:update'])]
     private string $lastname;
 
     #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Account::class)]
@@ -110,12 +110,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->name;
     }
 
-    public function getId(): ?Uuid
+    public function getId(): Uuid
     {
         return $this->id;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -179,7 +179,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->plainPassword = null;
     }
 
-    public function getUsername(): ?string
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -191,12 +191,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getBirthdate(): ?\DateTimeInterface
+    public function getBirthdate(): \DateTimeInterface
     {
         return $this->birthdate;
     }
 
-    public function setBirthdate(?\DateTimeInterface $birthdate): self
+    public function setBirthdate(\DateTimeInterface $birthdate): self
     {
         $this->birthdate = $birthdate;
 
@@ -230,7 +230,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -242,12 +242,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getLastname(): ?string
+    public function getLastname(): string
     {
         return $this->lastname;
     }
 
-    public function setLastname(?string $lastname): self
+    public function setLastname(string $lastname): self
     {
         $this->lastname = $lastname;
 
@@ -262,7 +262,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->account;
     }
 
-    public static function createFromPayload($username, array $payload)
+    public static function createFromPayload(string $username, array $payload): void
     {
         // TODO: Implement createFromPayload() method.
     }
@@ -272,7 +272,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->plainPassword;
     }
 
-    public function setPlainPassword(?string $plainPassword): self
+    public function setPlainPassword(string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
 

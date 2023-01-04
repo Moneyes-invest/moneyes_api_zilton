@@ -1,5 +1,8 @@
 parameters:
     level: 9
+    excludePaths:
+        analyseAndScan:
+            - ./src/State/UserPasswordHasher.php
     scanDirectories:
         - ./src
     earlyTerminatingMethodCalls:

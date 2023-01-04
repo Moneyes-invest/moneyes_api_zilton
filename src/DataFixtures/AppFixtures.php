@@ -35,8 +35,8 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-		##### USERS #####
-        # Create customer
+        // #### USERS #####
+        // Create customer
         $userCustomer = new User();
         $userCustomer->setEmail($this->faker->email())
                       ->setUsername($this->faker->userName())
@@ -46,7 +46,7 @@ class AppFixtures extends Fixture
                       ->setPassword('$2y$13$Avfr0GAnTYFWtBdm7lOi3eiZK0.frdZ4hjV2aBAu7gfdg2QFLy.EK');
         $manager->persist($userCustomer);
 
-        # Create admin account
+        // Create admin account
         $userAdmin = new User();
         $userAdmin->setEmail('admin@moneyes.fr')
                    ->setUsername('moneyes')
@@ -56,44 +56,43 @@ class AppFixtures extends Fixture
                    ->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
         $manager->persist($userAdmin);
 
+        // ##### Currencies #####
+        // Create Bitcoin EUR
+        $btcEur = new Currency();
+        $btcEur->setName('Bitcoin EUR')->setCodeIso('BTCEUR');
+        $manager->persist($btcEur);
 
-		###### Currencies #####
-	    # Create Bitcoin EUR
-	    $btcEur = new Currency();
-		$btcEur->setName("Bitcoin EUR")->setCodeIso("BTCEUR");
-		$manager->persist($btcEur);
+        // Create Ethereum EUR
+        $ethEur = new Currency();
+        $ethEur->setName('Ethereum EUR')->setCodeIso('ETHEUR');
+        $manager->persist($ethEur);
 
-		#Create Ethereum EUR
-	    $ethEur = new Currency();
-		$ethEur->setName("Ethereum EUR")->setCodeIso("ETHEUR");
-		$manager->persist($ethEur);
+        // #### Exchanges #####
+        // Create Binance Exchange
+        $binanceExchange = new Exchange();
+        $binanceExchange->setLabel('Binance');
+        $manager->persist($binanceExchange);
 
-		##### Exchanges #####
-	    # Create Binance Exchange
-	    $binanceExchange = new Exchange();
-		$binanceExchange->setLabel("Binance");
-		$manager->persist($binanceExchange);
+        // #### Transactions #####
+        // Create Transactions For userCustomer
+        $transactionUserCustomer = new Transaction();
+        $transactionUserCustomer->setAmount(12)
+                                ->setDate($this->faker->dateTime())
+                                ->setIdUser($userCustomer)
+                                ->setType()
+                                ->setValue(12000)
+                                ->setIdCurrency($btcEur)
+                                ->setIdExchange($binanceExchange)
+                                ->setOrderDirection();
+        $manager->persist($transactionUserCustomer);
 
-		##### Transactions #####
-	    # Create Transactions For userCustomer
-	    $transactionUserCustomer = new Transaction();
-		$transactionUserCustomer->setAmount(12)
-		                        ->setDate($this->faker->dateTime())
-		                        ->setIdUser($userCustomer)
-		                        ->setType()
-		                        ->setValue(12000)
-		                        ->setIdCurrency($btcEur)
-		                        ->setIdExchange($binanceExchange)
-		                        ->setOrderDirection();
-		$manager->persist($transactionUserCustomer);
-
-		##### Accounts ######
-	    $accountUserCustomer = new Account();
-		$accountUserCustomer->setIdUser($userCustomer)
-		                    ->setIdExchange($binanceExchange)
-		                    ->setPrivateKey($this->faker->md5())
-		                    ->setPublicKey($this->faker->md5());
-		$manager->persist($accountUserCustomer);
+        // #### Accounts ######
+        $accountUserCustomer = new Account();
+        $accountUserCustomer->setIdUser($userCustomer)
+                            ->setIdExchange($binanceExchange)
+                            ->setPrivateKey($this->faker->md5())
+                            ->setPublicKey($this->faker->md5());
+        $manager->persist($accountUserCustomer);
 
         $manager->flush();
     }
