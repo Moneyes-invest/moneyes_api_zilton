@@ -36,13 +36,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: '`user`')]
 #[ApiResource(
     operations: [
-                 new GetCollection(normalizationContext: ['groups' => ['get:users']]),
-                 new Post(processor: UserPasswordHasher::class),
-                 new Get(normalizationContext: ['groups' => ['get:users', 'get:user', 'get:transactions']]),
-                new Put(processor: UserPasswordHasher::class),
-                 new Patch(processor: UserPasswordHasher::class),
-                 new Delete(),
-             ],
+        new GetCollection(normalizationContext: ['groups' => ['get:users']]),
+        new Get(normalizationContext: ['groups' => ['get:users', 'get:user', 'get:transactions']]),
+        new Post(processor: UserPasswordHasher::class),
+        new Put(processor: UserPasswordHasher::class),
+        new Patch(processor: UserPasswordHasher::class),
+        new Delete(),
+    ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create', 'user:update']],
 )]

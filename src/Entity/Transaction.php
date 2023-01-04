@@ -12,6 +12,12 @@ declare(strict_types = 1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\TransactionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,9 +25,20 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
-#[ApiResource()]
+#[ApiResource(
+    operations: [
+        new GetCollection(normalizationContext: ['groups' => ['get:transactions']]),
+        new Get(normalizationContext: ['groups' => ['get:transactions', 'get:transaction']]),
+        new Post(),
+        new Put(),
+        new Patch(),
+        new Delete(),
+    ],
+    denormalizationContext: ['groups' => ['create:transaction', 'update:transaction']],
+)]
 class Transaction
 {
     #[ORM\Id]
@@ -32,38 +49,44 @@ class Transaction
     private Uuid $id;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups('get:transaction')]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column]
-    #[Groups(['get:transaction'])]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
     private ?float $value = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get:transaction'])]
+    #[Groups(['get:transaction', 'create:transaction', 'get:exchanges'])]
     private ?Exchange $idExchange = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get:transaction'])]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
     private ?User $idUser = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction'])]
-    private ?string $type = null;
+    private ?string $type = 'SPOT';
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get:transaction'])]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
     private ?Currency $idCurrency = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get:transaction'])]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
     private string $orderDirection = '';
 
     #[ORM\Column]
-    #[Groups(['get:transaction'])]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
     private int $amount;
 
     public function getId(): ?Uuid
