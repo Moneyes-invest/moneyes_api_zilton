@@ -26,18 +26,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 #[ORM\Entity(repositoryClass: AccountRepository::class)]
 #[ApiResource(
-	operations: [
-		new GetCollection(normalizationContext: ['groups' => ['get:accounts']]),
-		new Get(normalizationContext: ['groups' => ['get:accounts', 'get:account']]),
-		new Post(),
-		new Put(),
-		new Patch(),
-		new Delete(),
-	],
-	denormalizationContext: ['groups' => ['create:account', 'update:account']],
+    operations: [
+        new GetCollection(normalizationContext: ['groups' => ['get:accounts']]),
+        new Get(normalizationContext: ['groups' => ['get:accounts', 'get:account']]),
+        new Post(),
+        new Put(),
+        new Patch(),
+        new Delete(),
+    ],
+    denormalizationContext: ['groups' => ['create:account', 'update:account']],
 )]
 class Account
 {

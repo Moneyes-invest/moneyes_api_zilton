@@ -28,15 +28,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ExchangeRepository::class)]
 #[ApiResource(
-	operations: [
-		new GetCollection(normalizationContext: ['groups' => ['get:exchanges']]),
-		new Get(normalizationContext: ['groups' => ['get:exchanges', 'get:exchange']]),
-		new Post(),
-		new Put(),
-		new Patch(),
-		new Delete(),
-	],
-	denormalizationContext: ['groups' => ['create:exchange', 'update:exchange']],
+    operations: [
+        new GetCollection(normalizationContext: ['groups' => ['get:exchanges']]),
+        new Get(normalizationContext: ['groups' => ['get:exchanges', 'get:exchange']]),
+        new Post(),
+        new Put(),
+        new Patch(),
+        new Delete(),
+    ],
+    denormalizationContext: ['groups' => ['create:exchange', 'update:exchange']],
 )]
 class Exchange
 {
