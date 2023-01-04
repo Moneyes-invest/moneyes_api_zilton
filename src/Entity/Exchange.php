@@ -27,7 +27,7 @@ class Exchange
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    #[Groups( [ 'get:exchanges' ] )]
+    #[Groups(['get:exchanges'])]
     private Uuid $id;
 
     #[ORM\Column(length: 255)]

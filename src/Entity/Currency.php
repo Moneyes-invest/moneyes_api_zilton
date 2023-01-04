@@ -27,7 +27,7 @@ class Currency
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    #[Groups( [ 'get:currencies' ] )]
+    #[Groups(['get:currencies'])]
     private Uuid $id;
 
     #[ORM\Column(length: 255)]

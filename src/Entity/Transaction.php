@@ -1,6 +1,6 @@
 <?php
 
-declare( strict_types=1 );
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -27,161 +27,178 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
-#[ORM\Entity( repositoryClass: TransactionRepository::class )]
+#[ORM\Entity(repositoryClass: TransactionRepository::class)]
 #[ApiResource(
-	operations: [
-		new GetCollection( normalizationContext: [ 'groups' => [ 'get:transactions' ] ] ),
-		new Get( normalizationContext: [ 'groups' => [ 'get:transactions', 'get:transaction' ] ] ),
-		new Post(),
-		new Put(),
-		new Patch(),
-		new Delete(),
-	],
-	denormalizationContext: ['groups' => ['create:transaction', 'update:transaction']],
+    operations: [
+        new GetCollection(normalizationContext: ['groups' => ['get:transactions']]),
+        new Get(normalizationContext: ['groups' => ['get:transactions', 'get:transaction']]),
+        new Post(),
+        new Put(),
+        new Patch(),
+        new Delete(),
+    ],
+    denormalizationContext: ['groups' => ['create:transaction', 'update:transaction']],
 )]
-class Transaction {
-	#[ORM\Id]
-	#[ORM\Column( type: UuidType::NAME, unique: true )]
-	#[ORM\GeneratedValue( strategy: 'CUSTOM' )]
-	#[ORM\CustomIdGenerator( class: UuidGenerator::class )]
-	#[Groups( [ 'get:transaction', 'get:transactions' ] )]
-	private Uuid $id;
+class Transaction
+{
+    #[ORM\Id]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    #[Groups(['get:transaction', 'get:transactions'])]
+    private Uuid $id;
 
-	#[ORM\Column( type: Types::DATETIME_MUTABLE )]
-	#[Groups( ['get:transaction', 'create:transaction'])]
-	#[Assert\NotBlank( groups: [ 'create:transaction' ] )]
-	private ?\DateTimeInterface $date = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
+    private ?\DateTimeInterface $date = null;
 
-	#[ORM\Column]
-	#[Groups( [ 'get:transaction', 'create:transaction' ] )]
-	#[Assert\NotBlank( groups: [ 'create:transaction' ] )]
-	private ?float $value = null;
+    #[ORM\Column]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
+    private ?float $value = null;
 
-	#[ORM\ManyToOne]
-	#[ORM\JoinColumn( nullable: false )]
-	#[Groups( [ 'get:transaction', 'create:transaction', 'get:exchanges' ] )]
-	private ?Exchange $idExchange = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get:transaction', 'create:transaction', 'get:exchanges'])]
+    private ?Exchange $idExchange = null;
 
-	#[ORM\ManyToOne( inversedBy: 'transactions' )]
-	#[ORM\JoinColumn( nullable: false )]
-	#[Groups( [ 'get:transaction', 'create:transaction' ] )]
-	#[Assert\NotBlank( groups: [ 'create:transaction' ] )]
-	private ?User $idUser = null;
+    #[ORM\ManyToOne(inversedBy: 'transactions')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
+    private ?User $idUser = null;
 
-	#[ORM\Column( length: 255 )]
-	#[Groups( [ 'get:transaction' ] )]
-	private ?string $type = "SPOT";
+    #[ORM\Column(length: 255)]
+    #[Groups(['get:transaction'])]
+    private ?string $type = 'SPOT';
 
-	#[ORM\ManyToOne]
-	#[ORM\JoinColumn( nullable: false )]
-	#[Groups( [ 'get:transaction', 'create:transaction' ] )]
-	#[Assert\NotBlank( groups: [ 'create:transaction' ] )]
-	private ?Currency $idCurrency = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
+    private ?Currency $idCurrency = null;
 
-	#[ORM\Column( length: 255 )]
-	#[Groups( [ 'get:transaction', 'create:transaction' ] )]
-	#[Assert\NotBlank( groups: [ 'create:transaction' ] )]
-	private string $orderDirection = '';
+    #[ORM\Column(length: 255)]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
+    private string $orderDirection = '';
 
-	#[ORM\Column]
-	#[Groups( [ 'get:transaction', 'create:transaction' ] )]
-	#[Assert\NotBlank( groups: [ 'create:transaction' ] )]
-	private int $amount;
+    #[ORM\Column]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
+    private int $amount;
 
-	public function getId(): ?Uuid {
-		return $this->id;
-	}
+    public function getId(): ?Uuid
+    {
+        return $this->id;
+    }
 
-	public function getDate(): ?\DateTimeInterface {
-		return $this->date;
-	}
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
 
-	public function setDate( \DateTimeInterface $date ): self {
-		$this->date = $date;
+    public function setDate(\DateTimeInterface $date): self
+    {
+        $this->date = $date;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getValue(): ?float {
-		return $this->value;
-	}
+    public function getValue(): ?float
+    {
+        return $this->value;
+    }
 
-	public function setValue( float $value ): self {
-		$this->value = $value;
+    public function setValue(float $value): self
+    {
+        $this->value = $value;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getIdExchange(): ?Exchange {
-		return $this->idExchange;
-	}
+    public function getIdExchange(): ?Exchange
+    {
+        return $this->idExchange;
+    }
 
-	public function setIdExchange( ?Exchange $idExchange ): self {
-		$this->idExchange = $idExchange;
+    public function setIdExchange(?Exchange $idExchange): self
+    {
+        $this->idExchange = $idExchange;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getIdUser(): ?User {
-		return $this->idUser;
-	}
+    public function getIdUser(): ?User
+    {
+        return $this->idUser;
+    }
 
-	public function setIdUser( ?User $idUser ): self {
-		$this->idUser = $idUser;
+    public function setIdUser(?User $idUser): self
+    {
+        $this->idUser = $idUser;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getType(): ?string {
-		return $this->type;
-	}
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
 
-	/**
-	 * Specify transaction type (Spot, Futures, Margin, etc.) Type is different between exchanges and currency.
-	 *
-	 * @param string $type (default = "SPOT" for 0.0.1-pre-alpha)
-	 *
-	 * @return $this
-	 */
-	public function setType( string $type = 'SPOT' ): self {
-		$this->type = $type;
+    /**
+     * Specify transaction type (Spot, Futures, Margin, etc.) Type is different between exchanges and currency.
+     *
+     * @param string $type (default = "SPOT" for 0.0.1-pre-alpha)
+     *
+     * @return $this
+     */
+    public function setType(string $type = 'SPOT'): self
+    {
+        $this->type = $type;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getIdCurrency(): ?Currency {
-		return $this->idCurrency;
-	}
+    public function getIdCurrency(): ?Currency
+    {
+        return $this->idCurrency;
+    }
 
-	public function setIdCurrency( ?Currency $idCurrency ): self {
-		$this->idCurrency = $idCurrency;
+    public function setIdCurrency(?Currency $idCurrency): self
+    {
+        $this->idCurrency = $idCurrency;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getOrderDirection(): string {
-		return $this->orderDirection;
-	}
+    public function getOrderDirection(): string
+    {
+        return $this->orderDirection;
+    }
 
-	/**
-	 * Can be "BUY", "SELL" or "TRANSFERT".
-	 *
-	 * @return $this
-	 */
-	public function setOrderDirection( string $orderDirection = 'BUY' ): self {
-		$this->orderDirection = $orderDirection;
+    /**
+     * Can be "BUY", "SELL" or "TRANSFERT".
+     *
+     * @return $this
+     */
+    public function setOrderDirection(string $orderDirection = 'BUY'): self
+    {
+        $this->orderDirection = $orderDirection;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getAmount(): ?int {
-		return $this->amount;
-	}
+    public function getAmount(): ?int
+    {
+        return $this->amount;
+    }
 
-	public function setAmount( int $amount ): self {
-		$this->amount = $amount;
+    public function setAmount(int $amount): self
+    {
+        $this->amount = $amount;
 
-		return $this;
-	}
+        return $this;
+    }
 }
