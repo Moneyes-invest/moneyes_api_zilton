@@ -17,3 +17,6 @@ php bin/console doctrine:migrations:migrate
 ## Un fois le dev terminé faire
 ``make pre-commit``
 pour tester et formater le code
+## Rebase lors d'un conflit
+``git pull --rebase origin nomdelabranch``
+``git push --force-with-lease``
