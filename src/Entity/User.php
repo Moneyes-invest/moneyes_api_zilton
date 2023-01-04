@@ -99,10 +99,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:create', 'user:update'])]
     private ?string $plainPassword = null;
 
+    #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Holding::class, orphanRemoval: true)]
+    private Collection $holdings;
+
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
         $this->account      = new ArrayCollection();
+        $this->holdings     = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -275,6 +279,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Holding>
+     */
+    public function getHoldings(): Collection
+    {
+        return $this->holdings;
+    }
+
+    public function addHolding(Holding $holding): self
+    {
+        if (!$this->holdings->contains($holding)) {
+            $this->holdings->add($holding);
+            $holding->setIdUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHolding(Holding $holding): self
+    {
+        if ($this->holdings->removeElement($holding)) {
+            // set the owning side to null (unless already changed)
+            if ($holding->getIdUser() === $this) {
+                $holding->setIdUser(null);
+            }
+        }
 
         return $this;
     }

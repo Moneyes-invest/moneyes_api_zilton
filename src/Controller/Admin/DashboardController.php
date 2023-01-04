@@ -14,6 +14,7 @@ namespace App\Controller\Admin;
 use App\Entity\Account;
 use App\Entity\Currency;
 use App\Entity\Exchange;
+use App\Entity\Holding;
 use App\Entity\RefreshToken;
 use App\Entity\Transaction;
 use App\Entity\User;
@@ -69,6 +70,12 @@ class DashboardController extends AbstractDashboardController
 
         // Section pour gérer tous les objets liés à la gestion des investissements
         yield MenuItem::section('Invests');
+
+        // CRUS Holdings
+        yield MenuItem::subMenu('Holdings', 'fas fa-hand-holding-dollar')->setSubItems([
+            MenuItem::linkToCrud('Create Holding', 'fas fa-plus', Holding::class)->setAction(Crud::PAGE_NEW),
+            MenuItem::linkToCrud('Show Holdings', 'fas fa-eye', Holding::class),
+        ]);
 
         // CRUD Currencies
         yield MenuItem::subMenu('Currencies', 'fas fa-coins')->setSubItems([
