@@ -1,13 +1,6 @@
 <?php
 
-declare(strict_types = 1);
-
-/*
- * This file is part of the Moneyes API project.
- * (c) Moneyes
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
@@ -17,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230104095031 extends AbstractMigration
+final class Version20230104161829 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -27,6 +20,7 @@ final class Version20230104095031 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('CREATE SEQUENCE refresh_token_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE TABLE account (id UUID NOT NULL, id_exchange_id UUID NOT NULL, id_user_id UUID NOT NULL, private_key VARCHAR(255) DEFAULT NULL, public_key VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_7D3656A470BD1C57 ON account (id_exchange_id)');
         $this->addSql('CREATE INDEX IDX_7D3656A479F37AE5 ON account (id_user_id)');
@@ -37,6 +31,8 @@ final class Version20230104095031 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN currency.id IS \'(DC2Type:uuid)\'');
         $this->addSql('CREATE TABLE exchange (id UUID NOT NULL, label VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('COMMENT ON COLUMN exchange.id IS \'(DC2Type:uuid)\'');
+        $this->addSql('CREATE TABLE refresh_token (id INT NOT NULL, refresh_token VARCHAR(128) NOT NULL, username VARCHAR(255) NOT NULL, valid TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_C74F2195C74F2195 ON refresh_token (refresh_token)');
         $this->addSql('CREATE TABLE transaction (id UUID NOT NULL, id_exchange_id UUID NOT NULL, id_user_id UUID NOT NULL, id_currency_id UUID NOT NULL, date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, value DOUBLE PRECISION NOT NULL, type VARCHAR(255) NOT NULL, order_direction VARCHAR(255) NOT NULL, amount INT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_723705D170BD1C57 ON transaction (id_exchange_id)');
         $this->addSql('CREATE INDEX IDX_723705D179F37AE5 ON transaction (id_user_id)');
@@ -59,6 +55,7 @@ final class Version20230104095031 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SCHEMA public');
+        $this->addSql('DROP SEQUENCE refresh_token_id_seq CASCADE');
         $this->addSql('ALTER TABLE account DROP CONSTRAINT FK_7D3656A470BD1C57');
         $this->addSql('ALTER TABLE account DROP CONSTRAINT FK_7D3656A479F37AE5');
         $this->addSql('ALTER TABLE transaction DROP CONSTRAINT FK_723705D170BD1C57');
@@ -67,6 +64,7 @@ final class Version20230104095031 extends AbstractMigration
         $this->addSql('DROP TABLE account');
         $this->addSql('DROP TABLE currency');
         $this->addSql('DROP TABLE exchange');
+        $this->addSql('DROP TABLE refresh_token');
         $this->addSql('DROP TABLE transaction');
         $this->addSql('DROP TABLE "user"');
     }
