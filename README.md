@@ -10,6 +10,10 @@
 php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 ```
+## Remplir la base de données avec les données de dév
+```
+make load-fixtures-dev
+```
 ## URL
 ``http://localhost:8080/``
 ## EasyAdmin

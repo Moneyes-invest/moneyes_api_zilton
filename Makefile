@@ -220,3 +220,13 @@ update-php-cs-fixer:
 update-tools: update-php-cs-fixer update-phpstan update-phpcpd update-phpmd
 
 pre-commit: apply-phpmd apply-phpcpd apply-php-cs apply-phpstan
+
+
+##
+## Data
+## -----------------
+##
+load-fixtures-dev:
+	$(SYMFONY) doctrine:fixtures:load --group=dev --no-interaction
+load-fixtures-prod:
+	$(SYMFONY) doctrine:fixtures:load --group=prod --no-interaction
