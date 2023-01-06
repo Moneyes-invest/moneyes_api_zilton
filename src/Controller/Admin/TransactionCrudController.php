@@ -35,8 +35,9 @@ class TransactionCrudController extends AbstractCrudController
             AssociationField::new('currency'),
             AssociationField::new('exchange'),
             TextField::new('orderDirection'),
-            MoneyField::new('value')->setCurrency('EUR'),
-            NumberField::new('amount'),
+            MoneyField::new('price')->setCurrency('EUR'),
+            NumberField::new('quantity'),
+            NumberField::new('fees'),
             DateTimeField::new('date'),
             TextField::new('type'),
         ];

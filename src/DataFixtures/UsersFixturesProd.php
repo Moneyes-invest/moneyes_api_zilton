@@ -36,7 +36,7 @@ class UsersFixturesProd extends Fixture implements FixtureGroupInterface
                   ->setUsername('moneyes')
                   ->setName('Moneyes')
                   ->setLastname('Invest')
-                  ->setPassword('$2y$13$nlu.BeAzwBJr0KKcuVcz5.vrFaayO.dsXtvadcgcPfOrXYJ9tJyS6')
+                  ->setPassword('$2y$13$H7B6mdoMiTqE7WslnduAXu8aYJ6DJOdIHKobEZBGZoFoUPiQbILjK')
                   ->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
         $manager->persist($userAdmin);
 
