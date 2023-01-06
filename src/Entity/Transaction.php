@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\TransactionRepository;
+use App\State\TransactionStateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
@@ -32,7 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['get:transactions']]),
         new Get(normalizationContext: ['groups' => ['get:transactions', 'get:transaction']]),
-        new Post(),
+        new Post(processor: TransactionStateProcessor::class),
         new Put(),
         new Patch(),
         new Delete(),
@@ -52,11 +53,6 @@ class Transaction
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private ?\DateTimeInterface $date = null;
-
-    #[ORM\Column]
-    #[Groups(['get:transaction', 'create:transaction'])]
-    #[Assert\NotBlank(groups: ['create:transaction'])]
-    private ?float $value = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -84,10 +80,18 @@ class Transaction
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private string $orderDirection = '';
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $fees = "0";
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private int $amount;
+    private ?string $price = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
+    private ?string $quantity = null;
 
     public function getId(): ?Uuid
     {
@@ -106,17 +110,6 @@ class Transaction
         return $this;
     }
 
-    public function getValue(): ?float
-    {
-        return $this->value;
-    }
-
-    public function setValue(float $value): self
-    {
-        $this->value = $value;
-
-        return $this;
-    }
 
     public function getIdExchange(): ?Exchange
     {
@@ -190,14 +183,39 @@ class Transaction
         return $this;
     }
 
-    public function getAmount(): ?int
+
+    public function getFees(): ?string
     {
-        return $this->amount;
+        return $this->fees;
     }
 
-    public function setAmount(int $amount): self
+    public function setFees(string $fees): self
     {
-        $this->amount = $amount;
+        $this->fees = $fees;
+
+        return $this;
+    }
+
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
+
+    public function setPrice(string $price): self
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getQuantity(): ?string
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(string $quantity): self
+    {
+        $this->quantity = $quantity;
 
         return $this;
     }
