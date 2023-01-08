@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace App\DataFixtures;
 
 use App\Entity\Account;
+use App\Entity\Currency;
 use App\Entity\Exchange;
 use App\Entity\Transaction;
 use App\Entity\User;
@@ -58,9 +59,10 @@ class AppFixtures extends Fixture implements FixtureGroupInterface, DependentFix
         $manager->persist($userCustomer);
 
         // Get BTCEUR Reference
+        /** @phpstan-var Currency $btcEur */
         $btcEur = $this->getReference('btceurReference');
-
         // Get Binance Exchange Reference
+        /** @phpstan-var Exchange $binanceExchange */
         $binanceExchange = $this->getReference('binanceExchange');
 
         // #### Transactions #####
