@@ -61,13 +61,13 @@ class Transaction
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:transaction', 'create:transaction', 'get:exchanges'])]
-    private ?Exchange $idExchange = null;
+    private ?Exchange $exchange = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private ?User $idUser = null;
+    private ?User $user = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction'])]
@@ -77,7 +77,7 @@ class Transaction
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private ?Currency $idCurrency = null;
+    private ?Currency $currency = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction', 'create:transaction'])]
@@ -118,26 +118,26 @@ class Transaction
         return $this;
     }
 
-    public function getIdExchange(): ?Exchange
+    public function getExchange(): ?Exchange
     {
-        return $this->idExchange;
+        return $this->exchange;
     }
 
-    public function setIdExchange(?Exchange $idExchange): self
+    public function setExchange(?Exchange $exchange): self
     {
-        $this->idExchange = $idExchange;
+        $this->exchange = $exchange;
 
         return $this;
     }
 
-    public function getIdUser(): ?User
+    public function getUser(): ?User
     {
-        return $this->idUser;
+        return $this->user;
     }
 
-    public function setIdUser(?User $idUser): self
+    public function setUser(?User $user): self
     {
-        $this->idUser = $idUser;
+        $this->user = $user;
 
         return $this;
     }
@@ -161,14 +161,14 @@ class Transaction
         return $this;
     }
 
-    public function getIdCurrency(): ?Currency
+    public function getCurrency(): ?Currency
     {
-        return $this->idCurrency;
+        return $this->currency;
     }
 
-    public function setIdCurrency(?Currency $idCurrency): self
+    public function setCurrency(?Currency $currency): self
     {
-        $this->idCurrency = $idCurrency;
+        $this->currency = $currency;
 
         return $this;
     }
