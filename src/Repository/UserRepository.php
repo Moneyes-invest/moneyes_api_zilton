@@ -11,6 +11,8 @@ declare( strict_types=1 );
 
 namespace App\Repository;
 
+use App\Entity\Account;
+use App\Entity\Exchange;
 use App\Entity\Holding;
 use App\Entity\Transaction;
 use App\Entity\User;
@@ -64,30 +66,25 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 	}
 
 
+	public function getExchanges(User $user): array {
+		$entityManager = $this->getEntityManager();
+
+		$accounts = $entityManager->getRepository(Account::class)->findBy(["idUser" => $user]);
+
+		$nameExchanges = array();
+
+		foreach ( $accounts as $account ) {
+			$exchange = $entityManager->getRepository(Exchange::class)->find($account->getIdExchange());
+			$exchangeFormatted = array(
+				"labelExchange" => $exchange->getLabel(),
+				"idExchange" => $exchange->getId()
+			);
+			$nameExchanges[] = $exchangeFormatted;
+		}
+
+		return array_unique($nameExchanges, SORT_REGULAR);
+
+	}
 
 
-//    /**
-//     * @return User[] Returns an array of User objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

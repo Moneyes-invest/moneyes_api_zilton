@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
+use App\State\DashboardProvider;
 use App\State\UserPasswordHasher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -39,6 +40,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['get:users']]),
         new Get(normalizationContext: ['groups' => ['get:users', 'get:user', 'get:transactions']]),
+		new Get(
+			uriTemplate: '/users/{id}/dashboard',
+			provider: DashboardProvider::class,
+		),
         new Post(processor: UserPasswordHasher::class),
         new Put(processor: UserPasswordHasher::class),
         new Patch(processor: UserPasswordHasher::class),

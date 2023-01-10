@@ -54,7 +54,7 @@ class TransactionRepository extends ServiceEntityRepository
         }
     }
 
-	public function getTransactions(User $user, ?Exchange $exchange, ?Currency $currency, ?\DateTime $latestUpdate){
+	public function getTransactions(User $user, ?Exchange $exchange=null, ?Currency $currency=null, ?\DateTime $latestUpdate=null){
 		$entityManager = $this->getEntityManager();
 		# 1. if !Exchange and !Currency
 		if (!$exchange && !$currency){
