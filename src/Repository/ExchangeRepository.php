@@ -12,6 +12,8 @@ declare(strict_types = 1);
 namespace App\Repository;
 
 use App\Entity\Exchange;
+use App\Entity\Holding;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -48,28 +50,27 @@ class ExchangeRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Exchange[] Returns an array of Exchange objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('e.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+	public function getExchangePerf(Exchange $exchange, User $user): object|array|null {
+		$entityManager = $this->getEntityManager(); # Init Entity Manager
+		# Get Exchange's Holdings
+		$exchangeHoldings = $entityManager->getRepository(Holding::class)->findBy(["idUser" => $user, "idExchange" => $exchange]);
 
-//    public function findOneBySomeField($value): ?Exchange
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+		$value = 0;
+		$percentage = 0;
+		$gainLoss = 0;
+
+		foreach ($exchangeHoldings as $exchangeHolding){
+			$value += $exchangeHolding->getQuantity();
+		}
+
+		$exchangePerf = array(
+			$exchange->getLabel() => array(
+				"value" => $exchangeHoldings
+			)
+		);
+
+
+		return $exchangeHoldings;
+	}
+
 }
