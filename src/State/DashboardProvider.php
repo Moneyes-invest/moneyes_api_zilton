@@ -44,7 +44,7 @@ class DashboardProvider implements ProviderInterface
 	    # B. Total
 
 	    //tests
-	    $account = $this->manager->getRepository(Account::class)->find("1ed8f41c-dd0e-6570-9318-113216685832");
+	    $account = $this->manager->getRepository(Account::class)->find("1ed91248-b6f0-6b32-8390-c57cccfca4d5");
 
 		$history = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($account);
 
@@ -53,7 +53,7 @@ class DashboardProvider implements ProviderInterface
 
 	    $test = $this->manager->getRepository(BinanceAccount::class)->test($account);
 
-		return $test;
+		return $history;
 
     }
 }
