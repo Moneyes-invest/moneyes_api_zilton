@@ -5,13 +5,19 @@
 ## Se connecter au php
 ``make connect``
 ## Créer les migrations
-``make connect``
+```bash
+make connect
+```
 ```bash
 php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 ```
-## Remplir la base de données avec les données de dév
+## Créer les clefs privés JWT
+```bash
+php bin/console lexik:jwt:generate-keypair
 ```
+## Remplir la base de données avec les données de dév
+```bash
 make load-fixtures-dev
 ```
 ## URL

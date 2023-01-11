@@ -9,146 +9,181 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use function Symfony\Component\Translation\t;
 
 /**
  * @extends ServiceEntityRepository<BinanceAccount>
  *
- * @method BinanceAccount|null find( $id, $lockMode = null, $lockVersion = null )
- * @method BinanceAccount|null findOneBy( array $criteria, array $orderBy = null )
+ * @method BinanceAccount|null find($id, $lockMode = null, $lockVersion = null)
+ * @method BinanceAccount|null findOneBy(array $criteria, array $orderBy = null)
  * @method BinanceAccount[]    findAll()
- * @method BinanceAccount[]    findBy( array $criteria, array $orderBy = null, $limit = null, $offset = null )
+ * @method BinanceAccount[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BinanceAccountRepository extends ServiceEntityRepository {
+class BinanceAccountRepository extends ServiceEntityRepository
+{
 
-	private \Binance\API $binanceApiConnexion;
+    private \Binance\API $binanceApiConnexion;
 
-	public function __construct( ManagerRegistry $registry ) {
-		parent::__construct( $registry, BinanceAccount::class );
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, BinanceAccount::class);
 
-		$userAdmin    = $registry->getRepository( User::class )->findBy( [ "username" => "moneyes" ] );
-		$accountAdmin = $registry->getRepository( Account::class )->findOneBy( [ "idUser" => $userAdmin ] );
+        $userAdmin = $registry->getRepository(User::class)->findBy(["username" => "moneyes"]);
+        $accountAdmin = $registry->getRepository(Account::class)->findOneBy(["idUser" => $userAdmin]);
 
-		$this->binanceApiConnexion = new \Binance\API( $accountAdmin->getPublicKey(), $accountAdmin->getPrivateKey() );
-	}
+        $this->binanceApiConnexion = new \Binance\API($accountAdmin->getPublicKey(), $accountAdmin->getPrivateKey());
+    }
 
-	public function save( BinanceAccount $entity, bool $flush = false ): void {
-		$this->getEntityManager()->persist( $entity );
+    public function save(BinanceAccount $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
 
-		if ( $flush ) {
-			$this->getEntityManager()->flush();
-		}
-	}
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 
-	public function remove( BinanceAccount $entity, bool $flush = false ): void {
-		$this->getEntityManager()->remove( $entity );
+    public function remove(BinanceAccount $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
 
-		if ( $flush ) {
-			$this->getEntityManager()->flush();
-		}
-	}
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 
-	/**
-	 * Init \Binance\API Object with Customer credentials
-	 *
-	 * @param Account $account
-	 *
-	 * @return \Binance\API
-	 */
-	private function customerBinanceApi( Account $account ): \Binance\API {
-		return new \Binance\API( $account->getPublicKey(), $account->getPrivateKey() );
-	}
+    /**
+     * Init \Binance\API Object with Customer credentials
+     *
+     * @param Account $account
+     *
+     * @return \Binance\API
+     */
+    private function customerBinanceApi(Account $account): \Binance\API
+    {
+        return new \Binance\API($account->getPublicKey(), $account->getPrivateKey());
+    }
 
-	/**
-	 * @throws Exception
-	 */
-	public function fetchTransactions( Account $account, ?\DateTime $previousUpdate = null ): array {
+    public function getSymbolsList(Account $account)
+    {
+        $customerBinanceApi = $this->customerBinanceApi($account); # Connect to Binance API with customer's credentials
 
-		$customerBinanceApi = $this->customerBinanceApi( $account ); # Connect to Binance API with customer's credentials
+        $symbolsListRaw = $customerBinanceApi->exchangeInfo()["symbols"];
 
-		$customerTransactions = $customerBinanceApi->history( "BTCUSDT" );
+        $symbolsList = array();
 
-		$customerAssets = $this->getAssets($account);
 
-		$tradesList = array();
+        foreach ($symbolsListRaw as $symbol) {
+            $symbolsList[] = $symbol["symbol"];
+        }
 
-		foreach ( $customerAssets as $customerAsset ) {
-			$tradeList = $customerBinanceApi->history($customerAsset + "USDT");
-			$tradesList[] = $tradeList;
-		}
 
-		return array(
-			array(
-				$tradesList
-			)
-		);
-	}
+        return $symbolsList;
+    }
 
-	/**
-	 * Get Price of an asset by Binance API
-	 *
-	 * @throws Exception
-	 */
-	public function getPrice( Account $account, string $isoCode ): array {
-		$customerBinanceApi = $this->customerBinanceApi( $account ); # Connect to Binance API with customer's credentials
+    /**
+     * @throws Exception
+     */
+    public function fetchTransactions(Account $account, ?\DateTime $previousUpdate = null): array
+    {
 
-		return array(
-			array(
-				$isoCode => $customerBinanceApi->price( $isoCode ),
-			)
-		);
-	}
+        $customerBinanceApi = $this->customerBinanceApi($account); # Connect to Binance API with customer's credentials
+        $customerAssets = $this->getAssets($account);
+        $symbolsList = $this->getSymbolsList($account);
 
-	/**
-	 * Get Price of assets by Binance API
-	 *
-	 * @throws Exception
-	 */
-	public function getPrices( Account $account ): array {
-		$customerBinanceApi = $this->customerBinanceApi( $account ); # Connect to Binance API with customer's credentials
+        $tradesList = array();
+        $i = 0;
 
-		return array(
-			array(
-				$customerBinanceApi->prices(),
-			)
-		);
-	}
+        $symbolsListFiltered = array();
 
-	/**
-	 * Get Price of assets by Binance API
-	 *
-	 * @throws Exception
-	 */
-	public function test(): array {
-		return array(
-			array(
-				$this->binanceApiConnexion->history("BTCUSDT"),
-			)
-		);
-	}
+        foreach ($customerAssets as $customerAsset) {
+            $tempArray = array_filter($symbolsList, static function ($asset) use ($customerAsset) {
+                if (strpos($asset, $customerAsset)) {
+                    return $asset;
+                }
+            });
+            $symbolsListFiltered = array_merge($symbolsListFiltered, $tempArray);
+        }
 
-	/**
-	 * Get all assets about a given customer SPOT account
-	 *
-	 * @param Account $account
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getAssets( Account $account ): array {
-		$customerBinanceApi = $this->customerBinanceApi( $account ); # Connect to Binance API with customer's credentials
+        foreach ($symbolsListFiltered as $symbolFiltered) {
+            if ($i == 20)
+                break;
+            $tradesList[] = $customerBinanceApi->history($symbolFiltered);
+            $i++;
+        }
 
-		$balances = $customerBinanceApi->balances();
+        return array(
+            $tradesList
+        );
+    }
 
-		$assets = array();
+    /**
+     * Get Price of an asset by Binance API
+     *
+     * @throws Exception
+     */
+    public function getPrice(Account $account, string $isoCode): array
+    {
+        $customerBinanceApi = $this->customerBinanceApi($account); # Connect to Binance API with customer's credentials
 
-		foreach ( $balances as $asset => $balance ) {
-			$floatBalanceAssetBalance = (float) $balance["available"];
-			if ( $floatBalanceAssetBalance > 0 ) {
-				$assets[] = $asset;
-			}
-		}
+        return array(
+            array(
+                $isoCode => $customerBinanceApi->price($isoCode),
+            )
+        );
+    }
 
-		return $assets ;
-	}
+    /**
+     * Get Price of assets by Binance API
+     *
+     * @throws Exception
+     */
+    public function getPrices(Account $account): array
+    {
+        $customerBinanceApi = $this->customerBinanceApi($account); # Connect to Binance API with customer's credentials
+
+        return array(
+            array(
+                $customerBinanceApi->prices(),
+            )
+        );
+    }
+
+    /**
+     * Get Price of assets by Binance API
+     *
+     * @throws Exception
+     */
+    public function test(Account $account): array
+    {
+        $symbolsList = $this->getSymbolsList($account);
+        return $symbolsList;
+    }
+
+    /**
+     * Get all assets about a given customer SPOT account
+     *
+     * @param Account $account
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getAssets(Account $account): array
+    {
+        $customerBinanceApi = $this->customerBinanceApi($account); # Connect to Binance API with customer's credentials
+
+        $balances = $customerBinanceApi->balances();
+
+        $assets = array();
+
+        foreach ($balances as $asset => $balance) {
+            $floatBalanceAssetBalance = (float)$balance["available"];
+            if ($floatBalanceAssetBalance > 0) {
+                $assets[] = $asset;
+            }
+        }
+
+        return $assets;
+    }
 
 }
