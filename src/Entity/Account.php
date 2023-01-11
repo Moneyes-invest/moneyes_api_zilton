@@ -51,7 +51,7 @@ class Account
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:account', 'create:account'])]
     #[Assert\NotBlank(groups: ['create:account'])]
-    private ?Exchange $idExchange = null;
+    private ?Exchange $exchange = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]
@@ -67,33 +67,33 @@ class Account
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:account', 'create:account'])]
     #[Assert\NotBlank(groups: ['create:account'])]
-    private ?User $idUser = null;
+    private ?User $user = null;
 
     public function getId(): ?Uuid
     {
         return $this->id;
     }
 
-    public function getIdUser(): ?User
+    public function getUser(): ?User
     {
-        return $this->idUser;
+        return $this->user;
     }
 
-    public function setIdUser(User $idUser): self
+    public function setUser(User $user): self
     {
-        $this->idUser = $idUser;
+        $this->user = $user;
 
         return $this;
     }
 
-    public function getIdExchange(): ?Exchange
+    public function getExchange(): ?Exchange
     {
-        return $this->idExchange;
+        return $this->exchange;
     }
 
-    public function setIdExchange(?Exchange $idExchange): self
+    public function setExchange(?Exchange $exchange): self
     {
-        $this->idExchange = $idExchange;
+        $this->exchange = $exchange;
 
         return $this;
     }
