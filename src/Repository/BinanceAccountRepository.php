@@ -94,11 +94,13 @@ class BinanceAccountRepository extends ServiceEntityRepository
         $tradesList = array();
         $i = 0;
 
+        $customerAssets = array($customerAssets[0]);
+
         $symbolsListFiltered = array();
 
         foreach ($customerAssets as $customerAsset) {
             $tempArray = array_filter($symbolsList, static function ($asset) use ($customerAsset) {
-                if (strpos($asset, $customerAsset)) {
+                if (str_starts_with($asset, $customerAsset)) {
                     return $asset;
                 }
             });
@@ -106,14 +108,14 @@ class BinanceAccountRepository extends ServiceEntityRepository
         }
 
         foreach ($symbolsListFiltered as $symbolFiltered) {
-            if ($i == 20)
-                break;
+            //if ($i == 20)
+                //break;
             $tradesList[] = $customerBinanceApi->history($symbolFiltered);
             $i++;
         }
 
         return array(
-            $tradesList
+            $symbolsListFiltered
         );
     }
 

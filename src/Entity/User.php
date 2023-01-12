@@ -42,7 +42,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(normalizationContext: ['groups' => ['get:users', 'get:user', 'get:transactions']]),
 		new Get(
 			uriTemplate: '/users/{id}/dashboard',
-			provider: DashboardProvider::class,
+            provider: DashboardProvider::class,
 		),
         new Post(processor: UserPasswordHasher::class),
         new Put(processor: UserPasswordHasher::class),
@@ -51,6 +51,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create', 'user:update']],
+    mercure: true,
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
