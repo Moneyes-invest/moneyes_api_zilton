@@ -92,9 +92,6 @@ class BinanceAccountRepository extends ServiceEntityRepository
         $symbolsList = $this->getSymbolsList($account);
 
         $tradesList = array();
-        $i = 0;
-
-        $customerAssets = array($customerAssets[0]);
 
         $symbolsListFiltered = array();
 
@@ -108,15 +105,10 @@ class BinanceAccountRepository extends ServiceEntityRepository
         }
 
         foreach ($symbolsListFiltered as $symbolFiltered) {
-            //if ($i == 20)
-                //break;
-            $tradesList[] = $customerBinanceApi->history($symbolFiltered);
-            $i++;
+            $tradesList = array_merge($tradesList, $customerBinanceApi->history($symbolFiltered));
         }
 
-        return array(
-            $symbolsListFiltered
-        );
+        return $tradesList;
     }
 
     /**
@@ -158,8 +150,7 @@ class BinanceAccountRepository extends ServiceEntityRepository
      */
     public function test(Account $account): array
     {
-        $symbolsList = $this->getSymbolsList($account);
-        return $symbolsList;
+        return true;
     }
 
     /**

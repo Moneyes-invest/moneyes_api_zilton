@@ -93,6 +93,9 @@ class Transaction
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private ?string $quantity = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $exchangeId = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -216,6 +219,18 @@ class Transaction
     public function setQuantity(string $quantity): self
     {
         $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    public function getExchangeId(): ?int
+    {
+        return $this->exchangeId;
+    }
+
+    public function setExchangeId(?int $exchangeId): self
+    {
+        $this->exchangeId = $exchangeId;
 
         return $this;
     }

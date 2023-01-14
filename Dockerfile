@@ -31,6 +31,8 @@ RUN set -eux; \
 		libzip-dev \
 		zlib-dev \
 		postgresql-dev \
+        libxml2-dev \
+        rabbitmq-c rabbitmq-c-dev \
 	; \
 	docker-php-ext-configure zip; \
 	docker-php-ext-install -j$(nproc) \
@@ -40,11 +42,13 @@ RUN set -eux; \
 	; \
 	pecl install \
 		apcu \
+        amqp \
 	; \
 	pecl clear-cache; \
 	docker-php-ext-enable \
 		apcu \
 		opcache \
+        amqp \
 	; \
 	\
 	runDeps="$( \
@@ -56,6 +60,7 @@ RUN set -eux; \
 	apk add --no-cache --virtual .app-phpexts-rundeps $runDeps; \
 	\
 	apk del .build-deps
+
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY --link docker/php/conf.d/app.ini $PHP_INI_DIR/conf.d/
