@@ -80,18 +80,18 @@ class Transaction
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private string $orderDirection = '';
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $fees = "0";
+    #[ORM\Column]
+    private float $fees = 0;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[ORM\Column]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private ?string $price = null;
+    private float $price;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[ORM\Column]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private ?string $quantity = null;
+    private float $quantity;
 
     #[ORM\Column(nullable: true)]
     private ?int $exchangeId = null;
@@ -187,36 +187,36 @@ class Transaction
     }
 
 
-    public function getFees(): ?string
+    public function getFees(): float
     {
         return $this->fees;
     }
 
-    public function setFees(string $fees): self
+    public function setFees(float $fees): self
     {
         $this->fees = $fees;
 
         return $this;
     }
 
-    public function getPrice(): ?string
+    public function getPrice(): float
     {
         return $this->price;
     }
 
-    public function setPrice(string $price): self
+    public function setPrice(float $price): self
     {
         $this->price = $price;
 
         return $this;
     }
 
-    public function getQuantity(): ?string
+    public function getQuantity(): float
     {
         return $this->quantity;
     }
 
-    public function setQuantity(string $quantity): self
+    public function setQuantity(float $quantity): self
     {
         $this->quantity = $quantity;
 

@@ -33,7 +33,7 @@ class HoldingCrudController extends AbstractCrudController
             AssociationField::new('currency'),
             AssociationField::new('exchange'),
             NumberField::new('quantity'),
-            MoneyField::new('averagePurchasePrice')->setCurrency('EUR'),
+            NumberField::new('averagePurchasePrice'),
         ];
     }
 }

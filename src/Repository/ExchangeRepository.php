@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -11,6 +11,8 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Entity\Account;
+use App\Entity\BinanceAccount;
 use App\Entity\Exchange;
 use App\Entity\Holding;
 use App\Entity\User;
@@ -49,28 +51,5 @@ class ExchangeRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
-	public function getExchangePerf(Exchange $exchange, User $user): object|array|null {
-		$entityManager = $this->getEntityManager(); # Init Entity Manager
-		# Get Exchange's Holdings
-		$exchangeHoldings = $entityManager->getRepository(Holding::class)->findBy(["idUser" => $user, "idExchange" => $exchange]);
-
-		$value = 0;
-		$percentage = 0;
-		$gainLoss = 0;
-
-		foreach ($exchangeHoldings as $exchangeHolding){
-			$value += $exchangeHolding->getQuantity();
-		}
-
-		$exchangePerf = array(
-			$exchange->getLabel() => array(
-				"value" => $exchangeHoldings
-			)
-		);
-
-
-		return $exchangeHoldings;
-	}
 
 }

@@ -35,11 +35,12 @@ class Holding
     #[ORM\JoinColumn(nullable: false)]
     private ?Exchange $exchange = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $quantity = null;
+    #[ORM\Column]
+    private float $quantity;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $averagePurchasePrice = null;
+    #[ORM\Column]
+    private float $averagePurchasePrice;
+
 
     public function getId(): ?int
     {
@@ -82,26 +83,38 @@ class Holding
         return $this;
     }
 
-    public function getQuantity(): ?string
+    public function getQuantity(): float
     {
         return $this->quantity;
     }
 
-    public function setQuantity(string $quantity): self
+    public function setQuantity(float $quantity): self
     {
         $this->quantity = $quantity;
 
         return $this;
     }
 
-    public function getAveragePurchasePrice(): ?string
+    public function getAveragePurchasePrice(): float
     {
         return $this->averagePurchasePrice;
     }
 
-    public function setAveragePurchasePrice(string $averagePurchasePrice): self
+    public function setAveragePurchasePrice(float $averagePurchasePrice): self
     {
         $this->averagePurchasePrice = $averagePurchasePrice;
+
+        return $this;
+    }
+
+    public function getFloat(): ?float
+    {
+        return $this->float;
+    }
+
+    public function setFloat(float $float): self
+    {
+        $this->float = $float;
 
         return $this;
     }

@@ -61,8 +61,8 @@ class HoldingRepository extends ServiceEntityRepository
 	 */
 	public function upsertHolding( Transaction $transaction ): void {
 		$entityManager = $this->getEntityManager();
-		$idCurrency    = strval( $transaction->getIdCurrency()->getId() );
-		$idExchange    = strval( $transaction->getIdExchange()->getId() );
+		$idCurrency    = $transaction->getIdCurrency()->getId() ;
+		$idExchange    = $transaction->getIdExchange()->getId() ;
 		$idUser    = strval( $transaction->getIdUser()->getId() );
 		$holdingToFind = $entityManager->getRepository( Holding::class )
 		                               ->findOneBy( [
@@ -70,14 +70,15 @@ class HoldingRepository extends ServiceEntityRepository
 			                               "idExchange" => $idExchange,
 			                               "idUser" => $idUser,
 		                               ] );
-		if (!$holdingToFind) {
+
+        if (!$holdingToFind) {
 			# Create one
 			$newHolding = new Holding();
 			$newHolding->setIdCurrency($transaction->getIdCurrency())
 			           ->setIdExchange($transaction->getIdExchange())
 			           ->setIdUser($transaction->getIdUser())
-			           ->setQuantity($transaction->getQuantity())
-			           ->setAveragePurchasePrice($transaction->getPrice());
+			           ->setQuantity(floatval($transaction->getQuantity()))
+			           ->setAveragePurchasePrice(floatval($transaction->getPrice()));
 			$entityManager->persist($newHolding);
 		} # If Holding not exists, create one
 		else {
@@ -87,12 +88,13 @@ class HoldingRepository extends ServiceEntityRepository
 			$transactionPrice = $transaction->getPrice();
 			$totalQuantity = $previousQuantity + $nextQuantity;
 			$nextAveragePurchasePrice = ((($previousQuantity * $previousAveragePurchasePrice)+($nextQuantity * $transactionPrice))/$totalQuantity);
-			$holdingToFind->setQuantity(strval($totalQuantity))
-			              ->setAveragePurchasePrice(strval($nextAveragePurchasePrice));
+            $holdingToFind->setQuantity(floatval($totalQuantity))
+			              ->setAveragePurchasePrice(floatval($nextAveragePurchasePrice));
 			$entityManager->persist($holdingToFind);
 		} # If exists, update it
 
 		$entityManager->flush();
+
 
 	}
 
@@ -105,12 +107,25 @@ class HoldingRepository extends ServiceEntityRepository
 	 * @return void
 	 */
 	public function updateHoldings(User $user): void{
-		# Get all User's Transactions
 		$entityManager = $this->getEntityManager(); # Init Entity Manager
+        # Remove all User Holdings
+        $holdings = $entityManager->getRepository(Holding::class)->findBy(["idUser" => $user]);
+
+        if ($holdings){
+            foreach ($holdings as $holding){
+                $entityManager->remove($holding);
+            }
+            $entityManager->flush();
+        }
+
+		# Get all User's Transactions
 		$transactions = $entityManager->getRepository(Transaction::class)->getTransactions($user); # Get all user's transactions
+
 		foreach ($transactions as $transaction){
 			$this->upsertHolding($transaction);
 		} # For each Transaction, check Holding
 	}
+
+
 
 }

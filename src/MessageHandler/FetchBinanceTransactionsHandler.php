@@ -43,7 +43,7 @@ class FetchBinanceTransactionsHandler
             $currencyId = $this->manager->getRepository(Currency::class)->findOneBy(["codeIso" => $codeIso]);
             if ($currencyId == null) {
                 $newCurrency = new Currency();
-                $newCurrency->setCodeIso($codeIso);
+                $newCurrency->setCodeIso($codeIso)->setName($codeIso);
                 $currencyId = $newCurrency;
                 $this->manager->persist($currencyId);
                 $this->manager->flush();
