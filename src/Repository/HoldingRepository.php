@@ -11,7 +11,11 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Entity\Currency;
+use App\Entity\Exchange;
 use App\Entity\Holding;
+use App\Entity\Transaction;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -48,28 +52,80 @@ class HoldingRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Holding[] Returns an array of Holding objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('h')
-//            ->andWhere('h.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('h.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+	/**
+	 * Auto update Holding for a Transaction or create if not already created
+	 *
+	 * @param Transaction $transaction
+	 *
+	 * @return void
+	 */
+	public function upsertHolding( Transaction $transaction ): void {
+		$entityManager = $this->getEntityManager();
+		$idCurrency    = $transaction->getIdCurrency()->getId() ;
+		$idExchange    = $transaction->getIdExchange()->getId() ;
+		$idUser    = strval( $transaction->getIdUser()->getId() );
+		$holdingToFind = $entityManager->getRepository( Holding::class )
+		                               ->findOneBy( [
+			                               "idCurrency" => $idCurrency,
+			                               "idExchange" => $idExchange,
+			                               "idUser" => $idUser,
+		                               ] );
 
-//    public function findOneBySomeField($value): ?Holding
-//    {
-//        return $this->createQueryBuilder('h')
-//            ->andWhere('h.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        if (!$holdingToFind) {
+			# Create one
+			$newHolding = new Holding();
+			$newHolding->setIdCurrency($transaction->getIdCurrency())
+			           ->setIdExchange($transaction->getIdExchange())
+			           ->setIdUser($transaction->getIdUser())
+			           ->setQuantity(floatval($transaction->getQuantity()))
+			           ->setAveragePurchasePrice(floatval($transaction->getPrice()));
+			$entityManager->persist($newHolding);
+		} # If Holding not exists, create one
+		else {
+			$previousAveragePurchasePrice = $holdingToFind->getAveragePurchasePrice();
+			$previousQuantity = $holdingToFind->getQuantity();
+			$nextQuantity = $transaction->getQuantity();
+			$transactionPrice = $transaction->getPrice();
+			$totalQuantity = $previousQuantity + $nextQuantity;
+			$nextAveragePurchasePrice = ((($previousQuantity * $previousAveragePurchasePrice)+($nextQuantity * $transactionPrice))/$totalQuantity);
+            $holdingToFind->setQuantity(floatval($totalQuantity))
+			              ->setAveragePurchasePrice(floatval($nextAveragePurchasePrice));
+			$entityManager->persist($holdingToFind);
+		} # If exists, update it
+
+		$entityManager->flush();
+
+
+	}
+
+
+	/**
+	 * Auto update all holdings of a given user
+	 *
+	 * @param User $user
+	 *
+	 * @return void
+	 */
+	public function updateHoldings(User $user): void{
+		$entityManager = $this->getEntityManager(); # Init Entity Manager
+        # Remove all User Holdings
+        $holdings = $entityManager->getRepository(Holding::class)->findBy(["idUser" => $user]);
+
+        if ($holdings){
+            foreach ($holdings as $holding){
+                $entityManager->remove($holding);
+            }
+            $entityManager->flush();
+        }
+
+		# Get all User's Transactions
+		$transactions = $entityManager->getRepository(Transaction::class)->getTransactions($user); # Get all user's transactions
+
+		foreach ($transactions as $transaction){
+			$this->upsertHolding($transaction);
+		} # For each Transaction, check Holding
+	}
+
+
+
 }

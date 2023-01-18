@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\TransactionRepository;
+use App\State\TransactionStateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
@@ -32,7 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['get:transactions']]),
         new Get(normalizationContext: ['groups' => ['get:transactions', 'get:transaction']]),
-        new Post(),
+        new Post(processor: TransactionStateProcessor::class),
         new Put(),
         new Patch(),
         new Delete(),
@@ -53,21 +54,16 @@ class Transaction
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private ?\DateTimeInterface $date = null;
 
-    #[ORM\Column]
-    #[Groups(['get:transaction', 'create:transaction'])]
-    #[Assert\NotBlank(groups: ['create:transaction'])]
-    private ?float $value = null;
-
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:transaction', 'create:transaction', 'get:exchanges'])]
-    private ?Exchange $exchange = null;
+    private ?Exchange $idExchange = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private ?User $user = null;
+    private ?User $idUser = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction'])]
@@ -77,7 +73,7 @@ class Transaction
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private ?Currency $currency = null;
+    private ?Currency $idCurrency = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction', 'create:transaction'])]
@@ -85,9 +81,20 @@ class Transaction
     private string $orderDirection = '';
 
     #[ORM\Column]
+    private float $fees = 0;
+
+    #[ORM\Column]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private int $amount;
+    private float $price;
+
+    #[ORM\Column]
+    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
+    private float $quantity;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $exchangeId = null;
 
     public function getId(): ?Uuid
     {
@@ -106,38 +113,27 @@ class Transaction
         return $this;
     }
 
-    public function getValue(): ?float
+
+    public function getIdExchange(): ?Exchange
     {
-        return $this->value;
+        return $this->idExchange;
     }
 
-    public function setValue(float $value): self
+    public function setIdExchange(?Exchange $idExchange): self
     {
-        $this->value = $value;
+        $this->idExchange = $idExchange;
 
         return $this;
     }
 
-    public function getExchange(): ?Exchange
+    public function getIdUser(): ?User
     {
-        return $this->exchange;
+        return $this->idUser;
     }
 
-    public function setExchange(?Exchange $exchange): self
+    public function setIdUser(?User $idUser): self
     {
-        $this->exchange = $exchange;
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
+        $this->idUser = $idUser;
 
         return $this;
     }
@@ -161,14 +157,14 @@ class Transaction
         return $this;
     }
 
-    public function getCurrency(): ?Currency
+    public function getIdCurrency(): ?Currency
     {
-        return $this->currency;
+        return $this->idCurrency;
     }
 
-    public function setCurrency(?Currency $currency): self
+    public function setIdCurrency(?Currency $idCurrency): self
     {
-        $this->currency = $currency;
+        $this->idCurrency = $idCurrency;
 
         return $this;
     }
@@ -190,14 +186,51 @@ class Transaction
         return $this;
     }
 
-    public function getAmount(): ?int
+
+    public function getFees(): float
     {
-        return $this->amount;
+        return $this->fees;
     }
 
-    public function setAmount(int $amount): self
+    public function setFees(float $fees): self
     {
-        $this->amount = $amount;
+        $this->fees = $fees;
+
+        return $this;
+    }
+
+    public function getPrice(): float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(float $price): self
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getQuantity(): float
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(float $quantity): self
+    {
+        $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    public function getExchangeId(): ?int
+    {
+        return $this->exchangeId;
+    }
+
+    public function setExchangeId(?int $exchangeId): self
+    {
+        $this->exchangeId = $exchangeId;
 
         return $this;
     }

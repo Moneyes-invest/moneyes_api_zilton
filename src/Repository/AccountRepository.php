@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace App\Repository;
 
 use App\Entity\Account;
+use App\Entity\Transaction;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -46,6 +47,24 @@ class AccountRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * Delete Transactions from a User Account
+     *
+     * @param Account $account
+     * @return void
+     */
+    public function flushTransactions(Account $account): void
+    {
+        $idUser = $account->getIdUser();
+        $transactions = $this->getEntityManager()->getRepository(Transaction::class)->findBy(["idUser" => $idUser]);
+
+        foreach ($transactions as $transaction) {
+            $this->getEntityManager()->remove($transaction);
+        }
+
+        $this->getEntityManager()->flush();
     }
 
 //    /**

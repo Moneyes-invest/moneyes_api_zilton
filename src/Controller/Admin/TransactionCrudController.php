@@ -31,12 +31,13 @@ class TransactionCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            AssociationField::new('user'),
-            AssociationField::new('currency'),
-            AssociationField::new('exchange'),
+            AssociationField::new('idUser'),
+            AssociationField::new('idCurrency'),
+            AssociationField::new('idExchange'),
             TextField::new('orderDirection'),
-            MoneyField::new('value')->setCurrency('EUR'),
-            NumberField::new('amount'),
+            NumberField::new('price'),
+            NumberField::new('quantity'),
+            NumberField::new('fees'),
             DateTimeField::new('date'),
             TextField::new('type'),
         ];

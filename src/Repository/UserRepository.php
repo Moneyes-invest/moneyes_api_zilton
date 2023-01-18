@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -11,8 +11,13 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Entity\Account;
+use App\Entity\Exchange;
+use App\Entity\Holding;
+use App\Entity\Transaction;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -28,7 +33,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, User::class);
     }
@@ -65,28 +70,45 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->save($user, true);
     }
 
-//    /**
-//     * @return User[] Returns an array of User objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
 
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function getExchanges(User $user): array
+    {
+        $entityManager = $this->getEntityManager();
+
+        $accounts = $entityManager->getRepository(Account::class)->findBy(["idUser" => $user]);
+
+        $nameExchanges = array();
+
+        foreach ($accounts as $account) {
+            $exchange = $entityManager->getRepository(Exchange::class)->find($account->getIdExchange());
+            $exchangeFormatted = array(
+                "labelExchange" => $exchange->getLabel(),
+                "idExchange" => $exchange->getId()
+            );
+            $nameExchanges[] = $exchangeFormatted;
+        }
+
+        return array_unique($nameExchanges, SORT_REGULAR);
+
+    }
+
+    /**
+     * Delete Holdings from a User
+     *
+     * @param User $user
+     * @return void
+     */
+    public function flushHoldings(User $user): void
+    {
+
+        $holdings = $this->getEntityManager()->getRepository(Holding::class)->findBy(["idUser" => $user]);
+
+        foreach ($holdings as $holding) {
+            $this->getEntityManager()->remove($holding);
+        }
+
+        $this->getEntityManager()->flush();
+    }
+
+
 }

@@ -68,20 +68,20 @@ class AppFixtures extends Fixture implements FixtureGroupInterface, DependentFix
         // #### Transactions #####
         // Create Transactions For userCustomer
         $transactionUserCustomer = new Transaction();
-        $transactionUserCustomer->setAmount(12)
+        $transactionUserCustomer->setQuantity(12)
                                 ->setDate($this->faker->dateTime())
-                                ->setUser($userCustomer)
+                                ->setIdUser($userCustomer)
                                 ->setType()
-                                ->setValue(12000)
-                                ->setCurrency($btcEur)
-                                ->setExchange($binanceExchange)
+                                ->setPrice(12000)
+                                ->setIdCurrency($btcEur)
+                                ->setIdExchange($binanceExchange)
                                 ->setOrderDirection();
         $manager->persist($transactionUserCustomer);
 
         // #### Accounts ######
         $accountUserCustomer = new Account();
-        $accountUserCustomer->setUser($userCustomer)
-                            ->setExchange($binanceExchange)
+        $accountUserCustomer->setIdUser($userCustomer)
+                            ->setIdExchange($binanceExchange)
                             ->setPrivateKey($this->faker->md5())
                             ->setPublicKey($this->faker->md5());
         $manager->persist($accountUserCustomer);

@@ -33,8 +33,8 @@ class Currency
     #[ORM\Column(length: 255)]
     private ?string $codeIso = null;
 
-    #[ORM\Column(length: 255)]
-    private string $name;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $name = null;
 
     public function __toString(): string
     {

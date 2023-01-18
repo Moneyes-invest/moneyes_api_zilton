@@ -19,11 +19,14 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
+use App\State\DashboardProvider;
 use App\State\UserPasswordHasher;
+use App\State\UserProviderAllTransactions;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -38,6 +41,14 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['get:users']]),
         new Get(normalizationContext: ['groups' => ['get:users', 'get:user', 'get:transactions']]),
+		new Get(
+			uriTemplate: '/users/{id}/dashboard',
+            provider: DashboardProvider::class,
+		),
+        new Get(
+            uriTemplate: '/users/{id}/transactions/all',
+            provider: UserProviderAllTransactions::class,
+        ),
         new Post(processor: UserPasswordHasher::class),
         new Put(processor: UserPasswordHasher::class),
         new Patch(processor: UserPasswordHasher::class),
@@ -45,6 +56,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create', 'user:update']],
+    mercure: true,
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -73,7 +85,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['get:users', 'user:create', 'user:update'])]
     private string $username;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Transaction::class)]
+    #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Transaction::class)]
     #[Groups(['get:user', 'get:transactions'])]
     private Collection $transactions;
 
@@ -91,7 +103,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['get:users', 'user:create', 'user:update'])]
     private string $lastname;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Account::class)]
+    #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Account::class)]
     private Collection $account;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -99,7 +111,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:create', 'user:update'])]
     private ?string $plainPassword = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Holding::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Holding::class, orphanRemoval: true)]
     private Collection $holdings;
 
     public function __construct()
@@ -219,7 +231,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->transactions->contains($transaction)) {
             $this->transactions->add($transaction);
-            $transaction->setUser($this);
+            $transaction->setIdUser($this);
         }
 
         return $this;
@@ -295,7 +307,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->holdings->contains($holding)) {
             $this->holdings->add($holding);
-            $holding->setUser($this);
+            $holding->setIdUser($this);
         }
 
         return $this;
@@ -305,11 +317,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->holdings->removeElement($holding)) {
             // set the owning side to null (unless already changed)
-            if ($holding->getUser() === $this) {
-                $holding->setUser(null);
+            if ($holding->getIdUser() === $this) {
+                $holding->setIdUser(null);
             }
         }
 
         return $this;
     }
+
+
+
 }

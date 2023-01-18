@@ -29,11 +29,11 @@ class HoldingCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            AssociationField::new('user'),
-            AssociationField::new('currency'),
-            AssociationField::new('exchange'),
+            AssociationField::new('idUser'),
+            AssociationField::new('idCurrency'),
+            AssociationField::new('idExchange'),
             NumberField::new('quantity'),
-            MoneyField::new('averagePurchasePrice')->setCurrency('EUR'),
+            NumberField::new('averagePurchasePrice'),
         ];
     }
 }
