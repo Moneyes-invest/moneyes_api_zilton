@@ -225,3 +225,6 @@ pre-commit: apply-phpmd apply-phpcpd apply-php-cs apply-phpstan
 
 load-fixtures-prod:
 	$(SYMFONY) doctrine:fixtures:load --group=prod --no-interaction
+
+load-fixtures-dev:
+	$(SYMFONY) doctrine:fixtures:load --group=dev --no-interaction
