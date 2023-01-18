@@ -28,7 +28,7 @@ class DashboardProvider implements ProviderInterface
     {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $jsonReturn = [
             'total'     => [
@@ -41,12 +41,10 @@ class DashboardProvider implements ProviderInterface
 
         $user = $this->manager->getRepository(User::class)->find($uriVariables['id']);
         if (!$user instanceof User) {
-            return null;
+            return ["L'utilisateur n'existe pas"];
         }
         // 1. Get Exchanges
-        $exchanges               = $this->manager->getRepository(User::class)->getExchanges($user);
         $accounts                = $this->manager->getRepository(Account::class)->findBy(['user' => $user]);
-        $jsonReturn['exchanges'] = $exchanges;
 
         // 4. Return performances
 
@@ -75,6 +73,6 @@ class DashboardProvider implements ProviderInterface
 
         // $this->manager->getRepository(Holding::class)->updateHoldings($user);
 
-        return [$jsonReturn];
+        return $jsonReturn;
     }
 }

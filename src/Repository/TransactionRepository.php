@@ -16,9 +16,7 @@ use App\Entity\Exchange;
 use App\Entity\Transaction;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\DependencyInjection\Parameter;
 
 /**
  * @extends ServiceEntityRepository<Transaction>
@@ -79,10 +77,10 @@ class TransactionRepository extends ServiceEntityRepository
                                                   'exchange' => $exchange,
                                               ]);
             } else {
-                $queryParameters = new ArrayCollection([
-                    new Parameter('latestUpdate'),
-                    new Parameter('idExchange'),
-                ]);
+                $queryParameters = [
+                    'latestUpdate',
+                    'idExchange',
+                ];
                 $queryAllNewTransactions = $entityManager
                     ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.exchange > :exchange ORDER BY t.date DESC')
                     ->setParameters($queryParameters);
@@ -99,11 +97,11 @@ class TransactionRepository extends ServiceEntityRepository
                                                   'idCurrency' => $currency,
                                               ]);
             } else {
-                $queryParameters = new ArrayCollection([
-                    new Parameter('latestUpdate'),
-                    new Parameter('idExchange'),
-                    new Parameter('idCurrency'),
-                ]);
+                $queryParameters = [
+                    'latestUpdate',
+                    'idExchange',
+                    'idCurrency',
+                ];
                 $queryAllNewTransactions = $entityManager
                     ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.exchange = :exchange AND t.idCurrency = idCurrency ORDER BY t.date DESC')
                     ->setParameters($queryParameters);

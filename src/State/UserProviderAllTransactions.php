@@ -25,7 +25,7 @@ class UserProviderAllTransactions implements ProviderInterface
     {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         // Get Variables
         $idUser       = $uriVariables['id'];
@@ -33,7 +33,7 @@ class UserProviderAllTransactions implements ProviderInterface
         $userAccounts = $this->manager->getRepository(Account::class)->findBy(['user' => $idUser]);
 
         if (empty($user) || empty($userAccounts)) {
-            return null;
+            return ["L'utilisateur n'existe pas"];
         }
 
         // 1. Flush User Holdings
