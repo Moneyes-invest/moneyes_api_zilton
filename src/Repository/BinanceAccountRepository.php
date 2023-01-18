@@ -200,7 +200,7 @@ class BinanceAccountRepository extends ServiceEntityRepository
                     }
                     $totalValue += $floatBalanceAssetBalance * $price;
                 } catch (\Exception $exception) {
-                    throw new \Exception($exception->getMessage());
+                    continue;
                 }
             }
         }
