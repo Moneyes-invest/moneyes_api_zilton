@@ -72,7 +72,7 @@ db: vendor
 	$(SYMFONY) doctrine:database:create
 	$(SYMFONY) doctrine:migrations:migrate --no-interaction --allow-no-migration
 	$(SYMFONY) doctrine:fixtures:load --group=dev --no-interaction
-	$(SYMFONY) lexik:jwt:generate-keypair
+	$(SYMFONY) lexik:jwt:generate-keypair --overwrite
 
 migration: ## Generate a new doctrine migration
 migration: vendor
