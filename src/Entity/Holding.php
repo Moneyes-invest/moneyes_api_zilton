@@ -12,7 +12,6 @@ declare(strict_types = 1);
 namespace App\Entity;
 
 use App\Repository\HoldingRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: HoldingRepository::class)]
@@ -25,15 +24,15 @@ class Holding
 
     #[ORM\ManyToOne(inversedBy: 'holdings')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $idUser = null;
+    private ?User $user = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Currency $idCurrency = null;
+    private ?Currency $currency = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Exchange $idExchange = null;
+    private ?Exchange $exchange = null;
 
     #[ORM\Column]
     private float $quantity;
@@ -41,44 +40,43 @@ class Holding
     #[ORM\Column]
     private float $averagePurchasePrice;
 
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getIdUser(): ?User
+    public function getUser(): ?User
     {
-        return $this->idUser;
+        return $this->user;
     }
 
-    public function setIdUser(?User $idUser): self
+    public function setUser(?User $user): self
     {
-        $this->idUser = $idUser;
+        $this->user = $user;
 
         return $this;
     }
 
-    public function getIdCurrency(): ?Currency
+    public function getCurrency(): ?Currency
     {
-        return $this->idCurrency;
+        return $this->currency;
     }
 
-    public function setIdCurrency(?Currency $idCurrency): self
+    public function setCurrency(?Currency $currency): self
     {
-        $this->idCurrency = $idCurrency;
+        $this->currency = $currency;
 
         return $this;
     }
 
-    public function getIdExchange(): ?Exchange
+    public function getExchange(): ?Exchange
     {
-        return $this->idExchange;
+        return $this->exchange;
     }
 
-    public function setIdExchange(?Exchange $idExchange): self
+    public function setExchange(?Exchange $exchange): self
     {
-        $this->idExchange = $idExchange;
+        $this->exchange = $exchange;
 
         return $this;
     }
@@ -103,18 +101,6 @@ class Holding
     public function setAveragePurchasePrice(float $averagePurchasePrice): self
     {
         $this->averagePurchasePrice = $averagePurchasePrice;
-
-        return $this;
-    }
-
-    public function getFloat(): ?float
-    {
-        return $this->float;
-    }
-
-    public function setFloat(float $float): self
-    {
-        $this->float = $float;
 
         return $this;
     }

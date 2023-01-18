@@ -13,7 +13,6 @@ namespace App\Repository;
 
 use App\Entity\Currency;
 use App\Entity\Exchange;
-use App\Entity\Holding;
 use App\Entity\Transaction;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -54,66 +53,64 @@ class TransactionRepository extends ServiceEntityRepository
         }
     }
 
-	public function getTransactions(User $user, ?Exchange $exchange=null, ?Currency $currency=null, ?\DateTime $latestUpdate=null){
-		$entityManager = $this->getEntityManager();
-		# 1. if !Exchange and !Currency
-		if (!$exchange && !$currency){
-			if (!$latestUpdate){
-				$transactions = $entityManager->getRepository( Transaction::class )
-				                               ->findBy( [
-					                               "idUser" => $user,
-				                               ] );
-			}
-			else{
-				$queryAllNewTransactions = $entityManager
-					->createQuery( 'SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate ORDER BY t.date DESC' )
-					->setParameter('latestUpdate', $latestUpdate);
-				$transactions = $queryAllNewTransactions->getResult();
-			}
-		}
-		# 2. if Exchange and !Currency
-		elseif (!$currency){
-			if (!$latestUpdate){
-				$transactions = $entityManager->getRepository( Transaction::class )
-				                              ->findBy( [
-					                              "idUser" => $user,
-					                              "idExchange" => $exchange,
-				                              ] );
-			}
-			else{
-				$queryParameters = new ArrayCollection(array(
-					new Parameter('latestUpdate', $latestUpdate),
-					new Parameter('idExchange', $exchange->getId()),
-				));
-				$queryAllNewTransactions = $entityManager
-					->createQuery( 'SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.idExchange > :idExchange ORDER BY t.date DESC' )
-					->setParameters($queryParameters);
-				$transactions = $queryAllNewTransactions->getResult();
-			}
-		}
-		# 3. if Exchange and Currency
-		else{
-			if (!$latestUpdate){
-				$transactions = $entityManager->getRepository( Transaction::class )
-				                              ->findBy( [
-					                              "idUser" => $user,
-					                              "idExchange" => $exchange,
-					                              "idCurrency" => $currency,
-				                              ] );
-			}
-			else{
-				$queryParameters = new ArrayCollection(array(
-					new Parameter('latestUpdate', $latestUpdate),
-					new Parameter('idExchange', $exchange->getId()),
-					new Parameter('idCurrency', $currency->getId()),
-				));
-				$queryAllNewTransactions = $entityManager
-					->createQuery( 'SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.idExchange = :idExchange AND t.idCurrency = idCurrency ORDER BY t.date DESC' )
-					->setParameters($queryParameters);
-				$transactions = $queryAllNewTransactions->getResult();
-			}
-		}
-		return $transactions;
-	}
+    public function getTransactions(User $user, ?Exchange $exchange = null, ?Currency $currency = null, ?\DateTime $latestUpdate = null): array
+    {
+        $entityManager = $this->getEntityManager();
+        // 1. if !Exchange and !Currency
+        if (!$exchange && !$currency) {
+            if (!$latestUpdate) {
+                $transactions = $entityManager->getRepository(Transaction::class)
+                                               ->findBy([
+                                                   'user' => $user,
+                                               ]);
+            } else {
+                $queryAllNewTransactions = $entityManager
+                    ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate ORDER BY t.date DESC')
+                    ->setParameter('latestUpdate', $latestUpdate);
+                $transactions = $queryAllNewTransactions->getResult();
+            }
+        }
+        // 2. if Exchange and !Currency
+        elseif (!$currency) {
+            if (!$latestUpdate) {
+                $transactions = $entityManager->getRepository(Transaction::class)
+                                              ->findBy([
+                                                  'user'     => $user,
+                                                  'exchange' => $exchange,
+                                              ]);
+            } else {
+                $queryParameters = new ArrayCollection([
+                    new Parameter('latestUpdate'),
+                    new Parameter('idExchange'),
+                ]);
+                $queryAllNewTransactions = $entityManager
+                    ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.exchange > :exchange ORDER BY t.date DESC')
+                    ->setParameters($queryParameters);
+                $transactions = $queryAllNewTransactions->getResult();
+            }
+        }
+        // 3. if Exchange and Currency
+        else {
+            if (!$latestUpdate) {
+                $transactions = $entityManager->getRepository(Transaction::class)
+                                              ->findBy([
+                                                  'user'       => $user,
+                                                  'idExchange' => $exchange,
+                                                  'idCurrency' => $currency,
+                                              ]);
+            } else {
+                $queryParameters = new ArrayCollection([
+                    new Parameter('latestUpdate'),
+                    new Parameter('idExchange'),
+                    new Parameter('idCurrency'),
+                ]);
+                $queryAllNewTransactions = $entityManager
+                    ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.exchange = :exchange AND t.idCurrency = idCurrency ORDER BY t.date DESC')
+                    ->setParameters($queryParameters);
+                $transactions = $queryAllNewTransactions->getResult();
+            }
+        }
 
+        return (array) $transactions;
+    }
 }

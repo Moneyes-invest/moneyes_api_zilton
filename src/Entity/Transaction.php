@@ -57,23 +57,23 @@ class Transaction
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:transaction', 'create:transaction', 'get:exchanges'])]
-    private ?Exchange $idExchange = null;
+    private Exchange $exchange;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private ?User $idUser = null;
+    private User $user;
 
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction'])]
-    private ?string $type = 'SPOT';
+    private string $type = 'SPOT';
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private ?Currency $idCurrency = null;
+    private Currency $currency;
 
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction', 'create:transaction'])]
@@ -94,7 +94,7 @@ class Transaction
     private float $quantity;
 
     #[ORM\Column(nullable: true)]
-    private ?int $exchangeId = null;
+    private ?int $transactionExchangeId = null;
 
     public function getId(): ?Uuid
     {
@@ -113,27 +113,26 @@ class Transaction
         return $this;
     }
 
-
-    public function getIdExchange(): ?Exchange
+    public function getExchange(): Exchange
     {
-        return $this->idExchange;
+        return $this->exchange;
     }
 
-    public function setIdExchange(?Exchange $idExchange): self
+    public function setExchange(Exchange $exchange): self
     {
-        $this->idExchange = $idExchange;
+        $this->exchange = $exchange;
 
         return $this;
     }
 
-    public function getIdUser(): ?User
+    public function getUser(): User
     {
-        return $this->idUser;
+        return $this->user;
     }
 
-    public function setIdUser(?User $idUser): self
+    public function setUser(User $user): self
     {
-        $this->idUser = $idUser;
+        $this->user = $user;
 
         return $this;
     }
@@ -157,14 +156,14 @@ class Transaction
         return $this;
     }
 
-    public function getIdCurrency(): ?Currency
+    public function getCurrency(): Currency
     {
-        return $this->idCurrency;
+        return $this->currency;
     }
 
-    public function setIdCurrency(?Currency $idCurrency): self
+    public function setCurrency(Currency $currency): self
     {
-        $this->idCurrency = $idCurrency;
+        $this->currency = $currency;
 
         return $this;
     }
@@ -185,7 +184,6 @@ class Transaction
 
         return $this;
     }
-
 
     public function getFees(): float
     {
@@ -223,14 +221,14 @@ class Transaction
         return $this;
     }
 
-    public function getExchangeId(): ?int
+    public function getTransactionExchangeId(): ?int
     {
-        return $this->exchangeId;
+        return $this->transactionExchangeId;
     }
 
-    public function setExchangeId(?int $exchangeId): self
+    public function setTransactionExchangeId(?int $transactionExchangeId): self
     {
-        $this->exchangeId = $exchangeId;
+        $this->transactionExchangeId = $transactionExchangeId;
 
         return $this;
     }

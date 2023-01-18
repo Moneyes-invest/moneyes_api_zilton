@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -50,15 +50,12 @@ class AccountRepository extends ServiceEntityRepository
     }
 
     /**
-     * Delete Transactions from a User Account
-     *
-     * @param Account $account
-     * @return void
+     * Delete Transactions from a User Account.
      */
     public function flushTransactions(Account $account): void
     {
-        $idUser = $account->getIdUser();
-        $transactions = $this->getEntityManager()->getRepository(Transaction::class)->findBy(["idUser" => $idUser]);
+        $user         = $account->getUser();
+        $transactions = $this->getEntityManager()->getRepository(Transaction::class)->findBy(['user' => $user]);
 
         foreach ($transactions as $transaction) {
             $this->getEntityManager()->remove($transaction);

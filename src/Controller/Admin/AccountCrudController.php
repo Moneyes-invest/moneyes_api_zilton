@@ -28,8 +28,8 @@ class AccountCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            AssociationField::new('idUser'),
-            AssociationField::new('idExchange'),
+            AssociationField::new('user'),
+            AssociationField::new('exchange'),
             TextField::new('privateKey'),
             TextField::new('publicKey'),
         ];

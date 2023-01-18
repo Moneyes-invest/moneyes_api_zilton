@@ -34,7 +34,7 @@ class Currency
     private ?string $codeIso = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $name = null;
+    private string $name;
 
     public function __toString(): string
     {
@@ -58,7 +58,7 @@ class Currency
         return $this;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }

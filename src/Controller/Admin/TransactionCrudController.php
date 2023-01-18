@@ -16,7 +16,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
@@ -31,9 +30,9 @@ class TransactionCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            AssociationField::new('idUser'),
+            AssociationField::new('user'),
             AssociationField::new('idCurrency'),
-            AssociationField::new('idExchange'),
+            AssociationField::new('exchange'),
             TextField::new('orderDirection'),
             NumberField::new('price'),
             NumberField::new('quantity'),

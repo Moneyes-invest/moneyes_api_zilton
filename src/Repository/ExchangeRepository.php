@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -11,11 +11,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\Account;
-use App\Entity\BinanceAccount;
 use App\Entity\Exchange;
-use App\Entity\Holding;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -51,5 +47,4 @@ class ExchangeRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
 }

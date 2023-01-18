@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace App\DataFixtures;
 
 use App\Entity\Account;
+use App\Entity\Exchange;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
@@ -41,15 +42,16 @@ class UsersFixturesProd extends Fixture implements FixtureGroupInterface
                   ->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
         $manager->persist($userAdmin);
 
-	    // Get Binance Exchange Reference
-	    $binanceExchange = $this->getReference('binanceExchange');
+        // Get Binance Exchange Reference
+        /** @phpstan-var Exchange $binanceExchange */
+        $binanceExchange = $this->getReference('binanceExchange');
 
-	    $accountUserCustomer = new Account();
-	    $accountUserCustomer->setIdUser($userAdmin)
-	                        ->setIdExchange($binanceExchange)
-	                        ->setPrivateKey("Qcc8KLybfKZ22UB70PQVQqWzYnEO4l0RCmFqPzrg46Uwt3bwyOgGUdF0JfnJwSnd")
-	                        ->setPublicKey("pXihR7QxSJtRuPwNJ3c3z9fFIlfrXPS4j16mBRKnby8EtLkPvR8DJ3fQTtZ2ggjg");
-	    $manager->persist($accountUserCustomer);
+        $accountUserCustomer = new Account();
+        $accountUserCustomer->setUser($userAdmin)
+                            ->setExchange($binanceExchange)
+                            ->setPrivateKey('Qcc8KLybfKZ22UB70PQVQqWzYnEO4l0RCmFqPzrg46Uwt3bwyOgGUdF0JfnJwSnd')
+                            ->setPublicKey('pXihR7QxSJtRuPwNJ3c3z9fFIlfrXPS4j16mBRKnby8EtLkPvR8DJ3fQTtZ2ggjg');
+        $manager->persist($accountUserCustomer);
 
         $manager->flush();
     }

@@ -15,7 +15,6 @@ use App\Entity\Holding;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 
 class HoldingCrudController extends AbstractCrudController
@@ -29,9 +28,9 @@ class HoldingCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->hideOnForm(),
-            AssociationField::new('idUser'),
+            AssociationField::new('user'),
             AssociationField::new('idCurrency'),
-            AssociationField::new('idExchange'),
+            AssociationField::new('exchange'),
             NumberField::new('quantity'),
             NumberField::new('averagePurchasePrice'),
         ];
