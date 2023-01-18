@@ -15,9 +15,3 @@ services:
         extra_hosts:
             # Ensure that host.docker.internal is correctly defined on Linux
             - host.docker.internal:host-gateway
-
-###> symfony/mercure-bundle ###
-    mercure:
-        ports:
-            - "80"
-###< symfony/mercure-bundle ###
