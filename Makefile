@@ -71,6 +71,8 @@ db: vendor
 	$(SYMFONY) doctrine:database:drop --force || true
 	$(SYMFONY) doctrine:database:create
 	$(SYMFONY) doctrine:migrations:migrate --no-interaction --allow-no-migration
+	$(SYMFONY) doctrine:fixtures:load --group=dev --no-interaction
+	$(SYMFONY) lexik:jwt:generate-keypair
 
 migration: ## Generate a new doctrine migration
 migration: vendor
@@ -221,12 +223,5 @@ update-tools: update-php-cs-fixer update-phpstan update-phpcpd update-phpmd
 
 pre-commit: apply-phpmd apply-phpcpd apply-php-cs apply-phpstan
 
-
-##
-## Data
-## -----------------
-##
-load-fixtures-dev:
-	$(SYMFONY) doctrine:fixtures:load --group=dev --no-interaction
 load-fixtures-prod:
 	$(SYMFONY) doctrine:fixtures:load --group=prod --no-interaction
