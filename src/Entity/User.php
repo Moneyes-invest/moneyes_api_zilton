@@ -85,7 +85,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['get:users', 'user:create', 'user:update'])]
     private string $username;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Transaction::class)]
+    #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Transaction::class)]
     #[Groups(['get:user', 'get:transactions'])]
     private Collection $transactions;
 
@@ -103,7 +103,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['get:users', 'user:create', 'user:update'])]
     private string $lastname;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Account::class)]
+    #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Account::class)]
     private Collection $account;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -111,7 +111,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:create', 'user:update'])]
     private ?string $plainPassword = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Holding::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Holding::class, orphanRemoval: true)]
     private Collection $holdings;
 
     public function __construct()
@@ -231,7 +231,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->transactions->contains($transaction)) {
             $this->transactions->add($transaction);
-            $transaction->setUser($this);
+            $transaction->setIdUser($this);
         }
 
         return $this;
@@ -307,7 +307,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->holdings->contains($holding)) {
             $this->holdings->add($holding);
-            $holding->setUser($this);
+            $holding->setIdUser($this);
         }
 
         return $this;
@@ -317,8 +317,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->holdings->removeElement($holding)) {
             // set the owning side to null (unless already changed)
-            if ($holding->getUser() === $this) {
-                $holding->setUser(null);
+            if ($holding->getIdUser() === $this) {
+                $holding->setIdUser(null);
             }
         }
 

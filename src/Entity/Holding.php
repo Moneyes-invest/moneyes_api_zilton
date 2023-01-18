@@ -25,15 +25,15 @@ class Holding
 
     #[ORM\ManyToOne(inversedBy: 'holdings')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private ?User $idUser = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Currency $currency = null;
+    private ?Currency $idCurrency = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Exchange $exchange = null;
+    private ?Exchange $idExchange = null;
 
     #[ORM\Column]
     private float $quantity;
@@ -47,38 +47,38 @@ class Holding
         return $this->id;
     }
 
-    public function getUser(): ?User
+    public function getIdUser(): ?User
     {
-        return $this->user;
+        return $this->idUser;
     }
 
-    public function setUser(?User $user): self
+    public function setIdUser(?User $idUser): self
     {
-        $this->user = $user;
+        $this->idUser = $idUser;
 
         return $this;
     }
 
-    public function getCurrency(): ?Currency
+    public function getIdCurrency(): ?Currency
     {
-        return $this->currency;
+        return $this->idCurrency;
     }
 
-    public function setCurrency(?Currency $currency): self
+    public function setIdCurrency(?Currency $idCurrency): self
     {
-        $this->currency = $currency;
+        $this->idCurrency = $idCurrency;
 
         return $this;
     }
 
-    public function getExchange(): ?Exchange
+    public function getIdExchange(): ?Exchange
     {
-        return $this->exchange;
+        return $this->idExchange;
     }
 
-    public function setExchange(?Exchange $exchange): self
+    public function setIdExchange(?Exchange $idExchange): self
     {
-        $this->exchange = $exchange;
+        $this->idExchange = $idExchange;
 
         return $this;
     }
