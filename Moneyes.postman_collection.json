@@ -17,7 +17,17 @@
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
-									"});"
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"test_account creation\", () => {",
+									"    pm.expect(response[\"id\"]).is.not.empty;",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"id_test_account\", response[\"id\"]);",
+									"",
+									"postman.setNextRequest('Exchange List');"
 								],
 								"type": "text/javascript"
 							}
@@ -38,7 +48,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"exchange\": \"/api/exchanges/{{id_test_exchange}}\",\n  \"privateKey\": \"test_private_key\",\n  \"publicKey\": \"test_public_key\",\n  \"user\": \"/api/users/{{id_test_account}}\"\n}",
+							"raw": "{\n  \"exchange\": \"/api/exchanges/{{id_test_exchange}}\",\n  \"privateKey\": \"test_private_key\",\n  \"publicKey\": \"test_public_key\",\n  \"user\": \"/api/users/{{id_test_user}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -53,6 +63,95 @@
 							"path": [
 								"api",
 								"accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Account List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/accounts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/accounts/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accounts",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{id_test_account}}"
+								}
 							]
 						}
 					},
@@ -427,7 +526,12 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"date\": \"2023-01-22T16:40:29.775Z\",\n  \"exchange\": \"{{id_test_exchange}}\",\n  \"user\": \"{{id_test_account}}\",\n  \"currency\": \"{{id_test_currency}}\",\n  \"orderDirection\": \"string\",\n  \"price\": 0,\n  \"quantity\": 0\n}"
+							"raw": "{\n  \"exchange\": \"/api/exchanges/{{id_test_exchange}}\",\n  \"user\": \"/api/users/{{id_test_user}}\",\n  \"currency\": \"api/currencies/{{id_test_currency}}\",\n  \"orderDirection\": \"BUY\",\n  \"price\": 200000,\n  \"quantity\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/transactions",
@@ -583,7 +687,7 @@
 									"});",
 									"",
 									"const lastItem = response[\"hydra:member\"][response[\"hydra:member\"].length - 1];",
-									"pm.collectionVariables.set(\"id_test_account\", lastItem.id);",
+									"pm.collectionVariables.set(\"id_test_user\", lastItem.id);",
 									"",
 									"postman.setNextRequest(\"Create Exchange\");"
 								],
@@ -647,15 +751,6 @@
 						},
 						"method": "DELETE",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"jean_jacques@hello.com\",\n  \"roles\": [\n    \"ROLE_USER\"\n  ],\n  \"username\": \"jean_jacques_testeur\",\n  \"birthdate\": \"2023-01-03\",\n  \"name\": \"Jean\",\n  \"lastname\": \"Jacques\",\n  \"plainPassword\": \"jj13**\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{baseUrl}}/api/users/:id",
 							"host": [
@@ -669,7 +764,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{id_test_account}}"
+									"value": "{{id_test_user}}"
 								}
 							]
 						}
@@ -850,7 +945,7 @@
 			"type": "default"
 		},
 		{
-			"key": "id_test_account",
+			"key": "id_test_user",
 			"value": "",
 			"type": "default"
 		},
@@ -862,6 +957,11 @@
 		{
 			"key": "id_test_currency",
 			"value": ""
+		},
+		{
+			"key": "id_test_account",
+			"value": "1ed9ff42-cfe9-63b8-af88-b9c1a36a02b5",
+			"type": "default"
 		}
 	]
 }
