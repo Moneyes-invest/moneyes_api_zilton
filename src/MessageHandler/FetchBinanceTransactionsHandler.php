@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -32,12 +32,14 @@ class FetchBinanceTransactionsHandler
     public function __invoke(FetchBinanceTransactions $fetchBinanceTransactions): void
     {
         $account = $this->manager->getRepository(Account::class)->find($fetchBinanceTransactions->getAccountId());
+        $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); //user account symbols
+
 
         if (!$account instanceof Account) {
             return;
         }
 
-        $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($account, $fetchBinanceTransactions->getPreviousUpdate());
+        $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($account, $accountSymbols, $fetchBinanceTransactions->getPreviousUpdate());
 
         // Binance ID
         $binanceExchange = $this->manager->getRepository(Exchange::class)->findOneBy(['label' => 'Binance']);
@@ -69,24 +71,31 @@ class FetchBinanceTransactionsHandler
             }
 
             // Transaction ID
-            $exchangeTradeId   = $transaction['id'];
-            $transactionExists = $this->manager->getRepository(Transaction::class)->findOneBy(['exchangeId' => $exchangeTradeId]);
+            $exchangeTradeId = $transaction['id'];
+            //$transactionExists = $this->manager->getRepository(Transaction::class)->findOneBy(['transactionExchangeId' => $exchangeTradeId]);
+            $transactionExists = null;
 
-            if (null === $transactionExists && $binanceExchange instanceof Exchange) {
+            $transactionPrice = (float) $transaction['price'];
+            $transactionQuantity = (float) $transaction['qty'];
+
+            //if (null === $transactionExists && $binanceExchange instanceof Exchange) {
+            if (true) {
                 $newTransaction = new Transaction();
                 $newTransaction->setExchange($binanceExchange)
                     ->setUser($account->getUser())
                     ->setCurrency($currencyId)
                     ->setDate($date)
                     ->setOrderDirection($orderDirection)
-                    ->setPrice($transaction['price'])
-                    ->setQuantity($transaction['qty'])
-                    ->setTransactionExchangeId($transaction['id']);
+                    ->setPrice($transactionPrice)
+                    ->setQuantity($transactionQuantity)
+                    //->setTransactionExchangeId(null)
+                ;
 
                 $this->manager->persist($newTransaction);
                 $this->manager->flush();
             }
         }
+
 
         // Update holdings
         $user = $account->getUser();

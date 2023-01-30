@@ -14,6 +14,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
+use App\Entity\BinanceAccount;
 use App\Entity\User;
 use App\Message\FetchBinanceTransactions;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,6 +39,11 @@ class UserProviderAllTransactions implements ProviderInterface
 
         // 1. Flush User Holdings
         $this->manager->getRepository(User::class)->flushHoldings($user);
+
+
+        //get user balances
+        //$binanceApi = $this->manager->getRepository(BinanceAccount::class)->customerBinanceApi($user);
+        //$balances
 
         // 2. Fetch all transactions for all accounts
         foreach ($userAccounts as $userAccount) {
