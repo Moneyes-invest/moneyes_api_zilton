@@ -70,7 +70,7 @@ class HoldingRepository extends ServiceEntityRepository
             // Create one
             $newHolding = new Holding();
             $newHolding->setCurrency($transaction->getCurrency())
-                       ->setExchange($transaction->getExchange())
+                       ->setAccount($transaction->getExchange())
                        ->setUser($transaction->getUser())
                        ->setQuantity(floatval($transaction->getQuantity()))
                        ->setAveragePurchasePrice(floatval($transaction->getPrice()));

@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\AccountRepository;
+use App\State\AccountDetailProvider;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -31,6 +32,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['get:accounts']]),
         new Get(normalizationContext: ['groups' => ['get:accounts', 'get:account']]),
+        new Get(
+            uriTemplate: '/accounts/{id}/detail',
+            provider: AccountDetailProvider::class,
+        ),
         new Post(),
         new Put(),
         new Patch(),
