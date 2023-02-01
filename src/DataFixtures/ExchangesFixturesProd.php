@@ -34,7 +34,7 @@ class ExchangesFixturesProd extends Fixture implements FixtureGroupInterface
 
         // Create Binance Exchange
         $binanceExchange = new Exchange();
-        $binanceExchange->setLabel('Binance');
+        $binanceExchange->setLabel('binance');
         $manager->persist($binanceExchange);
         $manager->flush();
 

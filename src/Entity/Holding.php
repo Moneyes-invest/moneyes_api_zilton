@@ -32,7 +32,7 @@ class Holding
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Exchange $exchange = null;
+    private ?Account $account = null;
 
     #[ORM\Column]
     private float $quantity;
@@ -69,14 +69,14 @@ class Holding
         return $this;
     }
 
-    public function getExchange(): ?Exchange
+    public function getAccount(): ?Account
     {
-        return $this->exchange;
+        return $this->account;
     }
 
-    public function setExchange(?Exchange $exchange): self
+    public function setAccount(?Account $account): self
     {
-        $this->exchange = $exchange;
+        $this->account = $account;
 
         return $this;
     }

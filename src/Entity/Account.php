@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: AccountRepository::class)]
+#[ORM\MappedSuperclass]
 #[ApiResource(
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['get:accounts']]),
@@ -40,6 +40,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class Account
 {
+    const EXCHANGE = null;
+
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -120,5 +122,10 @@ class Account
         $this->publicKey = $publicKey;
 
         return $this;
+    }
+
+    public function getRepositoryClass(): string
+    {
+        return $this->exchange->getLabel() ? 'App\\Repository\\' . $this->exchange->getLabel() . 'AccountRepository' : AccountRepository::class;
     }
 }

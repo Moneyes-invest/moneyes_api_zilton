@@ -13,8 +13,6 @@ namespace App\Repository;
 
 use App\Entity\Account;
 use App\Entity\BinanceAccount;
-use App\Entity\Exchange;
-use App\Entity\Holding;
 use App\Entity\User;
 use Binance\API;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -28,7 +26,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method BinanceAccount[]    findAll()
  * @method BinanceAccount[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BinanceAccountRepository extends ServiceEntityRepository
+class BinanceAccountRepository extends AccountRepository
 {
     private API $binanceApiConnexion;
 
@@ -43,30 +41,10 @@ class BinanceAccountRepository extends ServiceEntityRepository
         }
     }
 
-    public function save(BinanceAccount $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(BinanceAccount $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
     public function getSymbolsList(Account $account): array
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-
         $symbolsListRaw = $customerBinanceApi->exchangeInfo()['symbols'];
-
         $symbolsList = [];
 
         foreach ($symbolsListRaw as $symbol) {
@@ -146,7 +124,7 @@ class BinanceAccountRepository extends ServiceEntityRepository
         $assets = [];
 
         foreach ($balances as $asset => $balance) {
-            $floatBalanceAssetBalance = (float) $balance['available'];
+            $floatBalanceAssetBalance = (float)$balance['available'];
             if ($floatBalanceAssetBalance > 0) {
                 $assets[] = $asset;
             }
@@ -155,7 +133,7 @@ class BinanceAccountRepository extends ServiceEntityRepository
         return $assets;
     }
 
-    public function getAccountPerf(Account $account, User $user): object|array|null
+    public function getAccountInfo(Account $account): array
     {
         $entityManager = $this->getEntityManager(); // Init Entity Manager
         // Get Exchange's Holdings
@@ -168,14 +146,12 @@ class BinanceAccountRepository extends ServiceEntityRepository
         $percentage = 0;
         $gainLoss = 0; */
 
-        $exchangePerf = [
+        return [
             $account->getExchange()->getLabel() => [
-                'value'  => $entityManager->getRepository(BinanceAccount::class)->getTotalValue($account),
+                'value' => $this->getTotalValue($account),
                 'symbol' => 'USDT',
             ],
         ];
-
-        return $exchangePerf;
     }
 
     /**
@@ -184,19 +160,19 @@ class BinanceAccountRepository extends ServiceEntityRepository
     public function getTotalValue(Account $account): float
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $userAssets         = $this->getAssets($account);
-        $balances           = $customerBinanceApi->balances();
+        $userAssets = $this->getAssets($account);
+        $balances = $customerBinanceApi->balances();
 
         $totalValue = 0.0;
 
         foreach ($balances as $asset => $balance) {
             if (in_array($asset, $userAssets)) {
-                $floatBalanceAssetBalance = (float) $balance['available'] + (float) $balance['onOrder'];
+                $floatBalanceAssetBalance = (float)$balance['available'] + (float)$balance['onOrder'];
                 try {
                     if ('USDT' === $asset) {
                         $price = 1;
                     } else {
-                        $price = (float) $this->getPrice($account, $asset.'USDT');
+                        $price = (float)$this->getPrice($account, $asset . 'USDT');
                     }
                     $totalValue += $floatBalanceAssetBalance * $price;
                 } catch (\Exception $exception) {
