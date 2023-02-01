@@ -1,0 +1,967 @@
+{
+	"info": {
+		"_postman_id": "18b341ee-70fc-40ee-93a3-189d070559e7",
+		"name": "Moneyes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Account",
+			"item": [
+				{
+					"name": "Create Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"test_account creation\", () => {",
+									"    pm.expect(response[\"id\"]).is.not.empty;",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"id_test_account\", response[\"id\"]);",
+									"",
+									"postman.setNextRequest('Exchange List');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"exchange\": \"/api/exchanges/{{id_test_exchange}}\",\n  \"privateKey\": \"test_private_key\",\n  \"publicKey\": \"test_public_key\",\n  \"user\": \"/api/users/{{id_test_user}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/accounts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Account List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/accounts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/accounts/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"accounts",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{id_test_account}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Asset",
+			"item": []
+		},
+		{
+			"name": "Currency",
+			"item": [
+				{
+					"name": "Currency List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"list currencies\", () => {",
+									"    pm.expect(response[\"hydra:member\"]).is.not.empty;",
+									"});",
+									"",
+									"",
+									"postman.setNextRequest('Delete Exchange');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/currencies",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"currencies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Currency",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"test_currency creation\", () => {",
+									"    pm.expect(response[\"codeIso\"]).is.eql(\"TEST\");",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"id_test_currency\", response[\"id\"]);",
+									"",
+									"postman.setNextRequest('Currency List');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codeIso\": \"TEST\",\n  \"name\": \"test_currency\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/currencies",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"currencies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Currancy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"postman.setNextRequest('Delete User');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/currencies/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"currencies",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{id_test_currency}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Exchange",
+			"item": [
+				{
+					"name": "Create Exchange",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"test_exchange creation\", () => {",
+									"    pm.expect(response[\"label\"]).is.eql(\"test_exchange\");",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"id_test_exchange\", response[\"id\"]);",
+									"",
+									"postman.setNextRequest('Exchange List');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"label\": \"test_exchange\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/exchanges",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exchanges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Exchange List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"list exchange\", () => {",
+									"    pm.expect(response[\"hydra:member\"]).is.not.empty;",
+									"});",
+									"",
+									"",
+									"postman.setNextRequest('Create Currency');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/exchanges",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exchanges"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Exchange",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"postman.setNextRequest('Delete Currency');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/exchanges/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exchanges",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{id_test_exchange}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transaction",
+			"item": [
+				{
+					"name": "Create Transaction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"exchange\": \"/api/exchanges/{{id_test_exchange}}\",\n  \"user\": \"/api/users/{{id_test_user}}\",\n  \"currency\": \"api/currencies/{{id_test_currency}}\",\n  \"orderDirection\": \"BUY\",\n  \"price\": 200000,\n  \"quantity\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/transactions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.collectionVariables.set(\"token\", response.token);",
+									"",
+									"pm.test(\"Get JWT Token\", () => {",
+									"    pm.expect(response.token).is.not.empty",
+									"});",
+									"pm.collectionVariables.set(\"refresh_token\", response.refresh_token);",
+									"",
+									"pm.test(\"Get JWT Refresh Token\", () => {",
+									"    pm.expect(response.token).is.not.empty",
+									"});",
+									"",
+									"postman.setNextRequest('Create User');",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\":\"{{pseudo}}\",\n\t\"password\":\"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"jean_jacques account creation\", () => {",
+									"    pm.expect(response[\"email\"]).is.eql(\"jean_jacques@hello.com\");",
+									"});",
+									"",
+									"postman.setNextRequest('User List');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"jean_jacques@hello.com\",\n  \"roles\": [\n    \"ROLE_USER\"\n  ],\n  \"username\": \"jean_jacques_testeur\",\n  \"birthdate\": \"2023-01-03\",\n  \"name\": \"Jean\",\n  \"lastname\": \"Jacques\",\n  \"plainPassword\": \"jj13**\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User List",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Get All Users\", () => {",
+									"    pm.expect(response[\"hydra:member\"]).is.not.empty;",
+									"});",
+									"",
+									"const lastItem = response[\"hydra:member\"][response[\"hydra:member\"].length - 1];",
+									"pm.collectionVariables.set(\"id_test_user\", lastItem.id);",
+									"",
+									"postman.setNextRequest(\"Create Exchange\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});",
+									"",
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{id_test_user}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Dashboard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Get Total\", () => {",
+									"    pm.expect(response[\"hydra:member\"][0][\"total\"]).is.not.empty;",
+									"});",
+									"",
+									"pm.test(\"Get Exchanges\", () => {",
+									"    pm.expect(response[\"hydra:member\"][0][\"exchanges\"]).is.not.empty;",
+									"});",
+									"",
+									"postman.setNextRequest(null);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/:uuid/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								":uuid",
+								"dashboard"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": "1ed971af-aaf4-6ea2-9c82-cf787ad8fc2c"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Transactions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Transactions are fetching\", () => {",
+									"    pm.expect(response[\"hydra:member\"][0]).to.eql(\"Transactions are fetching\")",
+									"});",
+									"",
+									"postman.setNextRequest(\"Dashboard\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/:id/transactions/all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								":id",
+								"transactions",
+								"all"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1ed9739d-e773-6c9e-aa8b-41cf7b4a5298"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic"
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "default"
+		},
+		{
+			"key": "pseudo",
+			"value": "admin@moneyes.fr",
+			"type": "default"
+		},
+		{
+			"key": "password",
+			"value": "test",
+			"type": "default"
+		},
+		{
+			"key": "token",
+			"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2NzQwNDI3NTYsImV4cCI6MTY3NDA0NjM1Niwicm9sZXMiOlsiUk9MRV9VU0VSIiwiUk9MRV9BRE1JTiJdLCJlbWFpbCI6ImFkbWluQG1vbmV5ZXMuZnIifQ.Hs7lb-QHvcaXyixHLfUuUHIXtSnOVvioAJSijbYFBUhNj0WeZ-CLkYHW0V01XANpEQpFXiOHyq6E9YfUC0IY-6-msYl2q5xtKrb-fDBfzyIxxnD2u6A_w3PFhEE3okdKvaoSDi3U4QnSC0MUAjVS34GqvNibMt_Z7PfRVa65DV846DmfYZ1CLSjx_fgiC6oHhqdwSy85FyuBxaNFCyuZhmlC4FpkZBBAurx9AwzrRhebqKR9PYFnGGut3fmsiMx12MJNYq_xwgAy_ihceIVfpa9Nl-PLjFFA5XHsTwaEur4p23KQ-lWu3out9tfH3CSi7JQFSsnPzApiygpn0toKWw",
+			"type": "default"
+		},
+		{
+			"key": "refresh_token",
+			"value": "79257afcbc88df21540a029956d21795375a7baeda9f90a2c146f6318b45e10916d50ece63adad81952729f29f60b9c63ccfd20a242bd50c3d0f82fb936af408",
+			"type": "default"
+		},
+		{
+			"key": "id_test_user",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "id_test_exchange",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "id_test_currency",
+			"value": ""
+		},
+		{
+			"key": "id_test_account",
+			"value": "1ed9ff42-cfe9-63b8-af88-b9c1a36a02b5",
+			"type": "default"
+		}
+	]
+}
