@@ -63,7 +63,7 @@ class HoldingRepository extends ServiceEntityRepository
                                        ->findOneBy([
                                            'currency' => $currency,
                                            'exchange'   => $exchange,
-                                           'user '      => $user,
+                                           'user'      => $user,
                                        ]);
 
         if (!$holdingToFind) {
