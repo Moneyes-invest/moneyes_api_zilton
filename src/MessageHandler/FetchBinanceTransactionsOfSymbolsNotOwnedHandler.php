@@ -1,14 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
-/*
- * This file is part of the Moneyes API project.
- * (c) Moneyes
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace App\MessageHandler;
 
 use App\Entity\Account;
@@ -19,44 +10,65 @@ use App\Entity\Holding;
 use App\Entity\Transaction;
 use App\Entity\User;
 use App\Message\FetchBinanceTransactions;
+use App\Message\FetchBinanceTransactionsOfSymbolsNotOwned;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
-class FetchBinanceTransactionsHandler
+class FetchBinanceTransactionsOfSymbolsNotOwnedHandler
 {
+    /**
+     * @param EntityManagerInterface $manager
+     */
     public function __construct(private readonly EntityManagerInterface $manager)
     {
     }
 
-    public function __invoke(FetchBinanceTransactions $fetchBinanceTransactions): void
+    public function handleFetchBinanceTransactionsOfSymbolsNotOwned(FetchBinanceTransactionsOfSymbolsNotOwned $fetchBinanceTransactions): void
     {
         $account = $this->manager->getRepository(Account::class)->find($fetchBinanceTransactions->getAccountId());
         $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); //user account symbols
+        $allSymbols = $this->manager->getRepository(BinanceAccount::class)->getAllSymbols(); //all symbols
 
+        // Remove symbols owned by user
+        $symbolsNotOwned = array_diff($allSymbols, $accountSymbols); //symbols not owned by user
 
         if (!$account instanceof Account) {
             return;
         }
 
-        $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($account, $accountSymbols, $fetchBinanceTransactions->getPreviousUpdate());
+        // Fetch transactions for not owned symbols
+        $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($account, $symbolsNotOwned, $fetchBinanceTransactions->getPreviousUpdate());
 
         // Binance ID
         $binanceExchange = $this->manager->getRepository(Exchange::class)->findOneBy(['label' => 'Binance']);
 
+        //Save transactions into database
+        $this->saveTransactions($transactions, $account, $binanceExchange, $this->manager);
+
+    }
+
+
+    /**
+     * @param array $transactions
+     * @param Account $account
+     * @param Exchange $binanceExchange
+     * @param EntityManagerInterface $manager
+     * @return void
+     */
+    public function saveTransactions(array $transactions, Account $account, Exchange $binanceExchange, EntityManagerInterface $manager): void
+    {
         // Register transactions
         foreach ($transactions as $transaction) {
             // Code ISO
             $codeIso = $transaction['symbol'];
 
             // Currency ID
-            $currencyId = $this->manager->getRepository(Currency::class)->findOneBy(['codeIso' => $codeIso]);
+            $currencyId = $manager->getRepository(Currency::class)->findOneBy(['codeIso' => $codeIso]);
             if (null === $currencyId) {
                 $newCurrency = new Currency();
                 $newCurrency->setCodeIso($codeIso)->setName($codeIso);
                 $currencyId = $newCurrency;
-                $this->manager->persist($currencyId);
-                $this->manager->flush();
+                $manager->persist($currencyId);
+                $manager->flush();
             }
 
             // Date
@@ -75,8 +87,8 @@ class FetchBinanceTransactionsHandler
             //$transactionExists = $this->manager->getRepository(Transaction::class)->findOneBy(['transactionExchangeId' => $exchangeTradeId]);
             $transactionExists = null;
 
-            $transactionPrice = (float) $transaction['price'];
-            $transactionQuantity = (float) $transaction['qty'];
+            $transactionPrice = (float)$transaction['price'];
+            $transactionQuantity = (float)$transaction['qty'];
 
             //if (null === $transactionExists && $binanceExchange instanceof Exchange) {
             if (true) {
@@ -87,20 +99,12 @@ class FetchBinanceTransactionsHandler
                     ->setDate($date)
                     ->setOrderDirection($orderDirection)
                     ->setPrice($transactionPrice)
-                    ->setQuantity($transactionQuantity)
-                    //->setTransactionExchangeId(null)
+                    ->setQuantity($transactionQuantity)//->setTransactionExchangeId(null)
                 ;
 
-                $this->manager->persist($newTransaction);
-                $this->manager->flush();
+                $manager->persist($newTransaction);
+                $manager->flush();
             }
-        }
-
-
-        // Update holdings
-        $user = $account->getUser();
-        if ($user instanceof User) {
-            $this->manager->getRepository(Holding::class)->updateHoldings($user);
         }
     }
 }
