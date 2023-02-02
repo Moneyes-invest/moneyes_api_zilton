@@ -14,7 +14,6 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
-use App\Entity\BinanceAccount;
 use App\Entity\Holding;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,9 +26,8 @@ class DashboardProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
-        $totalValue = 0;
-        $exchanges  = [];
-        $user = $this->manager->getRepository(User::class)->find($uriVariables['id']);
+        $accountArray   = [];
+        $user           = $this->manager->getRepository(User::class)->find($uriVariables['id']);
         if (!$user instanceof User) {
             return ["L'utilisateur n'existe pas"];
         }
@@ -37,14 +35,13 @@ class DashboardProvider implements ProviderInterface
         if (empty($accounts)) {
             return ["L'utilisateur n'a pas de compte"];
         }
-        // 4. Return performances
 
         // A. Exchanges
         foreach ($accounts as $account) {
             if (!$account instanceof Account) {
                 continue;
             }
-            $exchangeLabel = $account->getExchange()->getLabel();
+            $exchangeLabel     = $account::EXCHANGE;
             $holdingRepository = $this->manager->getRepository(Holding::class);
             $holdings          = $holdingRepository->findBy(['account' => $account]);
 
@@ -52,16 +49,17 @@ class DashboardProvider implements ProviderInterface
                 if (!$holding instanceof Holding) {
                     continue;
                 }
-                $exchanges[$exchangeLabel]['holdings'][] = [
-                    'currency' => $holding->getCurrency()->getCodeIso(),
-                    'quantity' => $holding->getQuantity(),
-                    'price'    => $holding->getAveragePurchasePrice(),
-                    'value'    => $holding->getQuantity() * $holding->getAveragePurchasePrice(),
+                $accountArray[$exchangeLabel]['holdings'][] = [
+                    'currency'                => $holding->getCurrency()?->getCodeIso(),
+                    'quantity'                => $holding->getQuantity(),
+                    'averagePurchasePrice'    => $holding->getAveragePurchasePrice(),
+                    'value'                   => $holding->getQuantity() * $holding->getAveragePurchasePrice(),
                 ];
             }
         }
-        return  [
-            'accounts' => $exchanges
+
+        return [
+            'accounts' => $accountArray,
         ];
     }
 }

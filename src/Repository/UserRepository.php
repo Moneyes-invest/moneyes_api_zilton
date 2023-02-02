@@ -11,8 +11,6 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
-use App\Entity\Account;
-use App\Entity\Exchange;
 use App\Entity\Holding;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -66,28 +64,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
 
         $this->save($user, true);
-    }
-
-    public function getExchanges(User $user): array
-    {
-        $entityManager = $this->getEntityManager();
-
-        $accounts = $entityManager->getRepository(Account::class)->findBy(['user' => $user]);
-
-        $nameExchanges = [];
-
-        foreach ($accounts as $account) {
-            $exchange          = $entityManager->getRepository(Exchange::class)->find($account->getExchange());
-            if ($exchange instanceof Exchange) {
-                $exchangeFormatted = [
-                    'labelExchange' => $exchange->getLabel(),
-                    'idExchange'    => $exchange->getId(),
-                ];
-                $nameExchanges[] = $exchangeFormatted;
-            }
-        }
-
-        return array_unique($nameExchanges, SORT_REGULAR);
     }
 
     /**

@@ -14,7 +14,6 @@ namespace App\MessageHandler;
 use App\Entity\Account;
 use App\Entity\BinanceAccount;
 use App\Entity\Currency;
-use App\Entity\Exchange;
 use App\Entity\Holding;
 use App\Entity\Transaction;
 use App\Entity\User;
@@ -38,9 +37,6 @@ class FetchBinanceTransactionsHandler
         }
 
         $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($account, $fetchBinanceTransactions->getPreviousUpdate());
-
-        // Binance ID
-        $binanceExchange = $this->manager->getRepository(Exchange::class)->findOneBy(['label' => 'Binance']);
 
         // Register transactions
         foreach ($transactions as $transaction) {
@@ -72,16 +68,16 @@ class FetchBinanceTransactionsHandler
             $exchangeTradeId   = $transaction['id'];
             $transactionExists = $this->manager->getRepository(Transaction::class)->findOneBy(['exchangeId' => $exchangeTradeId]);
 
-            if (null === $transactionExists && $binanceExchange instanceof Exchange) {
+            if (null === $transactionExists) {
                 $newTransaction = new Transaction();
-                $newTransaction->setExchange($binanceExchange)
+                $newTransaction->setAccount($account)
                     ->setUser($account->getUser())
                     ->setCurrency($currencyId)
                     ->setDate($date)
                     ->setOrderDirection($orderDirection)
                     ->setPrice($transaction['price'])
                     ->setQuantity($transaction['qty'])
-                    ->setTransactionExchangeId($transaction['id']);
+                    ->setExternalTransactionId($transaction['id']);
 
                 $this->manager->persist($newTransaction);
                 $this->manager->flush();

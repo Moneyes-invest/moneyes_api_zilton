@@ -26,7 +26,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\MappedSuperclass]
+#[ORM\Entity(repositoryClass: AccountRepository::class)]
+#[ORM\InheritanceType('JOINED')]
+#[ORM\DiscriminatorColumn(name: 'exchange', type: 'string')]
+#[ORM\DiscriminatorMap([
+    BinanceAccount::EXCHANGE => BinanceAccount::class,
+])]
 #[ApiResource(
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['get:accounts']]),
@@ -38,9 +43,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     denormalizationContext: ['groups' => ['create:account', 'update:account']],
 )]
-class Account
+abstract class Account
 {
-    const EXCHANGE = null;
+    public const EXCHANGE = null;
 
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
@@ -48,12 +53,6 @@ class Account
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     #[Groups(['get:account', 'get:accounts'])]
     private Uuid $id;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get:account', 'create:account'])]
-    #[Assert\NotBlank(groups: ['create:account'])]
-    private Exchange $exchange;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]
@@ -88,18 +87,6 @@ class Account
         return $this;
     }
 
-    public function getExchange(): Exchange
-    {
-        return $this->exchange;
-    }
-
-    public function setExchange(Exchange $exchange): self
-    {
-        $this->exchange = $exchange;
-
-        return $this;
-    }
-
     public function getPrivateKey(): ?string
     {
         return $this->privateKey;
@@ -122,10 +109,5 @@ class Account
         $this->publicKey = $publicKey;
 
         return $this;
-    }
-
-    public function getRepositoryClass(): string
-    {
-        return $this->exchange->getLabel() ? 'App\\Repository\\' . $this->exchange->getLabel() . 'AccountRepository' : AccountRepository::class;
     }
 }

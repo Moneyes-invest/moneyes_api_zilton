@@ -12,11 +12,8 @@ declare(strict_types = 1);
 namespace App\DataFixtures;
 
 use App\Entity\Account;
-use App\Entity\BinanceAccount;
 use App\Entity\Currency;
-use App\Entity\Exchange;
 use App\Entity\Holding;
-use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -38,14 +35,16 @@ class HoldingFixtures extends Fixture implements FixtureGroupInterface, Dependen
     {
         $holding = new Holding();
 
-        /** @phpstan-var Account $accountUserCustomer */
-        $accountUserCustomer = $this->getReference('accountUserCustomer');
+        /** @phpstan-var Account $binanceAccount */
+        $binanceAccount = $this->getReference('binanceAccount');
         /** @phpstan-var Currency $btcEur */
         $btcEur = $this->getReference('btcEur');
 
-        $holding->setAccount($accountUserCustomer)
+        $holding->setAccount($binanceAccount)
+                ->setUser($binanceAccount->getUser())
                 ->setCurrency($btcEur)
-                ->setQuantity(0.00000001);
+                ->setQuantity(0.00000001)
+                ->setAveragePurchasePrice(10000);
 
         $manager->persist($holding);
         $manager->flush();
@@ -55,7 +54,6 @@ class HoldingFixtures extends Fixture implements FixtureGroupInterface, Dependen
     {
         return [
             CurrenciesFixturesProd::class,
-            ExchangesFixturesProd::class,
             UsersFixturesProd::class,
         ];
     }

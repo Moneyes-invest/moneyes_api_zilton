@@ -12,7 +12,6 @@ declare(strict_types = 1);
 namespace App\Repository;
 
 use App\Entity\Account;
-use App\Entity\Exchange;
 use App\Entity\Transaction;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -44,18 +43,6 @@ class AccountRepository extends ServiceEntityRepository
             $this->getEntityManager()->remove($transaction);
         }
 
-        $this->getEntityManager()->flush();
-    }
-
-    public function save(Account $account): void
-    {
-        $exchangeRepository = $this->getEntityManager()->getRepository(Exchange::class);
-        if ($account::EXCHANGE === null) {
-            throw new \Exception('Do not implement Account class use child class instead');
-        }
-        $exchange           = $exchangeRepository->findOneBy(['name' => $account::EXCHANGE]);
-        $account->setExchange($exchange);
-        $this->getEntityManager()->persist($account);
         $this->getEntityManager()->flush();
     }
 }

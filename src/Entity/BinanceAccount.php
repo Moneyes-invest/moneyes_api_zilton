@@ -17,5 +17,5 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: BinanceAccountRepository::class)]
 class BinanceAccount extends Account
 {
-    const EXCHANGE = 'binance';
+    public const EXCHANGE = 'binance';
 }
