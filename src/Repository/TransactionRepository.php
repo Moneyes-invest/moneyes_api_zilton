@@ -11,8 +11,8 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Entity\Account;
 use App\Entity\Currency;
-use App\Entity\Exchange;
 use App\Entity\Transaction;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -51,11 +51,11 @@ class TransactionRepository extends ServiceEntityRepository
         }
     }
 
-    public function getTransactions(User $user, ?Exchange $exchange = null, ?Currency $currency = null, ?\DateTime $latestUpdate = null): array
+    public function getTransactions(User $user, ?Account $account = null, ?Currency $currency = null, ?\DateTime $latestUpdate = null): array
     {
         $entityManager = $this->getEntityManager();
-        // 1. if !Exchange and !Currency
-        if (!$exchange && !$currency) {
+        // 1. if !Account and !Currency
+        if (!$account && !$currency) {
             if (!$latestUpdate) {
                 $transactions = $entityManager->getRepository(Transaction::class)
                                                ->findBy([
@@ -74,15 +74,15 @@ class TransactionRepository extends ServiceEntityRepository
                 $transactions = $entityManager->getRepository(Transaction::class)
                                               ->findBy([
                                                   'user'     => $user,
-                                                  'exchange' => $exchange,
+                                                  'account'  => $account,
                                               ]);
             } else {
                 $queryParameters = [
                     'latestUpdate',
-                    'idExchange',
+                    'account',
                 ];
                 $queryAllNewTransactions = $entityManager
-                    ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.exchange > :exchange ORDER BY t.date DESC')
+                    ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.account > :account ORDER BY t.date DESC')
                     ->setParameters($queryParameters);
                 $transactions = $queryAllNewTransactions->getResult();
             }
@@ -93,17 +93,17 @@ class TransactionRepository extends ServiceEntityRepository
                 $transactions = $entityManager->getRepository(Transaction::class)
                                               ->findBy([
                                                   'user'       => $user,
-                                                  'idExchange' => $exchange,
-                                                  'idCurrency' => $currency,
+                                                  'account'    => $account,
+                                                  'currency'   => $currency,
                                               ]);
             } else {
                 $queryParameters = [
                     'latestUpdate',
-                    'idExchange',
-                    'idCurrency',
+                    'account',
+                    'currency',
                 ];
                 $queryAllNewTransactions = $entityManager
-                    ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.exchange = :exchange AND t.idCurrency = idCurrency ORDER BY t.date DESC')
+                    ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.account = :account AND t.currency = :currency ORDER BY t.date DESC')
                     ->setParameters($queryParameters);
                 $transactions = $queryAllNewTransactions->getResult();
             }

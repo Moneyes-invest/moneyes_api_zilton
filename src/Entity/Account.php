@@ -28,6 +28,11 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AccountRepository::class)]
+#[ORM\InheritanceType('JOINED')]
+#[ORM\DiscriminatorColumn(name: 'exchange', type: 'string')]
+#[ORM\DiscriminatorMap([
+    BinanceAccount::EXCHANGE => BinanceAccount::class,
+])]
 #[ApiResource(
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['get:accounts']]),
@@ -47,20 +52,16 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     denormalizationContext: ['groups' => ['create:account', 'update:account']],
 )]
-class Account
+abstract class Account
 {
+    public const EXCHANGE = null;
+
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     #[Groups(['get:account', 'get:accounts'])]
     private Uuid $id;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get:account', 'create:account'])]
-    #[Assert\NotBlank(groups: ['create:account'])]
-    private Exchange $exchange;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]
@@ -91,18 +92,6 @@ class Account
     public function setUser(User $user): self
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function getExchange(): Exchange
-    {
-        return $this->exchange;
-    }
-
-    public function setExchange(Exchange $exchange): self
-    {
-        $this->exchange = $exchange;
 
         return $this;
     }

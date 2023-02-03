@@ -43,6 +43,6 @@ class CurrenciesFixturesProd extends Fixture implements FixtureGroupInterface
 
         $manager->flush();
 
-        $this->addReference('btceurReference', $btcEur);
+        $this->addReference('btcEur', $btcEur);
     }
 }

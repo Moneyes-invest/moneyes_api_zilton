@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace App\DataFixtures;
 
 use App\Entity\Account;
+use App\Entity\BinanceAccount;
 use App\Entity\Currency;
 use App\Entity\Exchange;
 use App\Entity\Transaction;
@@ -60,11 +61,10 @@ class AppFixtures extends Fixture implements FixtureGroupInterface, DependentFix
 
         // Get BTCEUR Reference
         /** @phpstan-var Currency $btcEur */
-        $btcEur = $this->getReference('btceurReference');
+        $btcEur = $this->getReference('btcEur');
         // Get Binance Exchange Reference
-        /** @phpstan-var Exchange $binanceExchange */
-        $binanceExchange = $this->getReference('binanceExchange');
-
+        /** @phpstan-var Account $binanceAccount */
+        $binanceAccount = $this->getReference('binanceAccount');
         // #### Transactions #####
         // Create Transactions For userCustomer
         $transactionUserCustomer = new Transaction();
@@ -74,14 +74,13 @@ class AppFixtures extends Fixture implements FixtureGroupInterface, DependentFix
                                 ->setType()
                                 ->setPrice(12000)
                                 ->setCurrency($btcEur)
-                                ->setExchange($binanceExchange)
+                                ->setAccount($binanceAccount)
                                 ->setOrderDirection();
         $manager->persist($transactionUserCustomer);
 
         // #### Accounts ######
-        $accountUserCustomer = new Account();
+        $accountUserCustomer = new BinanceAccount();
         $accountUserCustomer->setUser($userCustomer)
-                            ->setExchange($binanceExchange)
                             ->setPrivateKey($this->faker->md5())
                             ->setPublicKey($this->faker->md5());
         $manager->persist($accountUserCustomer);
@@ -92,7 +91,6 @@ class AppFixtures extends Fixture implements FixtureGroupInterface, DependentFix
     public function getDependencies(): array
     {
         return [
-            ExchangesFixturesProd::class,
             CurrenciesFixturesProd::class,
         ];
     }

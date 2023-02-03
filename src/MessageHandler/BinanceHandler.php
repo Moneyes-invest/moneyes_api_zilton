@@ -5,7 +5,6 @@ namespace App\MessageHandler;
 use App\Entity\Account;
 use App\Entity\BinanceAccount;
 use App\Entity\Currency;
-use App\Entity\Exchange;
 use App\Entity\Holding;
 use App\Entity\Transaction;
 use App\Entity\User;
@@ -44,7 +43,7 @@ class BinanceHandler
     }
 
     /**
-     * @param BinanceOwnedTransactionsMessage $fetchBinanceTransactions
+     * @param BinanceAllTransactionsMessage $fetchBinanceTransactions
      * @return void
      */
     #[AsMessageHandler]

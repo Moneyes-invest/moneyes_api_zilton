@@ -13,23 +13,18 @@ namespace App\Repository;
 
 use App\Entity\Account;
 use App\Entity\BinanceAccount;
-use App\Entity\Exchange;
-use App\Entity\Holding;
 use App\Entity\User;
 use Binance\API;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use WebSocket\Client;
 
 /**
- * @extends ServiceEntityRepository<BinanceAccount>
- *
  * @method BinanceAccount|null find($id, $lockMode = null, $lockVersion = null)
  * @method BinanceAccount|null findOneBy(array $criteria, array $orderBy = null)
  * @method BinanceAccount[]    findAll()
  * @method BinanceAccount[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BinanceAccountRepository extends ServiceEntityRepository
+class BinanceAccountRepository extends AccountRepository
 {
     private API $binanceApiConnexion;
 
@@ -44,31 +39,11 @@ class BinanceAccountRepository extends ServiceEntityRepository
         }
     }
 
-    public function save(BinanceAccount $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(BinanceAccount $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
     public function getSymbolsList(Account $account): array
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-
-        $symbolsListRaw = $customerBinanceApi->exchangeInfo()['symbols'];
-
-        $symbolsList = [];
+        $symbolsListRaw     = $customerBinanceApi->exchangeInfo()['symbols'];
+        $symbolsList        = [];
 
         foreach ($symbolsListRaw as $symbol) {
             $symbolsList[] = $symbol['symbol'];
@@ -168,6 +143,7 @@ class BinanceAccountRepository extends ServiceEntityRepository
         return $assets;
     }
 
+
     public function getAccountPerf(Account $account, User $user): object|array|null
     {
         $entityManager = $this->getEntityManager(); // Init Entity Manager
@@ -220,6 +196,7 @@ class BinanceAccountRepository extends ServiceEntityRepository
 
         return $totalValue;
     }
+
 
     public function getBinanceApiConnexion(): API
     {
