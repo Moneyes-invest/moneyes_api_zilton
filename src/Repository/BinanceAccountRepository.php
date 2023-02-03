@@ -228,6 +228,17 @@ class BinanceAccountRepository extends AccountRepository
         return array_unique($accountSymbols); //return symbolsBalance
     }
 
+
+    /**
+     * @throws \Exception
+     */
+    public function getAllSymbols(Account $account): array
+    {
+        $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
+
+        return $customerBinanceApi->exchangeInfo()['symbols'];
+    }
+
     private function customerBinanceApi(Account $account): API
     {
         return new API($account->getPublicKey(), $account->getPrivateKey());

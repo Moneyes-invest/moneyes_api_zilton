@@ -40,6 +40,9 @@ class BinanceHandler
         // Fetch and save transactions for owned symbols
         $this->fetchTransactions($accountSymbols, $account );
 
+        // Update holdings
+        //$this->manager->getRepository(Holding::class)->updateHoldings($account);
+
     }
 
     /**
@@ -51,7 +54,7 @@ class BinanceHandler
     {
         $account = $this->manager->getRepository(Account::class)->find($fetchBinanceTransactions->getAccountId());
         $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); //user account symbols
-        $allSymbols = $this->manager->getRepository(BinanceAccount::class)->getAllSymbols(); //all symbols
+        $allSymbols = $this->manager->getRepository(BinanceAccount::class)->getAllSymbols($account); //all symbols
 
         // Remove symbols owned by user
         $symbolsNotOwned = array_diff($allSymbols, $accountSymbols); //symbols not owned by user
@@ -82,7 +85,6 @@ class BinanceHandler
     /**
      * @param array $transactions
      * @param Account $account
-     * @param Exchange $binanceExchange
      * @param EntityManagerInterface $manager
      * @return void
      */
@@ -121,6 +123,7 @@ class BinanceHandler
 
             $transactionPrice = (float)$transaction['price'];
             $transactionQuantity = (float)$transaction['qty'];
+            $externalTransactionId = (string)$transaction['id'];
 
             //if (null === $transactionExists && $binanceExchange instanceof Exchange) {
             if (true) {
@@ -131,7 +134,8 @@ class BinanceHandler
                     ->setDate($date)
                     ->setOrderDirection($orderDirection)
                     ->setPrice($transactionPrice)
-                    ->setQuantity($transactionQuantity)//->setTransactionExchangeId(null)
+                    ->setQuantity($transactionQuantity)
+                    ->setExternalTransactionId($externalTransactionId)
                 ;
 
                 $manager->persist($newTransaction);

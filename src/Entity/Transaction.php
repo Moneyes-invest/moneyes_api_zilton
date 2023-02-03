@@ -93,8 +93,8 @@ class Transaction
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private float $quantity;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $externalTransactionId = null;
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    private ?string $externalTransactionId = null;
 
     public function getId(): ?Uuid
     {
@@ -221,12 +221,13 @@ class Transaction
         return $this;
     }
 
-    public function getExternalTransactionId(): ?int
+
+    public function getExternalTransactionId(): ?string
     {
         return $this->externalTransactionId;
     }
 
-    public function setExternalTransactionId(?int $externalTransactionId): self
+    public function setExternalTransactionId(?string $externalTransactionId): self
     {
         $this->externalTransactionId = $externalTransactionId;
 
