@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\MessageHandler;
 
 use App\Entity\Account;
@@ -15,79 +24,56 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 class BinanceHandler
 {
-    /**
-     * @param EntityManagerInterface $manager
-     */
     public function __construct(private readonly EntityManagerInterface $manager)
     {
     }
 
-
-    /**
-     * @param BinanceOwnedTransactionsMessage $fetchBinanceTransactions
-     * @return void
-     */
     #[AsMessageHandler]
     public function handleFetchBinanceTransactionsOfSymbolsOwned(BinanceOwnedTransactionsMessage $fetchBinanceTransactions): void
     {
         $account = $this->manager->getRepository(Account::class)->find($fetchBinanceTransactions->getAccountId());
-        $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); //user account symbols
 
         if (!$account instanceof Account) {
             return;
         }
 
+        $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); // user account symbols
+
         // Fetch and save transactions for owned symbols
-        $this->fetchTransactions($accountSymbols, $account );
+        $this->fetchTransactions($accountSymbols, $account);
 
         // Update holdings
         $this->manager->getRepository(Holding::class)->updateHoldings($account->getUser());
-
     }
 
-    /**
-     * @param BinanceAllTransactionsMessage $fetchBinanceTransactions
-     * @return void
-     */
     #[AsMessageHandler]
     public function handleFetchBinanceTransactionsOfSymbolsNotOwned(BinanceAllTransactionsMessage $fetchBinanceTransactions): void
     {
         $account = $this->manager->getRepository(Account::class)->find($fetchBinanceTransactions->getAccountId());
-        $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); //user account symbols
-        $allSymbols = $this->manager->getRepository(BinanceAccount::class)->getAllSymbols($account); //all symbols
-
-        // Remove symbols owned by user
-        $symbolsNotOwned = array_diff($allSymbols, $accountSymbols); //symbols not owned by user
 
         if (!$account instanceof Account) {
             return;
         }
+
+        $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); // user account symbols
+        $allSymbols     = $this->manager->getRepository(BinanceAccount::class)->getAllSymbols($account); // all symbols
+
+        // Remove symbols owned by user
+        $symbolsNotOwned = array_diff($allSymbols, $accountSymbols); // symbols not owned by user
 
         // Fetch and save transactions for owned symbols
         $this->fetchTransactions($symbolsNotOwned, $account);
     }
 
-    /**
-     * @param array $accountSymbols
-     * @param Account $account
-     * @return void
-     */
     private function fetchTransactions(array $accountSymbols, Account $account): void
     {
         // Fetch transactions for owned symbols
         $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($account, $accountSymbols);
 
-        //Save transactions into database
+        // Save transactions into database
         $this->saveTransactions($transactions, $account, $this->manager);
     }
 
-
-    /**
-     * @param array $transactions
-     * @param Account $account
-     * @param EntityManagerInterface $manager
-     * @return void
-     */
     private function saveTransactions(array $transactions, Account $account, EntityManagerInterface $manager): void
     {
         // Register transactions
@@ -117,30 +103,26 @@ class BinanceHandler
             }
 
             // Transaction ID
-            $exchangeTradeId = $transaction['id'];
-            //$transactionExists = $this->manager->getRepository(Transaction::class)->findOneBy(['transactionExchangeId' => $exchangeTradeId]);
-            $transactionExists = null;
+            // $transactionExists = $this->manager->getRepository(Transaction::class)->findOneBy(['transactionExchangeId' => $exchangeTradeId]);
 
-            $transactionPrice = (float)$transaction['price'];
-            $transactionQuantity = (float)$transaction['qty'];
-            $externalTransactionId = (string)$transaction['id'];
+            $transactionPrice      = (float) $transaction['price'];
+            $transactionQuantity   = (float) $transaction['qty'];
+            $externalTransactionId = (string) $transaction['id'];
 
-            //if (null === $transactionExists && $binanceExchange instanceof Exchange) {
-            if (true) {
-                $newTransaction = new Transaction();
-                $newTransaction->setAccount($account)
-                    ->setUser($account->getUser())
-                    ->setCurrency($currencyId)
-                    ->setDate($date)
-                    ->setOrderDirection($orderDirection)
-                    ->setPrice($transactionPrice)
-                    ->setQuantity($transactionQuantity)
-                    ->setExternalTransactionId($externalTransactionId)
-                ;
+            // if (null === $transactionExists && $binanceExchange instanceof Exchange) {
+            $newTransaction = new Transaction();
+            $newTransaction->setAccount($account)
+                ->setUser($account->getUser())
+                ->setCurrency($currencyId)
+                ->setDate($date)
+                ->setOrderDirection($orderDirection)
+                ->setPrice($transactionPrice)
+                ->setQuantity($transactionQuantity)
+                ->setExternalTransactionId($externalTransactionId);
 
-                $manager->persist($newTransaction);
-                $manager->flush();
-            }
+            $manager->persist($newTransaction);
+            $manager->flush();
+            // }
         }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -16,7 +16,6 @@ use App\Entity\BinanceAccount;
 use App\Entity\User;
 use Binance\API;
 use Doctrine\Persistence\ManagerRegistry;
-use WebSocket\Client;
 
 /**
  * @method BinanceAccount|null find($id, $lockMode = null, $lockVersion = null)
@@ -32,7 +31,7 @@ class BinanceAccountRepository extends AccountRepository
     {
         parent::__construct($registry, BinanceAccount::class);
 
-        $userAdmin = $registry->getRepository(User::class)->findBy(['username' => 'moneyes']);
+        $userAdmin    = $registry->getRepository(User::class)->findBy(['username' => 'moneyes']);
         $accountAdmin = $registry->getRepository(Account::class)->findOneBy(['user' => $userAdmin]);
         if ($accountAdmin instanceof Account) {
             $this->binanceApiConnexion = new API($accountAdmin->getPublicKey(), $accountAdmin->getPrivateKey());
@@ -59,8 +58,7 @@ class BinanceAccountRepository extends AccountRepository
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
 
-
-        if ($symbolsBalance !== null) {
+        if (null !== $symbolsBalance) {
             $symbolsList = $symbolsBalance;
         } // If the list of symbols is provided, use it
         else {
@@ -69,13 +67,13 @@ class BinanceAccountRepository extends AccountRepository
 
         $tradesList = [];
 
-        $i = 0;
+        $index = 0;
         foreach ($symbolsList as $symbol) {
-            //si $i est un multiple de 120, on attend 35 secondes
-            if ($i % 120 === 0) {
+            // si $i est un multiple de 120, on attend 35 secondes
+            if (0 === $index % 120) {
                 sleep(35);
             }
-            $i++;
+            ++$index;
             $tradesList = array_merge($tradesList, $customerBinanceApi->history($symbol)); // Get all trades for each symbol
         } // Get all trades for each symbol
 
@@ -90,7 +88,7 @@ class BinanceAccountRepository extends AccountRepository
     public function getPrice(Account $account, string $isoCode): float
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $price = (float)$customerBinanceApi->price($isoCode);
+        $price              = (float) $customerBinanceApi->price($isoCode);
 
         return $price;
     }
@@ -131,40 +129,16 @@ class BinanceAccountRepository extends AccountRepository
         $assets = [];
 
         foreach ($balances as $asset => $balance) {
-            $floatBalanceAssetBalance = (float)$balance['available'] + (float)$balance['onOrder'];
+            $floatBalanceAssetBalance = (float) $balance['available'] + (float) $balance['onOrder'];
             if ($floatBalanceAssetBalance > 0) {
                 $assets[] = [
-                    'asset' => $asset,  // Asset's ISO code
-                    'balance' => $floatBalanceAssetBalance // Asset's balance
+                    'asset'   => $asset,  // Asset's ISO code
+                    'balance' => $floatBalanceAssetBalance, // Asset's balance
                 ];
             }
         }
 
         return $assets;
-    }
-
-
-    public function getAccountPerf(Account $account, User $user): object|array|null
-    {
-        $entityManager = $this->getEntityManager(); // Init Entity Manager
-        // Get Exchange's Holdings
-        /* $exchangeHoldings = $entityManager->getRepository(Holding::class)->findBy([
-            "user " => $user->getId(),
-            //TODO : ajouter de récupérer par account
-        ]);
-
-        $value = 0;
-        $percentage = 0;
-        $gainLoss = 0; */
-
-        $exchangePerf = [
-            $account->getExchange()->getLabel() => [
-                'value' => $entityManager->getRepository(BinanceAccount::class)->getTotalValue($account),
-                'symbol' => 'USDT',
-            ],
-        ];
-
-        return $exchangePerf;
     }
 
     /**
@@ -173,19 +147,19 @@ class BinanceAccountRepository extends AccountRepository
     public function getTotalValue(Account $account): float
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $userAssets = $this->getAssets($account);
-        $balances = $customerBinanceApi->balances();
+        $userAssets         = $this->getAssets($account);
+        $balances           = $customerBinanceApi->balances();
 
         $totalValue = 0.0;
 
         foreach ($balances as $asset => $balance) {
             if (in_array($asset, $userAssets)) {
-                $floatBalanceAssetBalance = (float)$balance['available'] + (float)$balance['onOrder'];
+                $floatBalanceAssetBalance = (float) $balance['available'] + (float) $balance['onOrder'];
                 try {
                     if ('USDT' === $asset) {
                         $price = 1;
                     } else {
-                        $price = (float)$this->getPrice($account, $asset . 'USDT');
+                        $price = (float) $this->getPrice($account, $asset.'USDT');
                     }
                     $totalValue += $floatBalanceAssetBalance * $price;
                 } catch (\Exception $exception) {
@@ -197,37 +171,34 @@ class BinanceAccountRepository extends AccountRepository
         return $totalValue;
     }
 
-
     public function getBinanceApiConnexion(): API
     {
         return $this->binanceApiConnexion;
     }
-
 
     /**
      * @throws \Exception
      */
     public function getAccountSymbols(Account $account): array
     {
-        $accountAssets = $this->getAssets($account); //user holdings assets
-        $symbolsList = $this->getSymbolsList($account); //all symbols list
+        $accountAssets = $this->getAssets($account); // user holdings assets
+        $symbolsList   = $this->getSymbolsList($account); // all symbols list
 
-        $accountSymbols = []; //symbolsBalance
+        $accountSymbols = []; // symbolsBalance
 
-        foreach ($symbolsList as $key => $symbol) {
-            //check if symbol string contains at least one of balance
+        foreach ($symbolsList as $symbol) {
+            // check if symbol string contains at least one of balance
             foreach ($accountAssets as $asset) {
-                //if symbol contains balance at the beginning of the string
+                // if symbol contains balance at the beginning of the string
                 if (str_starts_with($symbol, $asset['asset'])) {
-                    //add symbol to symbolsBalance
-                    $accountSymbols[] = $symbol; //add symbol to symbolsBalance
-                } //if symbol contains balance at the beginning of the string
-            } //foreach balance
-        } //get symbolsBalance
+                    // add symbol to symbolsBalance
+                    $accountSymbols[] = $symbol; // add symbol to symbolsBalance
+                } // if symbol contains balance at the beginning of the string
+            } // foreach balance
+        } // get symbolsBalance
 
-        return array_unique($accountSymbols); //return symbolsBalance
+        return array_unique($accountSymbols); // return symbolsBalance
     }
-
 
     /**
      * @throws \Exception
@@ -243,6 +214,4 @@ class BinanceAccountRepository extends AccountRepository
     {
         return new API($account->getPublicKey(), $account->getPrivateKey());
     }
-
-
 }

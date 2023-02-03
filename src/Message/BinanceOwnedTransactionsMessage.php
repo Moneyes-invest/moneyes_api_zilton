@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -11,20 +11,14 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Entity\Account;
-use App\Entity\Currency;
-use App\Entity\Transaction;
-use Doctrine\ORM\EntityManagerInterface;
-
 class BinanceOwnedTransactionsMessage
 {
     private string $accountId;
     private ?\DateTime $previousUpdate;
-    private array $symbolsBalance;
 
     public function __construct(string $accountId, ?\DateTime $previousUpdate = null)
     {
-        $this->accountId = $accountId;
+        $this->accountId      = $accountId;
         $this->previousUpdate = $previousUpdate;
     }
 
@@ -37,6 +31,4 @@ class BinanceOwnedTransactionsMessage
     {
         return $this->previousUpdate;
     }
-
-
 }

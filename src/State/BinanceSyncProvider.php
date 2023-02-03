@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
@@ -10,9 +19,6 @@ use App\Entity\Holding;
 use App\Entity\User;
 use App\Message\BinanceAllTransactionsMessage;
 use App\Message\BinanceOwnedTransactionsMessage;
-use App\MessageHandler\BinanceHandler;
-use App\Repository\BinanceAccountRepository;
-use Binance\API;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -24,25 +30,28 @@ class BinanceSyncProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $idAccount = $uriVariables['id']; //user id
-        $account = $this->manager->getRepository(Account::class)->find($idAccount); //user account
-        $binanceApi = new API($account->getPublicKey(), $account->getPrivateKey()); //Binance api customerBinanceApi
-        $holdings = $this->manager->getRepository(BinanceAccount::class)->getAssets($account); //user holdings assets
+        $idAccount = $uriVariables['id']; // user id
+        $account   = $this->manager->getRepository(Account::class)->find($idAccount); // user account
 
-        //Get all transactions for each symbol by messenger handler
-        $this->bus->dispatch(new BinanceOwnedTransactionsMessage((string)$account->getId()));
+        if (!$account instanceof BinanceAccount) {
+            return null;
+        }
 
-        //Get the rest of transactions (all symbols - user holdings)
-        //$this->bus->dispatch(new BinanceAllTransactionsMessage((string)$account->getId()));
+        $holdings = $this->manager->getRepository(BinanceAccount::class)->getAssets($account); // user holdings assets
 
+        // Get all transactions for each symbol by messenger handler
+        $this->bus->dispatch(new BinanceOwnedTransactionsMessage((string) $account->getId()));
 
-        //Update holdings
+        // Get the rest of transactions (all symbols - user holdings)
+        // $this->bus->dispatch(new BinanceAllTransactionsMessage((string)$account->getId()));
+
+        // Update holdings
         /*$user = $account->getUser();
         if ($user instanceof User) {
             $this->manager->getRepository(Holding::class)->updateHoldings($user);
         }*/
 
-        //Return Binance details endpoint
+        // Return Binance details endpoint
         return $holdings;
     }
 }

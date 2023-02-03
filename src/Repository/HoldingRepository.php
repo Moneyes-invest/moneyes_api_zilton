@@ -57,12 +57,12 @@ class HoldingRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $currency      = $transaction->getCurrency();
-        $account      = $transaction->getAccount();
+        $account       = $transaction->getAccount();
         $user          = $transaction->getUser();
         $holdingToFind = $entityManager->getRepository(Holding::class)
                                        ->findOneBy([
                                            'currency'   => $currency,
-                                           'account'   => $account,
+                                           'account'    => $account,
                                            'user'       => $user,
                                        ]);
 

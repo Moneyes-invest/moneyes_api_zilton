@@ -40,10 +40,9 @@ class UserProviderAllTransactions implements ProviderInterface
         // 1. Flush User Holdings
         $this->manager->getRepository(User::class)->flushHoldings($user);
 
-
-        //get user balances
-        //$binanceApi = $this->manager->getRepository(BinanceAccount::class)->customerBinanceApi($user);
-        //$balances
+        // get user balances
+        // $binanceApi = $this->manager->getRepository(BinanceAccount::class)->customerBinanceApi($user);
+        // $balances
 
         // 2. Fetch all transactions for all accounts
         foreach ($userAccounts as $userAccount) {

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -44,7 +44,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Get(
             normalizationContext: [
-                'groups' => ['get:accounts', 'get:account']
+                'groups' => ['get:accounts', 'get:account'],
             ]
         ),
         new Get(

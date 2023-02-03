@@ -221,7 +221,6 @@ class Transaction
         return $this;
     }
 
-
     public function getExternalTransactionId(): ?string
     {
         return $this->externalTransactionId;
