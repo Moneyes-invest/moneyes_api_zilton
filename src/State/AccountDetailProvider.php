@@ -24,7 +24,7 @@ class AccountDetailProvider implements ProviderInterface
         if (!$account instanceof Account) {
             return ["Le compte n'existe pas"];
         }
-        $jsonReturn["accountLabel"] = $account->getExchange()->getLabel();
+        $jsonReturn["accountLabel"] = "Binance";
         $holdings                = $this->manager->getRepository(Holding::class)->findBy(['account' => $account]);
         foreach ($holdings as $index => $holding) {
             $jsonReturn["holdings"][$index] = array(

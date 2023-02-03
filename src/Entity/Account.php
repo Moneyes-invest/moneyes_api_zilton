@@ -41,6 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(
             uriTemplate: '/accounts/{id}/detail',
             provider: AccountDetailProvider::class,
+        ),
         new Get(
             normalizationContext: [
                 'groups' => ['get:accounts', 'get:account']
