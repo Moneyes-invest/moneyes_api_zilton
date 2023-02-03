@@ -57,12 +57,12 @@ class HoldingRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $currency      = $transaction->getCurrency();
-        $exchange      = $transaction->getAccount();
+        $account      = $transaction->getAccount();
         $user          = $transaction->getUser();
         $holdingToFind = $entityManager->getRepository(Holding::class)
                                        ->findOneBy([
                                            'currency'   => $currency,
-                                           'exchange'   => $exchange,
+                                           'account'   => $account,
                                            'user'       => $user,
                                        ]);
 
@@ -104,8 +104,8 @@ class HoldingRepository extends ServiceEntityRepository
             foreach ($holdings as $holding) {
                 $entityManager->remove($holding);
             }
-            $entityManager->flush();
         }
+        $entityManager->flush();
 
         // Get all User's Transactions
         $transactions = $entityManager->getRepository(Transaction::class)->getTransactions($user); // Get all user's transactions

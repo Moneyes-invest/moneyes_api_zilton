@@ -41,7 +41,7 @@ class BinanceHandler
         $this->fetchTransactions($accountSymbols, $account );
 
         // Update holdings
-        //$this->manager->getRepository(Holding::class)->updateHoldings($account);
+        $this->manager->getRepository(Holding::class)->updateHoldings($account->getUser());
 
     }
 

@@ -13,7 +13,6 @@ namespace App\Message;
 
 use App\Entity\Account;
 use App\Entity\Currency;
-use App\Entity\Exchange;
 use App\Entity\Transaction;
 use Doctrine\ORM\EntityManagerInterface;
 
