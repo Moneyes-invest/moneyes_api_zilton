@@ -13,7 +13,6 @@ namespace App\Controller\Admin;
 
 use App\Entity\Account;
 use App\Entity\Currency;
-use App\Entity\Exchange;
 use App\Entity\Holding;
 use App\Entity\RefreshToken;
 use App\Entity\Transaction;
@@ -87,12 +86,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Transactions', 'fas fa-money-bill-trend-up')->setSubItems([
             MenuItem::linkToCrud('Create Transaction', 'fas fa-plus', Transaction::class)->setAction(Crud::PAGE_NEW),
             MenuItem::linkToCrud('Show Transactions', 'fas fa-eye', Transaction::class),
-        ]);
-
-        // CRUD Exchange
-        yield MenuItem::subMenu('Exchanges', 'fas fa-arrow-right-arrow-left')->setSubItems([
-            MenuItem::linkToCrud('Create Exchange', 'fas fa-plus', Exchange::class)->setAction(Crud::PAGE_NEW),
-            MenuItem::linkToCrud('Show Exchanges', 'fas fa-eye', Exchange::class),
         ]);
     }
 }

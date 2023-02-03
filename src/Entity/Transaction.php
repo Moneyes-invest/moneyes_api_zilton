@@ -56,8 +56,8 @@ class Transaction
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get:transaction', 'create:transaction', 'get:exchanges'])]
-    private Exchange $exchange;
+    #[Groups(['get:transaction', 'create:transaction'])]
+    private Account $account;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
     #[ORM\JoinColumn(nullable: false)]
@@ -93,8 +93,8 @@ class Transaction
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private float $quantity;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $transactionExchangeId = null;
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    private ?string $externalTransactionId = null;
 
     public function getId(): ?Uuid
     {
@@ -113,14 +113,14 @@ class Transaction
         return $this;
     }
 
-    public function getExchange(): Exchange
+    public function getAccount(): Account
     {
-        return $this->exchange;
+        return $this->account;
     }
 
-    public function setExchange(Exchange $exchange): self
+    public function setAccount(Account $account): self
     {
-        $this->exchange = $exchange;
+        $this->account = $account;
 
         return $this;
     }
@@ -221,14 +221,15 @@ class Transaction
         return $this;
     }
 
-    public function getTransactionExchangeId(): ?int
+
+    public function getExternalTransactionId(): ?string
     {
-        return $this->transactionExchangeId;
+        return $this->externalTransactionId;
     }
 
-    public function setTransactionExchangeId(?int $transactionExchangeId): self
+    public function setExternalTransactionId(?string $externalTransactionId): self
     {
-        $this->transactionExchangeId = $transactionExchangeId;
+        $this->externalTransactionId = $externalTransactionId;
 
         return $this;
     }
