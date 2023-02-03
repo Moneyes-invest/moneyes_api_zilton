@@ -17,7 +17,7 @@ use App\Entity\Exchange;
 use App\Entity\Transaction;
 use Doctrine\ORM\EntityManagerInterface;
 
-class FetchBinanceTransactionsOfSymbolsNotOwned
+class BinanceAllTransactionsMessage
 {
     private string $accountId;
     private ?\DateTime $previousUpdate;

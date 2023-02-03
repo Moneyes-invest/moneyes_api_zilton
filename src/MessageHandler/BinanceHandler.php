@@ -9,11 +9,12 @@ use App\Entity\Exchange;
 use App\Entity\Holding;
 use App\Entity\Transaction;
 use App\Entity\User;
-use App\Message\FetchBinanceTransactions;
-use App\Message\FetchBinanceTransactionsOfSymbolsNotOwned;
+use App\Message\BinanceAllTransactionsMessage;
+use App\Message\BinanceOwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-class FetchBinanceTransactionsOfSymbolsNotOwnedHandler
+class BinanceHandler
 {
     /**
      * @param EntityManagerInterface $manager
@@ -22,7 +23,32 @@ class FetchBinanceTransactionsOfSymbolsNotOwnedHandler
     {
     }
 
-    public function handleFetchBinanceTransactionsOfSymbolsNotOwned(FetchBinanceTransactionsOfSymbolsNotOwned $fetchBinanceTransactions): void
+
+    /**
+     * @param BinanceOwnedTransactionsMessage $fetchBinanceTransactions
+     * @return void
+     */
+    #[AsMessageHandler]
+    public function handleFetchBinanceTransactionsOfSymbolsOwned(BinanceOwnedTransactionsMessage $fetchBinanceTransactions): void
+    {
+        $account = $this->manager->getRepository(Account::class)->find($fetchBinanceTransactions->getAccountId());
+        $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); //user account symbols
+
+        if (!$account instanceof Account) {
+            return;
+        }
+
+        // Fetch and save transactions for owned symbols
+        $this->fetchTransactions($accountSymbols, $account );
+
+    }
+
+    /**
+     * @param BinanceOwnedTransactionsMessage $fetchBinanceTransactions
+     * @return void
+     */
+    #[AsMessageHandler]
+    public function handleFetchBinanceTransactionsOfSymbolsNotOwned(BinanceAllTransactionsMessage $fetchBinanceTransactions): void
     {
         $account = $this->manager->getRepository(Account::class)->find($fetchBinanceTransactions->getAccountId());
         $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); //user account symbols
@@ -35,15 +61,22 @@ class FetchBinanceTransactionsOfSymbolsNotOwnedHandler
             return;
         }
 
-        // Fetch transactions for not owned symbols
-        $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($account, $symbolsNotOwned, $fetchBinanceTransactions->getPreviousUpdate());
+        // Fetch and save transactions for owned symbols
+        $this->fetchTransactions($symbolsNotOwned, $account);
+    }
 
-        // Binance ID
-        $binanceExchange = $this->manager->getRepository(Exchange::class)->findOneBy(['label' => 'Binance']);
+    /**
+     * @param array $accountSymbols
+     * @param Account $account
+     * @return void
+     */
+    private function fetchTransactions(array $accountSymbols, Account $account): void
+    {
+        // Fetch transactions for owned symbols
+        $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($account, $accountSymbols);
 
         //Save transactions into database
-        $this->saveTransactions($transactions, $account, $binanceExchange, $this->manager);
-
+        $this->saveTransactions($transactions, $account, $this->manager);
     }
 
 
@@ -54,7 +87,7 @@ class FetchBinanceTransactionsOfSymbolsNotOwnedHandler
      * @param EntityManagerInterface $manager
      * @return void
      */
-    public function saveTransactions(array $transactions, Account $account, Exchange $binanceExchange, EntityManagerInterface $manager): void
+    private function saveTransactions(array $transactions, Account $account, EntityManagerInterface $manager): void
     {
         // Register transactions
         foreach ($transactions as $transaction) {
@@ -93,7 +126,7 @@ class FetchBinanceTransactionsOfSymbolsNotOwnedHandler
             //if (null === $transactionExists && $binanceExchange instanceof Exchange) {
             if (true) {
                 $newTransaction = new Transaction();
-                $newTransaction->setExchange($binanceExchange)
+                $newTransaction->setAccount($account)
                     ->setUser($account->getUser())
                     ->setCurrency($currencyId)
                     ->setDate($date)

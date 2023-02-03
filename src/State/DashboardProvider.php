@@ -19,7 +19,7 @@ use App\Entity\Currency;
 use App\Entity\Holding;
 use App\Entity\Transaction;
 use App\Entity\User;
-use App\Message\FetchBinanceTransactions;
+use App\Message\BinanceOwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use WebSocket\Client;
 
@@ -73,7 +73,7 @@ class DashboardProvider implements ProviderInterface
 
         // return $this->manager->getRepository(Currency::class)->findOneBy(["codeIso" => "blblblbl"]);
 
-        // $transactions = $this->bus->dispatch(new FetchBinanceTransactions("1ed91248-b6f0-6b32-8390-c57cccfca4d5"));
+        // $transactions = $this->bus->dispatch(new BinanceOwnedTransactionsMessage("1ed91248-b6f0-6b32-8390-c57cccfca4d5"));
 
         // return array("Transactions en cours de récupération");
 
