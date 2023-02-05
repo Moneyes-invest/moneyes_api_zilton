@@ -1,13 +1,6 @@
 <?php
 
-declare(strict_types = 1);
-
-/*
- * This file is part of the Moneyes API project.
- * (c) Moneyes
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
@@ -17,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230205163943 extends AbstractMigration
+final class Version20230205234808 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -29,9 +22,11 @@ final class Version20230205163943 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SEQUENCE holding_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE refresh_token_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE TABLE account (id UUID NOT NULL, user_id UUID NOT NULL, private_key VARCHAR(255) DEFAULT NULL, public_key VARCHAR(255) DEFAULT NULL, exchange VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE account (id UUID NOT NULL, exchange_id UUID NOT NULL, user_id UUID NOT NULL, private_key VARCHAR(255) DEFAULT NULL, public_key VARCHAR(255) DEFAULT NULL, exchange VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_7D3656A468AFD1A0 ON account (exchange_id)');
         $this->addSql('CREATE INDEX IDX_7D3656A4A76ED395 ON account (user_id)');
         $this->addSql('COMMENT ON COLUMN account.id IS \'(DC2Type:uuid)\'');
+        $this->addSql('COMMENT ON COLUMN account.exchange_id IS \'(DC2Type:uuid)\'');
         $this->addSql('COMMENT ON COLUMN account.user_id IS \'(DC2Type:uuid)\'');
         $this->addSql('CREATE TABLE asset (id UUID NOT NULL, asset_id UUID NOT NULL, symbol_id UUID NOT NULL, name VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_2AF5A5C5DA1941 ON asset (asset_id)');
@@ -43,6 +38,8 @@ final class Version20230205163943 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN binance_account.id IS \'(DC2Type:uuid)\'');
         $this->addSql('CREATE TABLE currency (id UUID NOT NULL, code_iso VARCHAR(255) NOT NULL, name VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('COMMENT ON COLUMN currency.id IS \'(DC2Type:uuid)\'');
+        $this->addSql('CREATE TABLE exchange (id UUID NOT NULL, label VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('COMMENT ON COLUMN exchange.id IS \'(DC2Type:uuid)\'');
         $this->addSql('CREATE TABLE holding (id INT NOT NULL, user_id UUID NOT NULL, currency_id UUID NOT NULL, account_id UUID NOT NULL, quantity DOUBLE PRECISION NOT NULL, average_purchase_price DOUBLE PRECISION NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_5BBFD816A76ED395 ON holding (user_id)');
         $this->addSql('CREATE INDEX IDX_5BBFD81638248176 ON holding (currency_id)');
@@ -75,6 +72,7 @@ final class Version20230205163943 extends AbstractMigration
         $$ LANGUAGE plpgsql;');
         $this->addSql('DROP TRIGGER IF EXISTS notify_trigger ON messenger_messages;');
         $this->addSql('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON messenger_messages FOR EACH ROW EXECUTE PROCEDURE notify_messenger_messages();');
+        $this->addSql('ALTER TABLE account ADD CONSTRAINT FK_7D3656A468AFD1A0 FOREIGN KEY (exchange_id) REFERENCES exchange (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE account ADD CONSTRAINT FK_7D3656A4A76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE asset ADD CONSTRAINT FK_2AF5A5C5DA1941 FOREIGN KEY (asset_id) REFERENCES currency (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE asset ADD CONSTRAINT FK_2AF5A5CC0F75674 FOREIGN KEY (symbol_id) REFERENCES currency (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -93,6 +91,7 @@ final class Version20230205163943 extends AbstractMigration
         $this->addSql('CREATE SCHEMA public');
         $this->addSql('DROP SEQUENCE holding_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE refresh_token_id_seq CASCADE');
+        $this->addSql('ALTER TABLE account DROP CONSTRAINT FK_7D3656A468AFD1A0');
         $this->addSql('ALTER TABLE account DROP CONSTRAINT FK_7D3656A4A76ED395');
         $this->addSql('ALTER TABLE asset DROP CONSTRAINT FK_2AF5A5C5DA1941');
         $this->addSql('ALTER TABLE asset DROP CONSTRAINT FK_2AF5A5CC0F75674');
@@ -107,6 +106,7 @@ final class Version20230205163943 extends AbstractMigration
         $this->addSql('DROP TABLE asset');
         $this->addSql('DROP TABLE binance_account');
         $this->addSql('DROP TABLE currency');
+        $this->addSql('DROP TABLE exchange');
         $this->addSql('DROP TABLE holding');
         $this->addSql('DROP TABLE refresh_token');
         $this->addSql('DROP TABLE transaction');
