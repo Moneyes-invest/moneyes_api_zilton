@@ -14,6 +14,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
+use App\Entity\BinanceAccount;
 use App\Entity\Holding;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,7 +37,6 @@ class DashboardProvider implements ProviderInterface
             return ["L'utilisateur n'a pas de compte"];
         }
 
-        // A. Exchanges
         foreach ($accounts as $account) {
             if (!$account instanceof Account) {
                 continue;
@@ -58,8 +58,12 @@ class DashboardProvider implements ProviderInterface
             }
         }
 
+        return $this->manager->getRepository(BinanceAccount::class)->fetchWithdraw($accounts[0], array('startTime' => 0));
+
+        /*
         return [
             'accounts' => $accountArray,
         ];
+        */
     }
 }

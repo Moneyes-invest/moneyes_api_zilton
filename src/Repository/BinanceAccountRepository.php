@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -15,6 +15,7 @@ use App\Entity\Account;
 use App\Entity\BinanceAccount;
 use App\Entity\User;
 use Binance\API;
+use Binance\RateLimiter;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -31,7 +32,7 @@ class BinanceAccountRepository extends AccountRepository
     {
         parent::__construct($registry, BinanceAccount::class);
 
-        $userAdmin    = $registry->getRepository(User::class)->findBy(['username' => 'moneyes']);
+        $userAdmin = $registry->getRepository(User::class)->findBy(['username' => 'moneyes']);
         $accountAdmin = $registry->getRepository(Account::class)->findOneBy(['user' => $userAdmin]);
         if ($accountAdmin instanceof Account) {
             $this->binanceApiConnexion = new API($accountAdmin->getPublicKey(), $accountAdmin->getPrivateKey());
@@ -41,8 +42,8 @@ class BinanceAccountRepository extends AccountRepository
     public function getSymbolsList(Account $account): array
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $symbolsListRaw     = $customerBinanceApi->exchangeInfo()['symbols'];
-        $symbolsList        = [];
+        $symbolsListRaw = $customerBinanceApi->exchangeInfo()['symbols'];
+        $symbolsList = [];
 
         foreach ($symbolsListRaw as $symbol) {
             $symbolsList[] = $symbol['symbol'];
@@ -88,7 +89,7 @@ class BinanceAccountRepository extends AccountRepository
     public function getPrice(Account $account, string $isoCode): float
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $price              = (float) $customerBinanceApi->price($isoCode);
+        $price = (float)$customerBinanceApi->price($isoCode);
 
         return $price;
     }
@@ -129,10 +130,10 @@ class BinanceAccountRepository extends AccountRepository
         $assets = [];
 
         foreach ($balances as $asset => $balance) {
-            $floatBalanceAssetBalance = (float) $balance['available'] + (float) $balance['onOrder'];
+            $floatBalanceAssetBalance = (float)$balance['available'] + (float)$balance['onOrder'];
             if ($floatBalanceAssetBalance > 0) {
                 $assets[] = [
-                    'asset'   => $asset,  // Asset's ISO code
+                    'asset' => $asset,  // Asset's ISO code
                     'balance' => $floatBalanceAssetBalance, // Asset's balance
                 ];
             }
@@ -147,19 +148,19 @@ class BinanceAccountRepository extends AccountRepository
     public function getTotalValue(Account $account): float
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $userAssets         = $this->getAssets($account);
-        $balances           = $customerBinanceApi->balances();
+        $userAssets = $this->getAssets($account);
+        $balances = $customerBinanceApi->balances();
 
         $totalValue = 0.0;
 
         foreach ($balances as $asset => $balance) {
             if (in_array($asset, $userAssets)) {
-                $floatBalanceAssetBalance = (float) $balance['available'] + (float) $balance['onOrder'];
+                $floatBalanceAssetBalance = (float)$balance['available'] + (float)$balance['onOrder'];
                 try {
                     if ('USDT' === $asset) {
                         $price = 1;
                     } else {
-                        $price = (float) $this->getPrice($account, $asset.'USDT');
+                        $price = (float)$this->getPrice($account, $asset . 'USDT');
                     }
                     $totalValue += $floatBalanceAssetBalance * $price;
                 } catch (\Exception $exception) {
@@ -182,7 +183,7 @@ class BinanceAccountRepository extends AccountRepository
     public function getAccountSymbols(Account $account): array
     {
         $accountAssets = $this->getAssets($account); // user holdings assets
-        $symbolsList   = $this->getSymbolsList($account); // all symbols list
+        $symbolsList = $this->getSymbolsList($account); // all symbols list
 
         $accountSymbols = []; // symbolsBalance
 
@@ -207,11 +208,55 @@ class BinanceAccountRepository extends AccountRepository
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
 
-        return $customerBinanceApi->exchangeInfo()['symbols'];
+        $rawSymbolsList = $customerBinanceApi->exchangeInfo()['symbols'];
+        $symbolsList = array();
+
+        foreach ($rawSymbolsList as $symbol) {
+            $symbolsList[] = $symbol['symbol'];
+        }
+
+        return $symbolsList;
     }
 
-    private function customerBinanceApi(Account $account): API
+    private function customerBinanceApi(Account $account): RateLimiter|API
     {
-        return new API($account->getPublicKey(), $account->getPrivateKey());
+        $api = new API($account->getPublicKey(), $account->getPrivateKey());
+        $api = new RateLimiter($api);
+
+        return $api;
     }
+
+
+    /**
+     * @throws \Exception
+     *
+     * @return array
+     */
+    public function fetchWithdraw(Account $account, array $params): array
+    {
+        $threeMonthsInMs = 7776000000;
+        $todayTimestampMs = time() * 1000;
+        $start = $todayTimestampMs - $threeMonthsInMs;
+        $end = $todayTimestampMs;
+        $binanceCreationTimestampMs = 1498860000000;
+        $withdrawHistory = [];
+        $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
+
+        while ($start > $binanceCreationTimestampMs) {
+            $params['startTime'] = $start;
+            $params['endTime'] = $end;
+            // if $customerBinanceApi->withdrawHistory(null, $params); is not empty add it to $withdrawHistory
+            $withdraw = $customerBinanceApi->withdrawHistory(null, $params);
+            if (!empty($withdraw['withdrawList'])) {
+                foreach ($withdraw['withdrawList'] as $withdrawValue) {
+                    $withdrawHistory[] = $withdrawValue;
+                }
+            }
+            $start = $start - $threeMonthsInMs;
+            $end = $end - $threeMonthsInMs;
+        }
+
+        return $withdrawHistory;
+    }
+
 }

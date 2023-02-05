@@ -43,13 +43,7 @@ class BinanceSyncProvider implements ProviderInterface
         $this->bus->dispatch(new BinanceOwnedTransactionsMessage((string) $account->getId()));
 
         // Get the rest of transactions (all symbols - user holdings)
-        // $this->bus->dispatch(new BinanceAllTransactionsMessage((string)$account->getId()));
-
-        // Update holdings
-        /*$user = $account->getUser();
-        if ($user instanceof User) {
-            $this->manager->getRepository(Holding::class)->updateHoldings($user);
-        }*/
+        $this->bus->dispatch(new BinanceAllTransactionsMessage((string)$account->getId()));
 
         // Return Binance details endpoint
         return $holdings;

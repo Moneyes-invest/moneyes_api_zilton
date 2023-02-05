@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -56,13 +56,16 @@ class BinanceHandler
         }
 
         $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); // user account symbols
-        $allSymbols     = $this->manager->getRepository(BinanceAccount::class)->getAllSymbols($account); // all symbols
+        $allSymbols = $this->manager->getRepository(BinanceAccount::class)->getAllSymbols($account); // all symbols
 
         // Remove symbols owned by user
         $symbolsNotOwned = array_diff($allSymbols, $accountSymbols); // symbols not owned by user
 
         // Fetch and save transactions for owned symbols
         $this->fetchTransactions($symbolsNotOwned, $account);
+
+        // Update holdings
+        $this->manager->getRepository(Holding::class)->updateHoldings($account->getUser());
     }
 
     private function fetchTransactions(array $accountSymbols, Account $account): void
@@ -105,9 +108,9 @@ class BinanceHandler
             // Transaction ID
             // $transactionExists = $this->manager->getRepository(Transaction::class)->findOneBy(['transactionExchangeId' => $exchangeTradeId]);
 
-            $transactionPrice      = (float) $transaction['price'];
-            $transactionQuantity   = (float) $transaction['qty'];
-            $externalTransactionId = (string) $transaction['id'];
+            $transactionPrice = (float)$transaction['price'];
+            $transactionQuantity = (float)$transaction['qty'];
+            $externalTransactionId = (string)$transaction['id'];
 
             // if (null === $transactionExists && $binanceExchange instanceof Exchange) {
             $newTransaction = new Transaction();
@@ -125,4 +128,4 @@ class BinanceHandler
             // }
         }
     }
-}
+} 
