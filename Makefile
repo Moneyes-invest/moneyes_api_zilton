@@ -122,7 +122,7 @@ db-test: vendor
 	$(SYMFONY) doctrine:migrations:migrate --no-interaction --allow-no-migration --env test
 
 test-fixtures: db-test
-#	$(SYMFONY) doctrine:fixtures:load --env test --group=test --append
+	$(SYMFONY) doctrine:fixtures:load --env test --group=dev --append
 
 test: test-fixtures assets
 	$(EXEC_APP) php ./vendor/bin/simple-phpunit --testdox
