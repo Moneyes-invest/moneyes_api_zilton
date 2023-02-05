@@ -93,7 +93,7 @@ class Transaction
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private float $quantity;
 
-    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    #[ORM\Column(nullable: true)]
     private ?string $externalTransactionId = null;
 
     public function getId(): ?Uuid
@@ -174,7 +174,7 @@ class Transaction
     }
 
     /**
-     * Can be "BUY", "SELL" or "TRANSFERT".
+     * Can be "BUY", "SELL", "TRANSFERT", "WITHDRAW", "DEPOSIT".
      *
      * @return $this
      */

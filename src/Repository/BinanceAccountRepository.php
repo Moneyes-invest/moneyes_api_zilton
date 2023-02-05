@@ -13,9 +13,12 @@ namespace App\Repository;
 
 use App\Entity\Account;
 use App\Entity\BinanceAccount;
+use App\Entity\Currency;
+use App\Entity\Transaction;
 use App\Entity\User;
 use Binance\API;
 use Binance\RateLimiter;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -28,12 +31,16 @@ class BinanceAccountRepository extends AccountRepository
 {
     private API $binanceApiConnexion;
 
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @param EntityManagerInterface $manager
+     * @param ManagerRegistry $registry
+     */
+    public function __construct(EntityManagerInterface $manager, ManagerRegistry $registry)
     {
         parent::__construct($registry, BinanceAccount::class);
 
-        $userAdmin = $registry->getRepository(User::class)->findBy(['username' => 'moneyes']);
-        $accountAdmin = $registry->getRepository(Account::class)->findOneBy(['user' => $userAdmin]);
+        $userAdmin = $manager->getRepository(User::class)->findBy(['username' => 'moneyes']);
+        $accountAdmin = $manager->getRepository(Account::class)->findOneBy(['user' => $userAdmin]);
         if ($accountAdmin instanceof Account) {
             $this->binanceApiConnexion = new API($accountAdmin->getPublicKey(), $accountAdmin->getPrivateKey());
         }
@@ -255,6 +262,33 @@ class BinanceAccountRepository extends AccountRepository
             $start = $start - $threeMonthsInMs;
             $end = $end - $threeMonthsInMs;
         }
+
+        //register transactions withdraws
+        foreach ($withdrawHistory as $withdraw){
+            $transaction = new Transaction();
+            $transaction->setAccount($account);
+            $currency = $this->getEntityManager()->getRepository(Currency::class)->findOneBy(['codeIso' => $withdraw['coin']]);
+            // if currency is not found, create it
+            if (null === $currency) {
+                $currency = new Currency();
+                $currency->setCodeIso($withdraw['coin']);
+                $currency->setName($withdraw['coin']);
+                $this->getEntityManager()->persist($currency);
+                $this->getEntityManager()->flush();
+            }
+            $transaction->setCurrency($currency);
+            $transaction->setUser($account->getUser());
+            $transaction->setDate(new \DateTime($withdraw['applyTime']));
+            $transaction->setOrderDirection("WITHDRAW");
+            $transaction->setFees((float)$withdraw['transactionFee']);
+            $transaction->setPrice(0);
+            $transaction->setQuantity((float)$withdraw['amount']);
+            $transaction->setExternalTransactionId($withdraw['id']);
+
+            $this->getEntityManager()->persist($transaction);
+            $this->getEntityManager()->flush();
+        }
+
 
         return $withdrawHistory;
     }
