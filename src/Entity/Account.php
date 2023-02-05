@@ -12,12 +12,8 @@ declare(strict_types = 1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use App\Repository\AccountRepository;
 use App\State\AccountDetailProvider;
 use App\State\BinanceSyncProvider;
@@ -43,18 +39,9 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: AccountDetailProvider::class,
         ),
         new Get(
-            normalizationContext: [
-                'groups' => ['get:accounts', 'get:account'],
-            ]
-        ),
-        new Get(
             uriTemplate: '/accounts/{id}/sync',
             provider: BinanceSyncProvider::class,
         ),
-        new Post(),
-        new Put(),
-        new Patch(),
-        new Delete(),
     ],
     denormalizationContext: ['groups' => ['create:account', 'update:account']],
 )]
@@ -72,12 +59,12 @@ abstract class Account
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]
     #[Assert\NotBlank(groups: ['create:account'])]
-    private ?string $privateKey = null;
+    private string $privateKey;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]
     #[Assert\NotBlank(groups: ['create:account'])]
-    private ?string $publicKey = null;
+    private string $publicKey;
 
     #[ORM\ManyToOne(inversedBy: 'account')]
     #[ORM\JoinColumn(nullable: false)]
@@ -85,7 +72,7 @@ abstract class Account
     #[Assert\NotBlank(groups: ['create:account'])]
     private User $user;
 
-    public function getId(): ?Uuid
+    public function getId(): Uuid
     {
         return $this->id;
     }
@@ -102,24 +89,24 @@ abstract class Account
         return $this;
     }
 
-    public function getPrivateKey(): ?string
+    public function getPrivateKey(): string
     {
         return $this->privateKey;
     }
 
-    public function setPrivateKey(?string $privateKey): self
+    public function setPrivateKey(string $privateKey): self
     {
         $this->privateKey = $privateKey;
 
         return $this;
     }
 
-    public function getPublicKey(): ?string
+    public function getPublicKey(): string
     {
         return $this->publicKey;
     }
 
-    public function setPublicKey(?string $publicKey): self
+    public function setPublicKey(string $publicKey): self
     {
         $this->publicKey = $publicKey;
 
