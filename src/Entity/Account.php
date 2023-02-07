@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -16,7 +16,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\AccountRepository;
 use App\State\AccountDetailProvider;
-use App\State\BinanceSyncProvider;
+use App\State\SyncProvider;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -40,7 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Get(
             uriTemplate: '/accounts/{id}/sync',
-            provider: BinanceSyncProvider::class,
+            provider: SyncProvider::class,
         ),
     ],
     denormalizationContext: ['groups' => ['create:account', 'update:account']],

@@ -16,7 +16,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
 use App\Entity\BinanceAccount;
 use App\Entity\User;
-use App\Message\BinanceOwnedTransactionsMessage;
+use App\Message\OwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -50,7 +50,7 @@ class UserProviderAllTransactions implements ProviderInterface
                 // 1. Delete all Transactions about this User Account
                 $this->manager->getRepository(Account::class)->flushTransactions($userAccount);
                 // 2. Fetch all Account Transactions
-                $this->bus->dispatch(new BinanceOwnedTransactionsMessage((string) $userAccount->getId()));
+                $this->bus->dispatch(new OwnedTransactionsMessage($userAccount));
             }
         }
 

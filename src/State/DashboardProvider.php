@@ -58,8 +58,7 @@ class DashboardProvider implements ProviderInterface
             }
         }
 
-        return $this->manager->getRepository(BinanceAccount::class)->fetchWithdraw($accounts[0], array('startTime' => 0));
-
+        return $this->manager->getRepository(BinanceAccount::class)->fetchWithdraw($accounts[0], ['startTime' => 0]);
         /*
         return [
             'accounts' => $accountArray,

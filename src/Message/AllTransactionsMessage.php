@@ -11,20 +11,22 @@ declare(strict_types = 1);
 
 namespace App\Message;
 
-class BinanceAllTransactionsMessage
+use App\Entity\Account;
+
+class AllTransactionsMessage
 {
-    private string $accountId;
+    private Account $account;
     private ?\DateTime $previousUpdate;
 
-    public function __construct(string $accountId, ?\DateTime $previousUpdate = null)
+    public function __construct(Account $account, ?\DateTime $previousUpdate = null)
     {
-        $this->accountId      = $accountId;
+        $this->account        = $account;
         $this->previousUpdate = $previousUpdate;
     }
 
-    public function getAccountId(): string
+    public function getAccount(): Account
     {
-        return $this->accountId;
+        return $this->account;
     }
 
     public function getPreviousUpdate(): ?\DateTime

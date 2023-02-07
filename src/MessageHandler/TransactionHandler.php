@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -12,51 +12,40 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Account;
-use App\Entity\BinanceAccount;
 use App\Entity\Currency;
 use App\Entity\Holding;
 use App\Entity\Transaction;
-use App\Entity\User;
-use App\Message\BinanceAllTransactionsMessage;
-use App\Message\BinanceOwnedTransactionsMessage;
+use App\Message\AllTransactionsMessage;
+use App\Message\OwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-class BinanceHandler
+class TransactionHandler
 {
     public function __construct(private readonly EntityManagerInterface $manager)
     {
     }
 
     #[AsMessageHandler]
-    public function handleFetchBinanceTransactionsOfSymbolsOwned(BinanceOwnedTransactionsMessage $fetchBinanceTransactions): void
+    public function handleFetchTransactionsOfSymbolsOwned(OwnedTransactionsMessage $message): void
     {
-        $account = $this->manager->getRepository(Account::class)->find($fetchBinanceTransactions->getAccountId());
-
-        if (!$account instanceof Account) {
-            return;
-        }
-
-        $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); // user account symbols
-
+        $account        = $message->getAccount();
+        $accountSymbols = $this->manager->getRepository($account::class)->getAccountSymbols($account);
         // Fetch and save transactions for owned symbols
         $this->fetchTransactions($accountSymbols, $account);
-
         // Update holdings
         $this->manager->getRepository(Holding::class)->updateHoldings($account->getUser());
     }
 
     #[AsMessageHandler]
-    public function handleFetchBinanceTransactionsOfSymbolsNotOwned(BinanceAllTransactionsMessage $fetchBinanceTransactions): void
+    public function handleFetchTransactionsOfSymbolsNotOwned(AllTransactionsMessage $message): void
     {
-        $account = $this->manager->getRepository(Account::class)->find($fetchBinanceTransactions->getAccountId());
+        $account           = $message->getAccount();
+        $accountRepository = $this->manager->getRepository($account::class);
+        $holdingRepository = $this->manager->getRepository(Holding::class);
 
-        if (!$account instanceof Account) {
-            return;
-        }
-
-        $accountSymbols = $this->manager->getRepository(BinanceAccount::class)->getAccountSymbols($account); // user account symbols
-        $allSymbols = $this->manager->getRepository(BinanceAccount::class)->getAllSymbols($account); // all symbols
+        $accountSymbols = $accountRepository->getAccountSymbols($account); // user account symbols
+        $allSymbols     = $accountRepository->getAllSymbols($account); // all symbols
 
         // Remove symbols owned by user
         $symbolsNotOwned = array_diff($allSymbols, $accountSymbols); // symbols not owned by user
@@ -65,13 +54,13 @@ class BinanceHandler
         $this->fetchTransactions($symbolsNotOwned, $account);
 
         // Update holdings
-        $this->manager->getRepository(Holding::class)->updateHoldings($account->getUser());
+        $holdingRepository->updateHoldings($account->getUser());
     }
 
     private function fetchTransactions(array $accountSymbols, Account $account): void
     {
         // Fetch transactions for owned symbols
-        $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($account, $accountSymbols);
+        $transactions = $this->manager->getRepository($account::class)->fetchTransactions($account, $accountSymbols);
 
         // Save transactions into database
         $this->saveTransactions($transactions, $account, $this->manager);
@@ -108,9 +97,9 @@ class BinanceHandler
             // Transaction ID
             // $transactionExists = $this->manager->getRepository(Transaction::class)->findOneBy(['transactionExchangeId' => $exchangeTradeId]);
 
-            $transactionPrice = (float)$transaction['price'];
-            $transactionQuantity = (float)$transaction['qty'];
-            $externalTransactionId = (string)$transaction['id'];
+            $transactionPrice      = (float) $transaction['price'];
+            $transactionQuantity   = (float) $transaction['qty'];
+            $externalTransactionId = (string) $transaction['id'];
 
             // if (null === $transactionExists && $binanceExchange instanceof Exchange) {
             $newTransaction = new Transaction();
@@ -128,4 +117,4 @@ class BinanceHandler
             // }
         }
     }
-} 
+}

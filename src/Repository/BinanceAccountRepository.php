@@ -16,6 +16,7 @@ use App\Entity\BinanceAccount;
 use App\Entity\Currency;
 use App\Entity\Transaction;
 use App\Entity\User;
+use App\Interface\AccountInterface;
 use Binance\API;
 use Binance\RateLimiter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,7 +28,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method BinanceAccount[]    findAll()
  * @method BinanceAccount[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BinanceAccountRepository extends AccountRepository
+class BinanceAccountRepository extends AccountRepository implements AccountInterface
 {
     private API $binanceApiConnexion;
 
@@ -277,11 +278,10 @@ class BinanceAccountRepository extends AccountRepository
         return $withdrawHistory;
     }
 
-    private function customerBinanceApi(Account $account): RateLimiter|API
+    private function customerBinanceApi(Account $account): RateLimiter
     {
         $api = new API($account->getPublicKey(), $account->getPrivateKey());
-        $api = new RateLimiter($api);
 
-        return $api;
+        return new RateLimiter($api);
     }
 }
