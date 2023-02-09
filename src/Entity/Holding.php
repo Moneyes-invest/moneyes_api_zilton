@@ -22,14 +22,6 @@ class Holding
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'holdings')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Currency $currency = null;
-
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Account $account = null;
@@ -37,36 +29,13 @@ class Holding
     #[ORM\Column]
     private float $quantity;
 
-    #[ORM\Column]
-    private float $averagePurchasePrice;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Asset $asset = null;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    public function getCurrency(): ?Currency
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency(?Currency $currency): self
-    {
-        $this->currency = $currency;
-
-        return $this;
     }
 
     public function getAccount(): ?Account
@@ -93,14 +62,15 @@ class Holding
         return $this;
     }
 
-    public function getAveragePurchasePrice(): float
+
+    public function getAsset(): ?Asset
     {
-        return $this->averagePurchasePrice;
+        return $this->asset;
     }
 
-    public function setAveragePurchasePrice(float $averagePurchasePrice): self
+    public function setAsset(?Asset $asset): self
     {
-        $this->averagePurchasePrice = $averagePurchasePrice;
+        $this->asset = $asset;
 
         return $this;
     }

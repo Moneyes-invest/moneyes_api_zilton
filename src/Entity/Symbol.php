@@ -2,19 +2,19 @@
 
 namespace App\Entity;
 
-use App\Repository\AssetRepository;
+use App\Repository\SymbolRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: AssetRepository::class)]
-class Asset
+#[ORM\Entity(repositoryClass: SymbolRepository::class)]
+class Symbol
 {
     #[ORM\Id]
     #[ORM\Column]
     private string $id;
 
-    #[ORM\ManyToMany(targetEntity: Exchange::class, inversedBy: 'assets')]
+    #[ORM\ManyToMany(targetEntity: Exchange::class, inversedBy: 'symbols')]
     private Collection $exchange;
 
     public function __construct()
