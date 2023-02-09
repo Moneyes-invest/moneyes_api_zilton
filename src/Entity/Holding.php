@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace App\Entity;
 
 use App\Repository\HoldingRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: HoldingRepository::class)]
@@ -32,6 +33,10 @@ class Holding
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Asset $asset = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, length: 255)]
+    private ?\DateTimeInterface $date = null;
+
 
     public function getId(): ?int
     {
@@ -71,6 +76,18 @@ class Holding
     public function setAsset(?Asset $asset): self
     {
         $this->asset = $asset;
+
+        return $this;
+    }
+
+    public function getDate(): ?string
+    {
+        return $this->date;
+    }
+
+    public function setDate(string $date): self
+    {
+        $this->date = $date;
 
         return $this;
     }
