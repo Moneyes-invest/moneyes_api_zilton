@@ -13,8 +13,6 @@ namespace App\MessageHandler;
 
 use App\Entity\Account;
 use App\Entity\BinanceAccount;
-use App\Entity\Currency;
-use App\Entity\Holding;
 use App\Entity\Symbol;
 use App\Entity\Transaction;
 use App\Message\AllTransactionsMessage;
@@ -41,9 +39,6 @@ class TransactionHandler
         $accountSymbols = $this->manager->getRepository($account::class)->getAccountSymbols($account);
         // Fetch and save transactions for owned symbols
         $this->fetchTransactions($accountSymbols, $account);
-
-        // Update holdings
-        //$this->manager->getRepository(Holding::class)->updateHoldings($account->getUser());
     }
 
     /**
@@ -56,7 +51,6 @@ class TransactionHandler
         $accountId = $message->getAccountId();
         $account = $this->manager->getRepository(Account::class)->find($accountId);
         $accountRepository = $this->manager->getRepository($account::class);
-        $holdingRepository = $this->manager->getRepository(Holding::class);
 
         $accountSymbols = $accountRepository->getAccountSymbols($account); // user account symbols
         $allSymbols = $accountRepository->getAllSymbols($account); // all symbols
@@ -69,9 +63,6 @@ class TransactionHandler
 
         // Fetch and save Transferts
         $this->manager->getRepository($account::class)->fetchTransferts($account);
-
-        // Update holdings
-        //$holdingRepository->updateHoldings($account->getUser());
     }
 
 

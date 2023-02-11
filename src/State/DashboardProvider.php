@@ -19,6 +19,7 @@ use App\Entity\Holding;
 use App\Entity\User;
 use App\Message\AllTransactionsMessage;
 use App\Message\AllTransfertsMessage;
+use App\Message\DailyHoldingsMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -61,12 +62,8 @@ class DashboardProvider implements ProviderInterface
             }
         }
 
-
-        return ["Fetch"];
-        /*
         return [
             'accounts' => $accountArray,
         ];
-        */
     }
 }

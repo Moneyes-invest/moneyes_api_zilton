@@ -317,27 +317,4 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
         $this->getEntityManager()->flush();
     }
 
-
-    public function fetchHoldings($account)
-    {
-        $thirtyDaysInMs = 2592000000; // 30 days in ms
-        $todayTimestampMs = time() * 1000;
-        $start = $todayTimestampMs - $thirtyDaysInMs;
-        $end = $todayTimestampMs;
-        $binanceCreationTimestampMs = 1498860000000;
-        $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $holdingsList = [];
-
-        while ($start > $binanceCreationTimestampMs) {
-            $holdings = $customerBinanceApi->accountSnapshot('SPOT', 30);
-            if (!empty($holdings['snapshotVos'])) {
-                $holdingsList[] = $holdings['snapshotVos'];
-            }
-            $start = $start - $thirtyDaysInMs;
-            $end = $end - $thirtyDaysInMs;
-        }
-
-        return $holdingsList;
-    }
-
 }
