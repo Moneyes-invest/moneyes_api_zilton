@@ -14,8 +14,9 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
+use App\Entity\BinanceAccount;
 use App\Entity\User;
-use App\Message\FetchBinanceTransactions;
+use App\Message\OwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -39,13 +40,17 @@ class UserProviderAllTransactions implements ProviderInterface
         // 1. Flush User Holdings
         $this->manager->getRepository(User::class)->flushHoldings($user);
 
+        // get user balances
+        // $binanceApi = $this->manager->getRepository(BinanceAccount::class)->customerBinanceApi($user);
+        // $balances
+
         // 2. Fetch all transactions for all accounts
         foreach ($userAccounts as $userAccount) {
             if ($userAccount instanceof Account) {
                 // 1. Delete all Transactions about this User Account
                 $this->manager->getRepository(Account::class)->flushTransactions($userAccount);
                 // 2. Fetch all Account Transactions
-                $this->bus->dispatch(new FetchBinanceTransactions((string) $userAccount->getId()));
+                $this->bus->dispatch(new OwnedTransactionsMessage((string) $userAccount->getId()));
             }
         }
 

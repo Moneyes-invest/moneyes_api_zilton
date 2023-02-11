@@ -56,29 +56,17 @@ class Transaction
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get:transaction', 'create:transaction', 'get:exchanges'])]
-    private Exchange $exchange;
-
-    #[ORM\ManyToOne(inversedBy: 'transactions')]
-    #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:transaction', 'create:transaction'])]
-    #[Assert\NotBlank(groups: ['create:transaction'])]
-    private User $user;
+    private Account $account;
 
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction'])]
     private string $type = 'SPOT';
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get:transaction', 'create:transaction'])]
-    #[Assert\NotBlank(groups: ['create:transaction'])]
-    private Currency $currency;
-
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private string $orderDirection = '';
+    private string $orderDirection = 'BUY';
 
     #[ORM\Column]
     private float $fees = 0;
@@ -94,7 +82,14 @@ class Transaction
     private float $quantity;
 
     #[ORM\Column(nullable: true)]
-    private ?int $transactionExchangeId = null;
+    private ?string $externalTransactionId = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private Symbol $symbol;
+
+    #[ORM\ManyToOne]
+    private ?Asset $assetFees = null;
 
     public function getId(): ?Uuid
     {
@@ -113,26 +108,14 @@ class Transaction
         return $this;
     }
 
-    public function getExchange(): Exchange
+    public function getAccount(): Account
     {
-        return $this->exchange;
+        return $this->account;
     }
 
-    public function setExchange(Exchange $exchange): self
+    public function setAccount(Account $account): self
     {
-        $this->exchange = $exchange;
-
-        return $this;
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): self
-    {
-        $this->user = $user;
+        $this->account = $account;
 
         return $this;
     }
@@ -156,25 +139,13 @@ class Transaction
         return $this;
     }
 
-    public function getCurrency(): Currency
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency(Currency $currency): self
-    {
-        $this->currency = $currency;
-
-        return $this;
-    }
-
     public function getOrderDirection(): string
     {
         return $this->orderDirection;
     }
 
     /**
-     * Can be "BUY", "SELL" or "TRANSFERT".
+     * Can be "BUY", "SELL", "TRANSFER", "WITHDRAW", "DEPOSIT".
      *
      * @return $this
      */
@@ -221,14 +192,38 @@ class Transaction
         return $this;
     }
 
-    public function getTransactionExchangeId(): ?int
+    public function getExternalTransactionId(): ?string
     {
-        return $this->transactionExchangeId;
+        return $this->externalTransactionId;
     }
 
-    public function setTransactionExchangeId(?int $transactionExchangeId): self
+    public function setExternalTransactionId(?string $externalTransactionId): self
     {
-        $this->transactionExchangeId = $transactionExchangeId;
+        $this->externalTransactionId = $externalTransactionId;
+
+        return $this;
+    }
+
+    public function getSymbol(): Symbol
+    {
+        return $this->symbol;
+    }
+
+    public function setSymbol(Symbol $symbol): self
+    {
+        $this->symbol = $symbol;
+
+        return $this;
+    }
+
+    public function getAssetFees(): ?Asset
+    {
+        return $this->assetFees;
+    }
+
+    public function setAssetFees(?Asset $assetFees): self
+    {
+        $this->assetFees = $assetFees;
 
         return $this;
     }

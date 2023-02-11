@@ -11,24 +11,17 @@ declare(strict_types = 1);
 
 namespace App\Message;
 
-class FetchBinanceTransactions
+class AllTransactionsMessage
 {
     private string $accountId;
-    private ?\DateTime $previousUpdate;
 
-    public function __construct(string $accountId, ?\DateTime $previousUpdate = null)
+    public function __construct(string $accountId)
     {
-        $this->accountId      = $accountId;
-        $this->previousUpdate = $previousUpdate;
+        $this->accountId        = $accountId;
     }
 
     public function getAccountId(): string
     {
         return $this->accountId;
-    }
-
-    public function getPreviousUpdate(): ?\DateTime
-    {
-        return $this->previousUpdate;
     }
 }

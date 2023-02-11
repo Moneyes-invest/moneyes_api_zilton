@@ -11,7 +11,7 @@ declare(strict_types = 1);
 
 namespace App\Entity;
 
-use App\Repository\AssetRepository;
+use App\Repository\SymbolRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -20,8 +20,8 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: AssetRepository::class)]
-class Asset
+#[ORM\Entity(repositoryClass: SymbolRepository::class)]
+class Symbol
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
@@ -29,13 +29,11 @@ class Asset
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private Uuid $id;
 
-    #[ORM\Column(type: 'string', length: 3, unique: true)]
+    #[ORM\Column(type: 'string', length: 20, unique: true)]
     #[Assert\NotBlank]
-    #[Assert\Length(min: 3, max: 3)]
-    #[Assert\Regex(pattern: '/^[A-Z]{3}$/')]
     private string $code;
 
-    #[ORM\ManyToMany(targetEntity: Exchange::class, inversedBy: 'assets')]
+    #[ORM\ManyToMany(targetEntity: Exchange::class, inversedBy: 'symbols')]
     private Collection $exchange;
 
     public function __construct()
@@ -46,6 +44,11 @@ class Asset
     public function getId(): Uuid
     {
         return $this->id;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
     }
 
     /**
@@ -70,11 +73,6 @@ class Asset
         $this->exchange->removeElement($exchange);
 
         return $this;
-    }
-
-    public function getCode(): string
-    {
-        return $this->code;
     }
 
     public function setCode(string $code): self

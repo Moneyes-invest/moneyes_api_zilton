@@ -11,7 +11,9 @@ framework:
 
         routing:
             # Route your messages to the transports
-            'App\Message\FetchBinanceTransactions': async
+            'App\Message\AllTransactionsMessage': async
+            'App\Message\OwnedTransactionsMessage': async
+            'App\Message\AllTransfersMessage': async
 
 # when@test:
 #    framework:

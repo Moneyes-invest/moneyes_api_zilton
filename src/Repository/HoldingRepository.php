@@ -56,35 +56,33 @@ class HoldingRepository extends ServiceEntityRepository
     public function upsertHolding(Transaction $transaction): void
     {
         $entityManager = $this->getEntityManager();
-        $currency    = $transaction->getCurrency();
-        $exchange    = $transaction->getExchange();
-        $user          = $transaction->getUser();
+        $symbol        = $transaction->getSymbol();
+        $account       = $transaction->getAccount();
         $holdingToFind = $entityManager->getRepository(Holding::class)
                                        ->findOneBy([
-                                           'currency' => $currency,
-                                           'exchange'   => $exchange,
-                                           'user'      => $user,
+                                           'symbol'     => $symbol,
+                                           'account'    => $account,
                                        ]);
 
         if (!$holdingToFind) {
             // Create one
             $newHolding = new Holding();
-            $newHolding->setCurrency($transaction->getCurrency())
-                       ->setExchange($transaction->getExchange())
-                       ->setUser($transaction->getUser())
-                       ->setQuantity(floatval($transaction->getQuantity()))
-                       ->setAveragePurchasePrice(floatval($transaction->getPrice()));
+            // TODO: Get Asset from Symbol
+            $newHolding->setAsset($transaction->getSymbol())
+                       ->setAccount($transaction->getAccount())
+                       ->setQuantity(floatval($transaction->getQuantity()));
             $entityManager->persist($newHolding);
         } // If Holding not exists, create one
-        else {
-            $previousAveragePurchasePrice = $holdingToFind->getAveragePurchasePrice();
+        elseif ('TRANSFER' === $transaction->getOrderDirection()) {
+            $previousQuantity             = $holdingToFind->getQuantity();
+            $nextQuantity                 = $previousQuantity - $transaction->getQuantity();
+            $holdingToFind->setQuantity(floatval($nextQuantity));
+            $entityManager->persist($holdingToFind);
+        } else {
             $previousQuantity             = $holdingToFind->getQuantity();
             $nextQuantity                 = $transaction->getQuantity();
-            $transactionPrice             = $transaction->getPrice();
             $totalQuantity                = $previousQuantity + $nextQuantity;
-            $nextAveragePurchasePrice     = ((($previousQuantity * $previousAveragePurchasePrice) + ($nextQuantity * $transactionPrice)) / $totalQuantity);
-            $holdingToFind->setQuantity(floatval($totalQuantity))
-                          ->setAveragePurchasePrice(floatval($nextAveragePurchasePrice));
+            $holdingToFind->setQuantity(floatval($totalQuantity));
             $entityManager->persist($holdingToFind);
         } // If exists, update it
 
@@ -104,8 +102,8 @@ class HoldingRepository extends ServiceEntityRepository
             foreach ($holdings as $holding) {
                 $entityManager->remove($holding);
             }
-            $entityManager->flush();
         }
+        $entityManager->flush();
 
         // Get all User's Transactions
         $transactions = $entityManager->getRepository(Transaction::class)->getTransactions($user); // Get all user's transactions
