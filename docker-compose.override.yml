@@ -3,11 +3,11 @@ version: '3.8'
 services:
     php:
         build:
-            context: .
+            context: ./symfony/
             target: php_dev
         volumes:
-            - ./:/srv/app:rw,cached
-            - ./docker/php/conf.d/app.dev.ini:/usr/local/etc/php/conf.d/app.ini
+            - ./symfony:/srv/app:rw,cached
+            - ./symfony/docker/php/conf.d/app.dev.ini:/usr/local/etc/php/conf.d/app.ini
             - /src/app/vendor
         environment:
             XDEBUG_MODE: "${XDEBUG_MODE:-debug}"

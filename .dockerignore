@@ -23,7 +23,7 @@ bin/*
 !bin/console
 !bin/admin
 build/
-docker/db/data/
+symfony/docker/db/data/
 helm/
 public/bundles/
 var/
