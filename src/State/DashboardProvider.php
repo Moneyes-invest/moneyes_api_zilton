@@ -17,11 +17,14 @@ use App\Entity\Account;
 use App\Entity\BinanceAccount;
 use App\Entity\Holding;
 use App\Entity\User;
+use App\Message\AllTransactionsMessage;
+use App\Message\AllTransfertsMessage;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class DashboardProvider implements ProviderInterface
 {
-    public function __construct(private readonly EntityManagerInterface $manager)
+    public function __construct(private readonly EntityManagerInterface $manager, private readonly MessageBusInterface $bus)
     {
     }
 
@@ -58,7 +61,8 @@ class DashboardProvider implements ProviderInterface
             }
         }
 
-        return $this->manager->getRepository(BinanceAccount::class)->fetchWithdraw($accounts[0], ['startTime' => 0]);
+
+        return ["Fetch"];
         /*
         return [
             'accounts' => $accountArray,
