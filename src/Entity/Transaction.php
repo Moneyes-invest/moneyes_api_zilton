@@ -145,7 +145,7 @@ class Transaction
     }
 
     /**
-     * Can be "BUY", "SELL", "TRANSFERT", "WITHDRAW", "DEPOSIT".
+     * Can be "BUY", "SELL", "TRANSFER", "WITHDRAW", "DEPOSIT".
      *
      * @return $this
      */

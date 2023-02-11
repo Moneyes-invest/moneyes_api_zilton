@@ -13,7 +13,7 @@ framework:
             # Route your messages to the transports
             'App\Message\AllTransactionsMessage': async
             'App\Message\OwnedTransactionsMessage': async
-            'App\Message\AllTransfertsMessage': async
+            'App\Message\AllTransfersMessage': async
 
 # when@test:
 #    framework:

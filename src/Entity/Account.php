@@ -80,12 +80,12 @@ abstract class Account
     #[Assert\NotBlank(groups: ['create:account'])]
     private User $user;
 
-    #[ORM\OneToMany(mappedBy: 'account', targetEntity: Transfert::class, orphanRemoval: true)]
-    private Collection $transferts;
+    #[ORM\OneToMany(mappedBy: 'account', targetEntity: Transfer::class, orphanRemoval: true)]
+    private Collection $transfers;
 
     public function __construct()
     {
-        $this->transferts = new ArrayCollection();
+        $this->transfers = new ArrayCollection();
     }
 
     public function getExchange(): Exchange
@@ -142,29 +142,29 @@ abstract class Account
     }
 
     /**
-     * @return Collection<int, Transfert>
+     * @return Collection<int, Transfer>
      */
-    public function getTransferts(): Collection
+    public function getTransfers(): Collection
     {
-        return $this->transferts;
+        return $this->transfers;
     }
 
-    public function addTransfert(Transfert $transfert): self
+    public function addTransfer(Transfer $transfer): self
     {
-        if (!$this->transferts->contains($transfert)) {
-            $this->transferts->add($transfert);
-            $transfert->setAccount($this);
+        if (!$this->transfers->contains($transfer)) {
+            $this->transfers->add($transfer);
+            $transfer->setAccount($this);
         }
 
         return $this;
     }
 
-    public function removeTransfert(Transfert $transfert): self
+    public function removeTransfer(Transfer $transfer): self
     {
-        if ($this->transferts->removeElement($transfert)) {
+        if ($this->transfers->removeElement($transfer)) {
             // set the owning side to null (unless already changed)
-            if ($transfert->getAccount() === $this) {
-                $transfert->setAccount(null);
+            if ($transfer->getAccount() === $this) {
+                $transfer->setAccount(null);
             }
         }
 

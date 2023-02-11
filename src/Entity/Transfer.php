@@ -11,12 +11,12 @@ declare(strict_types = 1);
 
 namespace App\Entity;
 
-use App\Repository\TransfertRepository;
+use App\Repository\TransferRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: TransfertRepository::class)]
-class Transfert
+#[ORM\Entity(repositoryClass: TransferRepository::class)]
+class Transfer
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -40,12 +40,12 @@ class Transfert
     private ?Asset $assetFees = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $externalTransfertId = null;
+    private ?string $externalTransferId = null;
 
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
-    #[ORM\ManyToOne(inversedBy: 'transferts')]
+    #[ORM\ManyToOne(inversedBy: 'transfers')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Account $account = null;
 
@@ -102,14 +102,14 @@ class Transfert
         return $this;
     }
 
-    public function getExternalTransfertId(): ?string
+    public function getExternalTransferId(): ?string
     {
-        return $this->externalTransfertId;
+        return $this->externalTransferId;
     }
 
-    public function setExternalTransfertId(?string $externalTransfertId): self
+    public function setExternalTransferId(?string $externalTransferId): self
     {
-        $this->externalTransfertId = $externalTransfertId;
+        $this->externalTransferId = $externalTransferId;
 
         return $this;
     }

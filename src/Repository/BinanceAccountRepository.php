@@ -14,7 +14,7 @@ namespace App\Repository;
 use App\Entity\Account;
 use App\Entity\Asset;
 use App\Entity\BinanceAccount;
-use App\Entity\Transfert;
+use App\Entity\Transfer;
 use App\Entity\User;
 use App\Interface\AccountInterface;
 use Binance\API;
@@ -218,7 +218,7 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
     /**
      * @throws \Exception
      */
-    public function fetchTransferts(Account $account): array
+    public function fetchTransfers(Account $account): array
     {
         $threeMonthsInMs            = 7776000000;
         $todayTimestampMs           = time() * 1000;
@@ -253,12 +253,12 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
 
         // register transactions withdraws
         foreach ($withdrawHistory as $withdraw) {
-            $this->registerTransfert($withdraw, $account, 'applyTime', 'WITHDRAW');
+            $this->registerTransfer($withdraw, $account, 'applyTime', 'WITHDRAW');
         }
 
         // register transactions deposits
         foreach ($depositHistory as $deposit) {
-            $this->registerTransfert($deposit, $account, 'insertTime', 'DEPOSIT');
+            $this->registerTransfer($deposit, $account, 'insertTime', 'DEPOSIT');
         }
 
         return $depositHistory;
@@ -267,39 +267,39 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
     /**
      * @throws \Exception
      */
-    public function registerTransfert(mixed $transfertValue, Account $account, string $time, string $type): void
+    public function registerTransfer(mixed $transferValue, Account $account, string $time, string $type): void
     {
-        $transfert = new Transfert();
-        $transfert->setAccount($account);
-        $transfert->setQuantity((float) $transfertValue['amount']);
-        $transfert->setExternalTransfertId($transfertValue['id']);
+        $transfer = new Transfer();
+        $transfer->setAccount($account);
+        $transfer->setQuantity((float) $transferValue['amount']);
+        $transfer->setExternalTransferId($transferValue['id']);
 
         if ('applyTime' === $time) {
-            $transfert->setDate(new \DateTime((string) $transfertValue[$time]));
+            $transfer->setDate(new \DateTime((string) $transferValue[$time]));
         } else {
             $date = new \DateTime();
-            $date->setTimestamp($transfertValue[$time] / 1000);
-            $transfert->setDate(new \DateTime($date->format('Y-m-d H:i:s')));
+            $date->setTimestamp($transferValue[$time] / 1000);
+            $transfer->setDate(new \DateTime($date->format('Y-m-d H:i:s')));
         }
 
-        $transfert->setType($type);
+        $transfer->setType($type);
 
-        $asset = $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['id' => $transfertValue['coin']]);
+        $asset = $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['id' => $transferValue['coin']]);
         if (null === $asset) {
             $asset = new Asset();
-            $asset->setCode($transfertValue['coin']);
+            $asset->setCode($transferValue['coin']);
             $this->getEntityManager()->persist($asset);
             $this->getEntityManager()->flush();
         }
-        $transfert->setAsset($asset);
+        $transfer->setAsset($asset);
         if ('DEPOSIT' === $type) {
-            $transfert->setFees(0);
+            $transfer->setFees(0);
         } else {
-            $transfert->setFees((float) $transfertValue['transactionFee']);
+            $transfer->setFees((float) $transferValue['transactionFee']);
         }
-        $transfert->setAssetFees($asset);
+        $transfer->setAssetFees($asset);
 
-        $this->getEntityManager()->persist($transfert);
+        $this->getEntityManager()->persist($transfer);
         $this->getEntityManager()->flush();
     }
 

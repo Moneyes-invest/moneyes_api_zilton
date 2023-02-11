@@ -11,26 +11,26 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
-use App\Entity\Transfert;
+use App\Entity\Transfer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Transfert>
+ * @extends ServiceEntityRepository<Transfer>
  *
- * @method Transfert|null find($id, $lockMode = null, $lockVersion = null)
- * @method Transfert|null findOneBy(array $criteria, array $orderBy = null)
- * @method Transfert[]    findAll()
- * @method Transfert[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Transfer|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Transfer|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Transfer[]    findAll()
+ * @method Transfer[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class TransfertRepository extends ServiceEntityRepository
+class TransferRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Transfert::class);
+        parent::__construct($registry, Transfer::class);
     }
 
-    public function save(Transfert $entity, bool $flush = false): void
+    public function save(Transfer $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -39,7 +39,7 @@ class TransfertRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Transfert $entity, bool $flush = false): void
+    public function remove(Transfer $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -49,7 +49,7 @@ class TransfertRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Transfert[] Returns an array of Transfert objects
+//     * @return Transfer[] Returns an array of Transfer objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -63,7 +63,7 @@ class TransfertRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Transfert
+//    public function findOneBySomeField($value): ?Transfer
 //    {
 //        return $this->createQueryBuilder('t')
 //            ->andWhere('t.exampleField = :val')

@@ -15,7 +15,7 @@ use App\Entity\Account;
 use App\Entity\Symbol;
 use App\Entity\Transaction;
 use App\Message\AllTransactionsMessage;
-use App\Message\AllTransfertsMessage;
+use App\Message\AllTransfersMessage;
 use App\Message\OwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -52,7 +52,7 @@ class TransactionHandler
             throw new \Exception('Account not found');
         }
         $accountRepository = $this->manager->getRepository($account::class);
-        if (!method_exists($accountRepository, 'getAccountSymbols') || !method_exists($accountRepository, 'getAllSymbols') || !method_exists($accountRepository, 'fetchTransferts')) {
+        if (!method_exists($accountRepository, 'getAccountSymbols') || !method_exists($accountRepository, 'getAllSymbols') || !method_exists($accountRepository, 'fetchTransfers')) {
             throw new \Exception('Method getAccountSymbols not found');
         }
         $accountSymbols = $accountRepository->getAccountSymbols($account); // user account symbols
@@ -64,24 +64,24 @@ class TransactionHandler
         // Fetch and save transactions for owned symbols
         $this->fetchTransactions($symbolsNotOwned, $account);
 
-        // Fetch and save Transferts
-        $accountRepository->fetchTransferts($account);
+        // Fetch and save Transfers
+        $accountRepository->fetchTransfers($account);
     }
 
     #[AsMessageHandler]
-    public function handleFetchTransferts(AllTransfertsMessage $message): void
+    public function handleFetchTransfers(AllTransfersMessage $message): void
     {
         $accountId = $message->getAccountId();
         $account   = $this->manager->getRepository(Account::class)->find($accountId);
         if (null === $account) {
             throw new \Exception('Account not found');
         }
-        // Fetch and save Transferts
+        // Fetch and save Transfers
         $accountRepository = $this->manager->getRepository($account::class);
-        if (!method_exists($accountRepository, 'fetchTransferts')) {
-            throw new \Exception('Method fetchTransferts not found');
+        if (!method_exists($accountRepository, 'fetchTransfers')) {
+            throw new \Exception('Method fetchTransfers not found');
         }
-        $accountRepository->fetchTransferts($account);
+        $accountRepository->fetchTransfers($account);
     }
 
     private function fetchTransactions(array $accountSymbols, Account $account): void
