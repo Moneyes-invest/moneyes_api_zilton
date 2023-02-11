@@ -14,7 +14,6 @@ framework:
             'App\Message\AllTransactionsMessage': async
             'App\Message\OwnedTransactionsMessage': async
             'App\Message\AllTransfertsMessage': async
-            'App\Message\DailyHoldingsMessage': async
 
 # when@test:
 #    framework:
