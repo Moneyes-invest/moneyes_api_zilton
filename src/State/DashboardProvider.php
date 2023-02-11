@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class DashboardProvider implements ProviderInterface
 {
-    public function __construct(private readonly EntityManagerInterface $manager, private readonly MessageBusInterface $bus)
+    public function __construct(private readonly EntityManagerInterface $manager)
     {
     }
 
