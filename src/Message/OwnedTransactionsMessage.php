@@ -15,22 +15,15 @@ use App\Entity\Account;
 
 class OwnedTransactionsMessage
 {
-    private Account $account;
-    private ?\DateTime $previousUpdate;
+    private string $accountId;
 
-    public function __construct(Account $account, ?\DateTime $previousUpdate = null)
+    public function __construct(string $accountId)
     {
-        $this->account        = $account;
-        $this->previousUpdate = $previousUpdate;
+        $this->accountId        = $accountId;
     }
 
-    public function getAccount(): Account
+    public function getAccountId(): string
     {
-        return $this->account;
-    }
-
-    public function getPreviousUpdate(): ?\DateTime
-    {
-        return $this->previousUpdate;
+        return $this->accountId;
     }
 }

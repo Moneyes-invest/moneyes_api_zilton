@@ -59,21 +59,9 @@ class Transaction
     #[Groups(['get:transaction', 'create:transaction'])]
     private Account $account;
 
-    #[ORM\ManyToOne(inversedBy: 'transactions')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get:transaction', 'create:transaction'])]
-    #[Assert\NotBlank(groups: ['create:transaction'])]
-    private User $user;
-
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction'])]
     private string $type = 'SPOT';
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['get:transaction', 'create:transaction'])]
-    #[Assert\NotBlank(groups: ['create:transaction'])]
-    private Currency $currency;
 
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction', 'create:transaction'])]
@@ -95,6 +83,13 @@ class Transaction
 
     #[ORM\Column(nullable: true)]
     private ?string $externalTransactionId = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Symbol $symbol = null;
+
+    #[ORM\ManyToOne]
+    private ?Asset $assetFees = null;
 
     public function getId(): ?Uuid
     {
@@ -125,18 +120,6 @@ class Transaction
         return $this;
     }
 
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     public function getType(): ?string
     {
         return $this->type;
@@ -152,18 +135,6 @@ class Transaction
     public function setType(string $type = 'SPOT'): self
     {
         $this->type = $type;
-
-        return $this;
-    }
-
-    public function getCurrency(): Currency
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency(Currency $currency): self
-    {
-        $this->currency = $currency;
 
         return $this;
     }
@@ -229,6 +200,30 @@ class Transaction
     public function setExternalTransactionId(?string $externalTransactionId): self
     {
         $this->externalTransactionId = $externalTransactionId;
+
+        return $this;
+    }
+
+    public function getSymbol(): ?Symbol
+    {
+        return $this->symbol;
+    }
+
+    public function setSymbol(?Symbol $symbol): self
+    {
+        $this->symbol = $symbol;
+
+        return $this;
+    }
+
+    public function getAssetFees(): ?Asset
+    {
+        return $this->assetFees;
+    }
+
+    public function setAssetFees(?Asset $assetFees): self
+    {
+        $this->assetFees = $assetFees;
 
         return $this;
     }

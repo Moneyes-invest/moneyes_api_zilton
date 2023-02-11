@@ -33,21 +33,18 @@ class HoldingFixtures extends Fixture implements FixtureGroupInterface, Dependen
 
     public function load(ObjectManager $manager): void
     {
-        $holding = new Holding();
-
-        /** @phpstan-var Account $binanceAccount */
-        $binanceAccount = $this->getReference('binanceAccount');
-        /** @phpstan-var Currency $btcEur */
-        $btcEur = $this->getReference('btcEur');
-
-        $holding->setAccount($binanceAccount)
-                ->setUser($binanceAccount->getUser())
-                ->setCurrency($btcEur)
-                ->setQuantity(0.00000001)
-                ->setAveragePurchasePrice(10000);
-
-        $manager->persist($holding);
-        $manager->flush();
+//        $holding = new Holding();
+//
+//        /** @phpstan-var Account $binanceAccount */
+//        $binanceAccount = $this->getReference('binanceAccount');
+//        /** @phpstan-var Currency $btcEur */
+//        $btcEur = $this->getReference('btcEur');
+//
+//        $holding->setAccount($binanceAccount)
+//                ->setQuantity(0.00000001)->
+//
+//        $manager->persist($holding);
+//        $manager->flush();
     }
 
     public function getDependencies(): array

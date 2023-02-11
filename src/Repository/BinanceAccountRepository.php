@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -12,9 +12,11 @@ declare(strict_types = 1);
 namespace App\Repository;
 
 use App\Entity\Account;
+use App\Entity\Asset;
 use App\Entity\BinanceAccount;
 use App\Entity\Currency;
 use App\Entity\Transaction;
+use App\Entity\Transfert;
 use App\Entity\User;
 use App\Interface\AccountInterface;
 use Binance\API;
@@ -36,7 +38,7 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
     {
         parent::__construct($registry, BinanceAccount::class);
 
-        $userAdmin    = $manager->getRepository(User::class)->findBy(['username' => 'moneyes']);
+        $userAdmin = $manager->getRepository(User::class)->findBy(['username' => 'moneyes']);
         $accountAdmin = $manager->getRepository(Account::class)->findOneBy(['user' => $userAdmin]);
         if ($accountAdmin instanceof Account) {
             $this->binanceApiConnexion = new API($accountAdmin->getPublicKey(), $accountAdmin->getPrivateKey());
@@ -46,8 +48,8 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
     public function getSymbolsList(Account $account): array
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $symbolsListRaw     = $customerBinanceApi->exchangeInfo()['symbols'];
-        $symbolsList        = [];
+        $symbolsListRaw = $customerBinanceApi->exchangeInfo()['symbols'];
+        $symbolsList = [];
 
         foreach ($symbolsListRaw as $symbol) {
             $symbolsList[] = $symbol['symbol'];
@@ -72,13 +74,7 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
 
         $tradesList = [];
 
-        $index = 0;
         foreach ($symbolsList as $symbol) {
-            // si $i est un multiple de 120, on attend 35 secondes
-            if (0 === $index % 120) {
-                sleep(35);
-            }
-            ++$index;
             $tradesList = array_merge($tradesList, $customerBinanceApi->history($symbol)); // Get all trades for each symbol
         } // Get all trades for each symbol
 
@@ -93,7 +89,7 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
     public function getPrice(Account $account, string $isoCode): float
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $price              = (float) $customerBinanceApi->price($isoCode);
+        $price = (float)$customerBinanceApi->price($isoCode);
 
         return $price;
     }
@@ -134,10 +130,10 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
         $assets = [];
 
         foreach ($balances as $asset => $balance) {
-            $floatBalanceAssetBalance = (float) $balance['available'] + (float) $balance['onOrder'];
+            $floatBalanceAssetBalance = (float)$balance['available'] + (float)$balance['onOrder'];
             if ($floatBalanceAssetBalance > 0) {
                 $assets[] = [
-                    'asset'   => $asset,  // Asset's ISO code
+                    'asset' => $asset,  // Asset's ISO code
                     'balance' => $floatBalanceAssetBalance, // Asset's balance
                 ];
             }
@@ -152,19 +148,19 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
     public function getTotalValue(Account $account): float
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $userAssets         = $this->getAssets($account);
-        $balances           = $customerBinanceApi->balances();
+        $userAssets = $this->getAssets($account);
+        $balances = $customerBinanceApi->balances();
 
         $totalValue = 0.0;
 
         foreach ($balances as $asset => $balance) {
             if (in_array($asset, $userAssets)) {
-                $floatBalanceAssetBalance = (float) $balance['available'] + (float) $balance['onOrder'];
+                $floatBalanceAssetBalance = (float)$balance['available'] + (float)$balance['onOrder'];
                 try {
                     if ('USDT' === $asset) {
                         $price = 1;
                     } else {
-                        $price = (float) $this->getPrice($account, $asset.'USDT');
+                        $price = (float)$this->getPrice($account, $asset . 'USDT');
                     }
                     $totalValue += $floatBalanceAssetBalance * $price;
                 } catch (\Exception $exception) {
@@ -187,7 +183,7 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
     public function getAccountSymbols(Account $account): array
     {
         $accountAssets = $this->getAssets($account); // user holdings assets
-        $symbolsList   = $this->getSymbolsList($account); // all symbols list
+        $symbolsList = $this->getSymbolsList($account); // all symbols list
 
         $accountSymbols = []; // symbolsBalance
 
@@ -213,7 +209,7 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
 
         $rawSymbolsList = $customerBinanceApi->exchangeInfo()['symbols'];
-        $symbolsList    = [];
+        $symbolsList = [];
 
         foreach ($rawSymbolsList as $symbol) {
             $symbolsList[] = $symbol['symbol'];
@@ -225,19 +221,20 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
     /**
      * @throws \Exception
      */
-    public function fetchWithdraw(Account $account, array $params): array
+    public function fetchTransferts(Account $account): array
     {
-        $threeMonthsInMs            = 7776000000;
-        $todayTimestampMs           = time() * 1000;
-        $start                      = $todayTimestampMs - $threeMonthsInMs;
-        $end                        = $todayTimestampMs;
+        $threeMonthsInMs = 7776000000;
+        $todayTimestampMs = time() * 1000;
+        $start = $todayTimestampMs - $threeMonthsInMs;
+        $end = $todayTimestampMs;
         $binanceCreationTimestampMs = 1498860000000;
-        $withdrawHistory            = [];
-        $customerBinanceApi         = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
+        $withdrawHistory = [];
+        $depositHistory = [];
+        $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
 
         while ($start > $binanceCreationTimestampMs) {
             $params['startTime'] = $start;
-            $params['endTime']   = $end;
+            $params['endTime'] = $end;
             // if $customerBinanceApi->withdrawHistory(null, $params); is not empty add it to $withdrawHistory
             $withdraw = $customerBinanceApi->withdrawHistory(null, $params);
             if (!empty($withdraw['withdrawList'])) {
@@ -245,38 +242,31 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
                     $withdrawHistory[] = $withdrawValue;
                 }
             }
+            //same for deposit
+            $deposit = $customerBinanceApi->depositHistory(null, $params);
+            if (!empty($deposit)) {
+                foreach ($deposit as $depositValue) {
+                    $depositHistory[] = $depositValue;
+                }
+            }
             $start = $start - $threeMonthsInMs;
-            $end   = $end - $threeMonthsInMs;
+            $end = $end - $threeMonthsInMs;
         }
 
         // register transactions withdraws
         foreach ($withdrawHistory as $withdraw) {
-            $transaction = new Transaction();
-            $transaction->setAccount($account);
-            $currency = $this->getEntityManager()->getRepository(Currency::class)->findOneBy(['codeIso' => $withdraw['coin']]);
-            // if currency is not found, create it
-            if (null === $currency) {
-                $currency = new Currency();
-                $currency->setCodeIso($withdraw['coin']);
-                $currency->setName($withdraw['coin']);
-                $this->getEntityManager()->persist($currency);
-                $this->getEntityManager()->flush();
-            }
-            $transaction->setCurrency($currency);
-            $transaction->setUser($account->getUser());
-            $transaction->setDate(new \DateTime($withdraw['applyTime']));
-            $transaction->setOrderDirection('WITHDRAW');
-            $transaction->setFees((float) $withdraw['transactionFee']);
-            $transaction->setPrice(0);
-            $transaction->setQuantity((float) $withdraw['amount']);
-            $transaction->setExternalTransactionId($withdraw['id']);
-
-            $this->getEntityManager()->persist($transaction);
-            $this->getEntityManager()->flush();
+            $this->registerTransfert($withdraw, $account, 'applyTime', 'WITHDRAW');
         }
 
-        return $withdrawHistory;
+        // register transactions deposits
+        foreach ($depositHistory as $deposit) {
+            $this->registerTransfert($deposit, $account, 'insertTime', 'DEPOSIT');
+
+        }
+
+        return $depositHistory;
     }
+
 
     private function customerBinanceApi(Account $account): RateLimiter
     {
@@ -284,4 +274,47 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
 
         return new RateLimiter($api);
     }
+
+    /**
+     * @param mixed $transfertValue
+     * @param Transfert $transfert
+     * @return void
+     * @throws \Exception
+     */
+    public function registerTransfert(mixed $transfertValue, Account $account, string $time, string $type): void
+    {
+        $transfert = new Transfert();
+        $transfert->setAccount($account);
+        $transfert->setQuantity((float)$transfertValue['amount']);
+        $transfert->setExternalTransfertId($transfertValue['id']);
+
+        if ('applyTime' === $time) {
+            $transfert->setDate(new \DateTime((string)$transfertValue[$time]));
+        } else {
+            $date = new \DateTime();
+            $date->setTimestamp($transfertValue[$time] / 1000);
+            $transfert->setDate(new \DateTime(($date->format('Y-m-d H:i:s'))));
+        }
+
+        $transfert->setType($type);
+
+        $asset = $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['id' => $transfertValue['coin']]);
+        if (null === $asset) {
+            $asset = new Asset();
+            $asset->setId($transfertValue['coin']);
+            $this->getEntityManager()->persist($asset);
+            $this->getEntityManager()->flush();
+        }
+        $transfert->setAsset($asset);
+        if ($type == 'DEPOSIT') {
+            $transfert->setFees(0);
+        } else {
+            $transfert->setFees((float)$transfertValue['transactionFee']);
+        }
+        $transfert->setAssetFees($asset);
+
+        $this->getEntityManager()->persist($transfert);
+        $this->getEntityManager()->flush();
+    }
+
 }

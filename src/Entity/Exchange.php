@@ -15,6 +15,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\ExchangeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -44,6 +46,18 @@ class Exchange
     #[Groups(['create:exchange'])]
     private string $label;
 
+    #[ORM\ManyToMany(targetEntity: Asset::class, mappedBy: 'exchange')]
+    private Collection $assets;
+
+    #[ORM\ManyToMany(targetEntity: Symbol::class, mappedBy: 'exchange')]
+    private Collection $symbols;
+
+    public function __construct()
+    {
+        $this->assets = new ArrayCollection();
+        $this->symbols = new ArrayCollection();
+    }
+
     public function __toString(): string
     {
         return $this->label;
@@ -62,6 +76,60 @@ class Exchange
     public function setLabel(string $label): self
     {
         $this->label = $label;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Asset>
+     */
+    public function getAssets(): Collection
+    {
+        return $this->assets;
+    }
+
+    public function addAsset(Asset $asset): self
+    {
+        if (!$this->assets->contains($asset)) {
+            $this->assets->add($asset);
+            $asset->addExchange($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAsset(Asset $asset): self
+    {
+        if ($this->assets->removeElement($asset)) {
+            $asset->removeExchange($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Symbol>
+     */
+    public function getSymbols(): Collection
+    {
+        return $this->symbols;
+    }
+
+    public function addSymbol(Symbol $symbol): self
+    {
+        if (!$this->symbols->contains($symbol)) {
+            $this->symbols->add($symbol);
+            $symbol->addExchange($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSymbol(Symbol $symbol): self
+    {
+        if ($this->symbols->removeElement($symbol)) {
+            $symbol->removeExchange($this);
+        }
 
         return $this;
     }

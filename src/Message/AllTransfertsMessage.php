@@ -13,7 +13,7 @@ namespace App\Message;
 
 use App\Entity\Account;
 
-class AllTransactionsMessage
+class AllTransfertsMessage
 {
     private string $accountId;
 

@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
 use App\Message\AllTransactionsMessage;
+use App\Message\AllTransfertsMessage;
 use App\Message\OwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -36,9 +37,12 @@ class SyncProvider implements ProviderInterface
 
         $holdings = $this->manager->getRepository($account::class)->getAssets($account); // user holdings assets
         // Get all transactions for each symbol by messenger handler
-        $this->bus->dispatch(new OwnedTransactionsMessage($account));
+        $this->bus->dispatch(new OwnedTransactionsMessage((string)$account->getId()));
         // Get the rest of transactions (all symbols - user holdings)
-        $this->bus->dispatch(new AllTransactionsMessage($account));
+        $this->bus->dispatch(new AllTransactionsMessage((string)$account->getId()));
+        // Get all transferts
+        $this->bus->dispatch(new AllTransfertsMessage((string)($account->getId())));
+
 
         // Return Binance details endpoint
         return $holdings;

@@ -17,6 +17,8 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Repository\AccountRepository;
 use App\State\AccountDetailProvider;
 use App\State\SyncProvider;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -78,6 +80,14 @@ abstract class Account
     #[Assert\NotBlank(groups: ['create:account'])]
     private User $user;
 
+    #[ORM\OneToMany(mappedBy: 'account', targetEntity: Transfert::class, orphanRemoval: true)]
+    private Collection $transferts;
+
+    public function __construct()
+    {
+        $this->transferts = new ArrayCollection();
+    }
+
     public function getExchange(): Exchange
     {
         return $this->exchange;
@@ -127,6 +137,36 @@ abstract class Account
     public function setPublicKey(string $publicKey): self
     {
         $this->publicKey = $publicKey;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Transfert>
+     */
+    public function getTransferts(): Collection
+    {
+        return $this->transferts;
+    }
+
+    public function addTransfert(Transfert $transfert): self
+    {
+        if (!$this->transferts->contains($transfert)) {
+            $this->transferts->add($transfert);
+            $transfert->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransfert(Transfert $transfert): self
+    {
+        if ($this->transferts->removeElement($transfert)) {
+            // set the owning side to null (unless already changed)
+            if ($transfert->getAccount() === $this) {
+                $transfert->setAccount(null);
+            }
+        }
 
         return $this;
     }
