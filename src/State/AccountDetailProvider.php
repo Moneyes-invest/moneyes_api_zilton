@@ -38,9 +38,7 @@ class AccountDetailProvider implements ProviderInterface
         $holdings                   = $this->manager->getRepository(Holding::class)->findBy(['account' => $account]);
         foreach ($holdings as $index => $holding) {
             $jsonReturn['holdings'][$index] = [
-                'currency'             => $holding->getCurrency(),
                 'quantity'             => $holding->getQuantity(),
-                'averagePurchasePrice' => $holding->getAveragePurchasePrice(),
             ];
         }
 

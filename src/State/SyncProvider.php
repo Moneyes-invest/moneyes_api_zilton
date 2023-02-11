@@ -34,15 +34,17 @@ class SyncProvider implements ProviderInterface
         if (!$account instanceof Account) {
             return null;
         }
-
-        $holdings = $this->manager->getRepository($account::class)->getAssets($account); // user holdings assets
+        $accountRepository = $this->manager->getRepository(Account::class);
+        if (!method_exists($accountRepository, 'getAssets')) {
+            return null;
+        }
+        $holdings = $accountRepository->getAssets($account); // user holdings assets
         // Get all transactions for each symbol by messenger handler
-        $this->bus->dispatch(new OwnedTransactionsMessage((string)$account->getId()));
+        $this->bus->dispatch(new OwnedTransactionsMessage((string) $account->getId()));
         // Get the rest of transactions (all symbols - user holdings)
-        $this->bus->dispatch(new AllTransactionsMessage((string)$account->getId()));
+        $this->bus->dispatch(new AllTransactionsMessage((string) $account->getId()));
         // Get all transferts
-        $this->bus->dispatch(new AllTransfertsMessage((string)($account->getId())));
-
+        $this->bus->dispatch(new AllTransfertsMessage((string) $account->getId()));
 
         // Return Binance details endpoint
         return $holdings;

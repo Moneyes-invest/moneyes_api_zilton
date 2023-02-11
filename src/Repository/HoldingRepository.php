@@ -56,24 +56,21 @@ class HoldingRepository extends ServiceEntityRepository
     public function upsertHolding(Transaction $transaction): void
     {
         $entityManager = $this->getEntityManager();
-        $currency      = $transaction->getCurrency();
+        $symbol        = $transaction->getSymbol();
         $account       = $transaction->getAccount();
-        $user          = $transaction->getUser();
         $holdingToFind = $entityManager->getRepository(Holding::class)
                                        ->findOneBy([
-                                           'currency'   => $currency,
+                                           'symbol'     => $symbol,
                                            'account'    => $account,
-                                           'user'       => $user,
                                        ]);
 
         if (!$holdingToFind) {
             // Create one
             $newHolding = new Holding();
-            $newHolding->setCurrency($transaction->getCurrency())
+            // TODO: Get Asset from Symbol
+            $newHolding->setAsset($transaction->getSymbol())
                        ->setAccount($transaction->getAccount())
-                       ->setUser($transaction->getUser())
-                       ->setQuantity(floatval($transaction->getQuantity()))
-                       ->setAveragePurchasePrice(floatval($transaction->getPrice()));
+                       ->setQuantity(floatval($transaction->getQuantity()));
             $entityManager->persist($newHolding);
         } // If Holding not exists, create one
         elseif ('TRANSFERT' === $transaction->getOrderDirection()) {

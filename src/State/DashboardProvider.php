@@ -14,14 +14,9 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
-use App\Entity\BinanceAccount;
 use App\Entity\Holding;
 use App\Entity\User;
-use App\Message\AllTransactionsMessage;
-use App\Message\AllTransfertsMessage;
-use App\Message\DailyHoldingsMessage;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class DashboardProvider implements ProviderInterface
 {
@@ -54,10 +49,8 @@ class DashboardProvider implements ProviderInterface
                     continue;
                 }
                 $accountArray[$exchangeLabel]['holdings'][] = [
-                    'currency'                => $holding->getCurrency()?->getCodeIso(),
+                    'currency'                => $holding->getAsset()?->getCode(),
                     'quantity'                => $holding->getQuantity(),
-                    'averagePurchasePrice'    => $holding->getAveragePurchasePrice(),
-                    'value'                   => $holding->getQuantity() * $holding->getAveragePurchasePrice(),
                 ];
             }
         }

@@ -50,7 +50,7 @@ class UserProviderAllTransactions implements ProviderInterface
                 // 1. Delete all Transactions about this User Account
                 $this->manager->getRepository(Account::class)->flushTransactions($userAccount);
                 // 2. Fetch all Account Transactions
-                $this->bus->dispatch(new OwnedTransactionsMessage($userAccount));
+                $this->bus->dispatch(new OwnedTransactionsMessage((string) $userAccount->getId()));
             }
         }
 

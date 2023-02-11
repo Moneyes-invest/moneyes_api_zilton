@@ -3,7 +3,7 @@ DOCKER_COMPOSE	= docker compose
 EXEC_APP        = docker exec php
 EXEC_PG         = docker exec database
 EXEC_PG_I       = docker exec -i database
-SYMFONY         = $(EXEC_APP) bin/console
+SYMFONY         = $(EXEC_APP) php bin/console
 COMPOSER        = $(EXEC_APP) composer
 
 ##

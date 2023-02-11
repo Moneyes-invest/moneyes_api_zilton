@@ -42,6 +42,7 @@ class UsersFixturesProd extends Fixture implements FixtureGroupInterface
                   ->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
         $manager->persist($userAdmin);
 
+        // Create binance account
         $binanceAccount = new BinanceAccount();
         $binanceAccount->setUser($userAdmin)
                             ->setPrivateKey('Qcc8KLybfKZ22UB70PQVQqWzYnEO4l0RCmFqPzrg46Uwt3bwyOgGUdF0JfnJwSnd')

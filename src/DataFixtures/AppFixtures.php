@@ -13,8 +13,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Account;
 use App\Entity\BinanceAccount;
-use App\Entity\Currency;
-use App\Entity\Exchange;
+use App\Entity\Symbol;
 use App\Entity\Transaction;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -59,23 +58,23 @@ class AppFixtures extends Fixture implements FixtureGroupInterface, DependentFix
                       ->setPassword('$2y$13$Avfr0GAnTYFWtBdm7lOi3eiZK0.frdZ4hjV2aBAu7gfdg2QFLy.EK');
         $manager->persist($userCustomer);
 
-        // Get BTCEUR Reference
-        /** @phpstan-var Currency $btcEur */
-        $btcEur = $this->getReference('btcEur');
         // Get Binance Exchange Reference
         /** @phpstan-var Account $binanceAccount */
         $binanceAccount = $this->getReference('binanceAccount');
+
+        // Get BTCUSDT Symbol Reference
+        /** @phpstan-var Symbol $symbol */
+        $symbol = $this->getReference('symbolBTCUSDT');
+
         // #### Transactions #####
         // Create Transactions For userCustomer
         $transactionUserCustomer = new Transaction();
         $transactionUserCustomer->setQuantity(12)
                                 ->setDate($this->faker->dateTime())
-                                ->setUser($userCustomer)
                                 ->setType()
                                 ->setPrice(12000)
-                                ->setCurrency($btcEur)
                                 ->setAccount($binanceAccount)
-                                ->setOrderDirection();
+                                ->setSymbol($symbol);
         $manager->persist($transactionUserCustomer);
 
         // #### Accounts ######
@@ -91,7 +90,8 @@ class AppFixtures extends Fixture implements FixtureGroupInterface, DependentFix
     public function getDependencies(): array
     {
         return [
-            CurrenciesFixturesProd::class,
+            SymbolsFixtures::class,
+            UsersFixturesProd::class,
         ];
     }
 }

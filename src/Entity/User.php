@@ -84,10 +84,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['get:users', 'user:create', 'user:update'])]
     private string $username;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Transaction::class)]
-    #[Groups(['get:user', 'get:transactions'])]
-    private Collection $transactions;
-
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Groups(['get:user', 'user:create', 'user:update'])]
     private \DateTimeInterface $birthdate;
@@ -110,14 +106,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:create', 'user:update'])]
     private ?string $plainPassword = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Holding::class, orphanRemoval: true)]
-    private Collection $holdings;
-
     public function __construct()
     {
-        $this->transactions = new ArrayCollection();
         $this->account      = new ArrayCollection();
-        $this->holdings     = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -218,33 +209,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Transaction>
-     */
-    public function getTransactions(): Collection
-    {
-        return $this->transactions;
-    }
-
-    public function addTransaction(Transaction $transaction): self
-    {
-        if (!$this->transactions->contains($transaction)) {
-            $this->transactions->add($transaction);
-            $transaction->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTransaction(Transaction $transaction): self
-    {
-        // if ($this->transactions->removeElement($transaction)) {
-        // TODO : Supprimer une transaction
-        // }
-
-        return $this;
-    }
-
     public function getName(): string
     {
         return $this->name;
@@ -290,36 +254,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Holding>
-     */
-    public function getHoldings(): Collection
-    {
-        return $this->holdings;
-    }
-
-    public function addHolding(Holding $holding): self
-    {
-        if (!$this->holdings->contains($holding)) {
-            $this->holdings->add($holding);
-            $holding->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeHolding(Holding $holding): self
-    {
-        if ($this->holdings->removeElement($holding)) {
-            // set the owning side to null (unless already changed)
-            if ($holding->getUser() === $this) {
-                $holding->setUser(null);
-            }
-        }
 
         return $this;
     }

@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Entity;
 
 use App\Repository\TransfertRepository;
@@ -13,7 +22,6 @@ class Transfert
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
@@ -40,8 +48,6 @@ class Transfert
     #[ORM\ManyToOne(inversedBy: 'transferts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Account $account = null;
-
-
 
     public function getId(): ?int
     {
@@ -143,5 +149,4 @@ class Transfert
 
         return $this;
     }
-
 }

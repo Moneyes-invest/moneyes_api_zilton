@@ -37,7 +37,6 @@ class Holding
     #[ORM\Column(type: Types::DATETIME_MUTABLE, length: 255)]
     private ?\DateTimeInterface $date = null;
 
-
     public function getId(): ?int
     {
         return $this->id;
@@ -67,7 +66,6 @@ class Holding
         return $this;
     }
 
-
     public function getAsset(): ?Asset
     {
         return $this->asset;
@@ -80,12 +78,12 @@ class Holding
         return $this;
     }
 
-    public function getDate(): ?string
+    public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(string $date): self
+    public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
 

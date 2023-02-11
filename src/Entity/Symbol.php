@@ -1,18 +1,37 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Entity;
 
 use App\Repository\SymbolRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SymbolRepository::class)]
 class Symbol
 {
     #[ORM\Id]
-    #[ORM\Column]
-    private string $id;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    private Uuid $id;
+
+    #[ORM\Column(type: 'string', length: 20, unique: true)]
+    #[Assert\NotBlank]
+    private string $code;
 
     #[ORM\ManyToMany(targetEntity: Exchange::class, inversedBy: 'symbols')]
     private Collection $exchange;
@@ -22,9 +41,14 @@ class Symbol
         $this->exchange = new ArrayCollection();
     }
 
-    public function getId(): ?string
+    public function getId(): Uuid
     {
         return $this->id;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
     }
 
     /**
@@ -51,11 +75,10 @@ class Symbol
         return $this;
     }
 
-    /**
-     * @param string $id
-     */
-    public function setId(string $id): void
+    public function setCode(string $code): self
     {
-        $this->id = $id;
+        $this->code = $code;
+
+        return $this;
     }
 }

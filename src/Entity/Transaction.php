@@ -66,7 +66,7 @@ class Transaction
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
-    private string $orderDirection = '';
+    private string $orderDirection = 'BUY';
 
     #[ORM\Column]
     private float $fees = 0;
@@ -86,7 +86,7 @@ class Transaction
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Symbol $symbol = null;
+    private Symbol $symbol;
 
     #[ORM\ManyToOne]
     private ?Asset $assetFees = null;
@@ -204,12 +204,12 @@ class Transaction
         return $this;
     }
 
-    public function getSymbol(): ?Symbol
+    public function getSymbol(): Symbol
     {
         return $this->symbol;
     }
 
-    public function setSymbol(?Symbol $symbol): self
+    public function setSymbol(Symbol $symbol): self
     {
         $this->symbol = $symbol;
 

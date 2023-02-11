@@ -54,7 +54,7 @@ class Exchange
 
     public function __construct()
     {
-        $this->assets = new ArrayCollection();
+        $this->assets  = new ArrayCollection();
         $this->symbols = new ArrayCollection();
     }
 

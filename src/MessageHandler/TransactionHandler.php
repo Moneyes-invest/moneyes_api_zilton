@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Account;
-use App\Entity\BinanceAccount;
 use App\Entity\Symbol;
 use App\Entity\Transaction;
 use App\Message\AllTransactionsMessage;
@@ -27,33 +26,37 @@ class TransactionHandler
     {
     }
 
-    /**
-     * @param OwnedTransactionsMessage $message
-     * @return void
-     */
     #[AsMessageHandler]
     public function handleFetchTransactionsOfSymbolsOwned(OwnedTransactionsMessage $message): void
     {
-        $accountId = $message->getAccountId();
-        $account = $this->manager->getRepository(Account::class)->find($accountId);
-        $accountSymbols = $this->manager->getRepository($account::class)->getAccountSymbols($account);
+        $accountId      = $message->getAccountId();
+        $account        = $this->manager->getRepository(Account::class)->find($accountId);
+        if (null === $account) {
+            throw new \Exception('Account not found');
+        }
+        $accountRepository = $this->manager->getRepository($account::class);
+        if (!method_exists($accountRepository, 'getAccountSymbols')) {
+            throw new \Exception('Method getAccountSymbols not found');
+        }
+        $accountSymbols = $accountRepository->getAccountSymbols($account);
         // Fetch and save transactions for owned symbols
         $this->fetchTransactions($accountSymbols, $account);
     }
 
-    /**
-     * @param AllTransactionsMessage $message
-     * @return void
-     */
     #[AsMessageHandler]
     public function handleFetchTransactionsOfSymbolsNotOwned(AllTransactionsMessage $message): void
     {
-        $accountId = $message->getAccountId();
-        $account = $this->manager->getRepository(Account::class)->find($accountId);
+        $accountId         = $message->getAccountId();
+        $account           = $this->manager->getRepository(Account::class)->find($accountId);
+        if (null === $account) {
+            throw new \Exception('Account not found');
+        }
         $accountRepository = $this->manager->getRepository($account::class);
-
+        if (!method_exists($accountRepository, 'getAccountSymbols') || !method_exists($accountRepository, 'getAllSymbols') || !method_exists($accountRepository, 'fetchTransferts')) {
+            throw new \Exception('Method getAccountSymbols not found');
+        }
         $accountSymbols = $accountRepository->getAccountSymbols($account); // user account symbols
-        $allSymbols = $accountRepository->getAllSymbols($account); // all symbols
+        $allSymbols     = $accountRepository->getAllSymbols($account); // all symbols
 
         // Remove symbols owned by user
         $symbolsNotOwned = array_diff($allSymbols, $accountSymbols); // symbols not owned by user
@@ -62,29 +65,33 @@ class TransactionHandler
         $this->fetchTransactions($symbolsNotOwned, $account);
 
         // Fetch and save Transferts
-        $this->manager->getRepository($account::class)->fetchTransferts($account);
+        $accountRepository->fetchTransferts($account);
     }
 
-
-    /**
-     * @param AllTransfertsMessage $message
-     * @return void
-     */
     #[AsMessageHandler]
     public function handleFetchTransferts(AllTransfertsMessage $message): void
     {
         $accountId = $message->getAccountId();
-        $account = $this->manager->getRepository(Account::class)->find($accountId);
-
+        $account   = $this->manager->getRepository(Account::class)->find($accountId);
+        if (null === $account) {
+            throw new \Exception('Account not found');
+        }
         // Fetch and save Transferts
-        $this->manager->getRepository(BinanceAccount::class)->fetchTransferts($account);
+        $accountRepository = $this->manager->getRepository($account::class);
+        if (!method_exists($accountRepository, 'fetchTransferts')) {
+            throw new \Exception('Method fetchTransferts not found');
+        }
+        $accountRepository->fetchTransferts($account);
     }
-
 
     private function fetchTransactions(array $accountSymbols, Account $account): void
     {
+        $accountRepository = $this->manager->getRepository($account::class);
+        if (!method_exists($accountRepository, 'fetchTransactions')) {
+            throw new \Exception('Method fetchTransactions not found');
+        }
         // Fetch transactions for owned symbols
-        $transactions = $this->manager->getRepository($account::class)->fetchTransactions($account, $accountSymbols);
+        $transactions = $accountRepository->fetchTransactions($account, $accountSymbols);
 
         // Save transactions into database
         $this->saveTransactions($transactions, $account, $this->manager);
@@ -97,11 +104,11 @@ class TransactionHandler
             // Code ISO
             $codeIso = $transaction['symbol'];
 
-            //If symbol is not in the database, create it
+            // If symbol is not in the database, create it
             $symbol = $manager->getRepository(Symbol::class)->findOneBy(['id' => $codeIso]);
             if (null === $symbol) {
                 $newSymbol = new Symbol();
-                $newSymbol->setId($codeIso);
+                $newSymbol->setCode($codeIso);
                 $symbol = $newSymbol;
                 $manager->persist($symbol);
                 $manager->flush();
@@ -121,9 +128,9 @@ class TransactionHandler
             // Transaction ID
             // $transactionExists = $this->manager->getRepository(Transaction::class)->findOneBy(['transactionExchangeId' => $exchangeTradeId]);
 
-            $transactionPrice = (float)$transaction['price'];
-            $transactionQuantity = (float)$transaction['qty'];
-            $externalTransactionId = (string)$transaction['id'];
+            $transactionPrice      = (float) $transaction['price'];
+            $transactionQuantity   = (float) $transaction['qty'];
+            $externalTransactionId = (string) $transaction['id'];
 
             // if (null === $transactionExists && $binanceExchange instanceof Exchange) {
             $newTransaction = new Transaction();
