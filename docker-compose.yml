@@ -3,7 +3,7 @@ version: '3.8'
 services:
     php:
         build:
-            context: ./symfony/
+            context: symfony/
             target: php
         container_name: php
         restart: unless-stopped
@@ -18,7 +18,7 @@ services:
 
     caddy:
         build:
-            context: ./symfony/
+            context: symfony/
             target: caddy
         container_name: caddy
         restart: unless-stopped

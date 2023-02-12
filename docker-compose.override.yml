@@ -3,7 +3,7 @@ version: '3.8'
 services:
     php:
         build:
-            context: ./symfony/
+            context: symfony/
             target: php_dev
         volumes:
             - ./symfony:/srv/app:rw,cached

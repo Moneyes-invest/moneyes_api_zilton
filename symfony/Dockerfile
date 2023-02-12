@@ -63,7 +63,7 @@ RUN set -eux; \
 
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-COPY --link ./docker/php/conf.d/app.ini $PHP_INI_DIR/conf.d/
+COPY --link docker/php/conf.d/app.ini $PHP_INI_DIR/conf.d/
 COPY --link ./docker/php/php-fpm.d/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 
 COPY --link ./docker/php/docker-healthcheck.sh /usr/local/bin/docker-healthcheck
@@ -92,13 +92,13 @@ RUN set -eux; \
 	composer clear-cache
 
 # copy sources
-COPY --link .. .
+COPY --link . .
 RUN rm -rf docker/
 
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
-	composer run-script --no-dev post-install-cmd; \
+	#composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync
 
 ENTRYPOINT ["docker-entrypoint"]
