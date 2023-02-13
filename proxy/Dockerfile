@@ -7,19 +7,17 @@ WORKDIR /var/www
 COPY package*.json ./
 
 RUN npm install
+RUN npm install -g supervisor
+
 #If you are building your code for production
 #RUN npm ci --only=production
 COPY . .
 
-RUN ls -al /var/www/dist
-RUN whoami
-# Bundle app source
-
-
 EXPOSE 8888
 
+CMD [ "npm", "run", "watchserver" ]
 
-CMD [ "node", "dist/app.js" ]
+# CMD [ "npm", "run", "start" ]
 
 # RUN npm install pm2 -g
 # CMD ["pm2-runtime", "start", "package.json"]

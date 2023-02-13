@@ -7,7 +7,7 @@ import userService from "./services/user";
 import { urlApi } from "./types";
 const app = express();
 const cors = require('cors')
-const port = 8080;
+const port = 8888;
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

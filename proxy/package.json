@@ -1,9 +1,11 @@
 {
   "scripts": {
-    "test": "ls -al",
-    "dev": "nodemon --watch src -e js,ts,json --exec \"ts-node src/app.ts\"",
-    "build": "tsup src/app.ts --format cjs --clean",
-    "start": "node dist/app.js"
+    "build": "tsc",
+    "start": "tsc && node dist/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watchsupervisor": "supervisor -W -t dist/app.js",
+    "watchtypescript": "node ./node_modules/typescript/bin/tsc -w &",
+    "watchserver": "npm run build && npm run watchtypescript && npm run watchsupervisor"
   },
   "devDependencies": {
     "@types/cors": "^2.8.13",
