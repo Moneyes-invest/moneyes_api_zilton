@@ -22,7 +22,7 @@ export const connection = (username: string, password: string, res) => {
             res.json(resp.data);
         })
         .catch((error) => {
-            res.json("CA MARCHE ????");
+            res.json(error);
         });
 };
 

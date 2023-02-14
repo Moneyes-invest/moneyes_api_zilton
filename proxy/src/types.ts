@@ -12,7 +12,7 @@ export const urlApiUsersInfo = `${urlApiUser}/users`;
 
 
 /** Service User */
-export const urlServerServiceUser = "http://localhost:8080/api";
+export const urlServerServiceUser = "http://caddy/api";
 export const endPointServiceUserHello = `${urlServerServiceUser}/hello`;
 export const endPointServiceUserLogin = `${urlServerServiceUser}/login`;
 export const endPointServiceUserInfo = `${urlServerServiceUser}/user`;

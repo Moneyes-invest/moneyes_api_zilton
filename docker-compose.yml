@@ -70,11 +70,29 @@ services:
             - app-network
 
 
+    # Nginx service
+    nginx:
+        image: nginx:alpine
+        container_name: nginx
+        ports:
+            -   9999:9999
+        working_dir: /var/www
+        volumes:
+            - ./symfony:/var/www
+            - ./nginx/conf.d/:/etc/nginx/conf.d/
+        networks:
+            - app-network
+
+
     proxy:
         build: ./proxy
         container_name: proxy
         ports:
             -   8888:8888
+        volumes:
+            - ./proxy:/var/www
+        networks:
+            - app-network
 
 
     ###> doctrine/doctrine-bundle ###
@@ -109,7 +127,6 @@ volumes:
     ###> doctrine/doctrine-bundle ###
     db-data: ~
 ###< doctrine/doctrine-bundle ###
-
 
 networks:
     app-network:
