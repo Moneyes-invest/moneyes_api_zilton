@@ -8,7 +8,7 @@ services:
         volumes:
             - ./symfony:/srv/app:rw,cached
             - ./symfony/docker/php/conf.d/app.dev.ini:/usr/local/etc/php/conf.d/app.ini
-            - /src/app/vendor
+            - /srv/app/vendor
         environment:
             XDEBUG_MODE: "${XDEBUG_MODE:-debug}"
             XDEBUG_IDE_KEY: "${XDEBUG_IDE_KEY:-PHPSTORM}"
