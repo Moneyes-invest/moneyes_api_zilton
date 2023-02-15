@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -48,7 +48,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/users/{id}/transactions/all',
             provider: UserProviderAllTransactions::class,
         ),
-        new Post(processor: UserPasswordHasher::class),
+        new Post(processor: UserPasswordHasher::class, uriTemplate: '/register',),
         new Put(processor: UserPasswordHasher::class),
         new Patch(processor: UserPasswordHasher::class),
         new Delete(),
@@ -116,8 +116,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->transactions = new ArrayCollection();
-        $this->account      = new ArrayCollection();
-        $this->holdings     = new ArrayCollection();
+        $this->account = new ArrayCollection();
+        $this->holdings = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -149,7 +149,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
