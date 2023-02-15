@@ -1,7 +1,11 @@
 # Moneyes API 
 ## Lancer le projet
+1. Lancer l'installation complète de docker :
 `make install`
+2. Créer la base de données : 
 `make db`
+3. Installer les migrations :
+`make migrate`
 ## Se connecter au php
 ``make connect``
 ## Créer les migrations
@@ -11,10 +15,6 @@ make connect
 ```bash
 php bin/console make:migration
 php bin/console doctrine:migrations:migrate
-```
-## Créer les clefs privés JWT
-```bash
-php bin/console lexik:jwt:generate-keypair
 ```
 ## Remplir la base de données avec les données de dév
 ```bash
