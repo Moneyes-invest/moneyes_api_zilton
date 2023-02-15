@@ -70,20 +70,6 @@ services:
             - app-network
 
 
-    # Nginx service
-    nginx:
-        image: nginx:alpine
-        container_name: nginx
-        ports:
-            -   9999:9999
-        working_dir: /var/www
-        volumes:
-            - ./symfony:/var/www
-            - ./nginx/conf.d/:/etc/nginx/conf.d/
-        networks:
-            - app-network
-
-
     proxy:
         build: ./proxy
         container_name: proxy
