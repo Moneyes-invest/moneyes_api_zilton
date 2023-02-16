@@ -55,19 +55,6 @@ services:
         networks:
             - app-network
 
-    django:
-        build: django/
-        command: python manage.py runserver 0.0.0.0:3333
-        volumes:
-            - ./django/app:/usr/src/app/
-        ports:
-            - 3333:3333
-        env_file:
-            - ./django/.env.dev
-        depends_on:
-            - database
-        networks:
-            - app-network
 
 
     proxy:
@@ -106,6 +93,23 @@ services:
         networks:
             - app-network
 ###< doctrine/doctrine-bundle ###
+
+
+
+    django:
+      build: django/
+      command: python manage.py runserver 0.0.0.0:3333
+      volumes:
+        - ./django/app:/usr/src/app/
+      ports:
+        - 3333:3333
+      env_file:
+        - ./django/.env.dev
+      depends_on:
+        - database
+      networks:
+        - app-network
+
 
 volumes:
     caddy_data: ~
