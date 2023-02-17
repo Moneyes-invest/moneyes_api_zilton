@@ -1,111 +1,111 @@
 version: '3.8'
 
 services:
-    php:
-        build:
-            context: symfony/
-            target: php
-        container_name: php
-        restart: unless-stopped
-        depends_on:
-            database:
-                condition: service_healthy
-        healthcheck:
-            interval: 10s
-            timeout: 3s
-            retries: 3
-            start_period: 30s
-        networks:
-            - app-network
+  php:
+    build:
+      context: symfony/
+      target: php
+    container_name: php
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+    networks:
+      - app-network
 
-    caddy:
-        build:
-            context: symfony/
-            target: caddy
-        container_name: caddy
-        restart: unless-stopped
-        depends_on:
-            php:
-                condition: service_healthy
-        environment:
-            SERVER_NAME: ${SERVER_NAME:-localhost:80 caddy:80}
-            PHP_SOCKET: ${PHP_SOCKET:-php:9000}
-            MAINTENANCE_MODE: 0
-        volumes:
-            - caddy_data:/data
-            - caddy_config:/config
-            - ./symfony/public:/srv/app/public:ro
-        ports:
-            # HTTP
-            -   target: 80
-                published: 8080
-                protocol: tcp
-            # HTTPS
-            -   target: 443
-                published: 8443
-                protocol: tcp
-            # HTTP/3
-            -   target: 443
-                published: 8443
-                protocol: udp
-            # DEBUG
-            -   target: 2019
-                published: 2019
-                protocol: tcp
-        networks:
-            - app-network
-
-
-    ###> doctrine/doctrine-bundle ###
-    database:
-        image: postgres:${POSTGRES_VERSION:-14}-alpine
-        container_name: database
-        environment:
-            POSTGRES_DB: ${POSTGRES_DB:-moneyes}
-            # You should definitely change the password in production
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-moneyes}
-            POSTGRES_USER: ${POSTGRES_USER:-moneyes}
-        volumes:
-            - db-data:/var/lib/postgresql/data:rw
-            # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-            # - ./docker/db/data:/var/lib/postgresql/data:rw
-        ports:
-            -   target: 5432
-                published: 5432
-                protocol: tcp
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U symfony"]
-            interval: 5s
-            timeout: 20s
-            retries: 10
-        networks:
-            - app-network
-###< doctrine/doctrine-bundle ###
+  caddy:
+    build:
+      context: symfony/
+      target: caddy
+    container_name: caddy
+    restart: unless-stopped
+    depends_on:
+      php:
+        condition: service_healthy
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-localhost:80 caddy:80}
+      PHP_SOCKET: ${PHP_SOCKET:-php:9000}
+      MAINTENANCE_MODE: 0
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./symfony/public:/srv/app/public:ro
+    ports:
+      # HTTP
+      - target: 80
+        published: 8080
+        protocol: tcp
+      # HTTPS
+      - target: 443
+        published: 8443
+        protocol: tcp
+      # HTTP/3
+      - target: 443
+        published: 8443
+        protocol: udp
+      # DEBUG
+      - target: 2019
+        published: 2019
+        protocol: tcp
+    networks:
+      - app-network
 
 
+  ###> doctrine/doctrine-bundle ###
+  database:
+    image: postgres:${POSTGRES_VERSION:-14}-alpine
+    container_name: database
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-moneyes}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-moneyes}
+      POSTGRES_USER: ${POSTGRES_USER:-moneyes}
+    volumes:
+      - db-data:/var/lib/postgresql/data:rw
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+    ports:
+      - target: 5432
+        published: 5432
+        protocol: tcp
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U symfony" ]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+    networks:
+      - app-network
+  ###< doctrine/doctrine-bundle ###
 
-    django:
-      build: django/
-      command: python manage.py runserver 0.0.0.0:3333
-      volumes:
-        - ./django/app:/usr/src/app/
-      ports:
-        - 3333:3333
-      env_file:
-        - ./django/.env.dev
-      depends_on:
-        - database
-      networks:
-        - app-network
+
+
+  django:
+    build: django/
+    command: python manage.py runserver 0.0.0.0:3333
+    volumes:
+      - ./django/app:/usr/src/app/
+    ports:
+      - 3333:3333
+    env_file:
+      - ./django/.env.dev
+    depends_on:
+      - database
+    networks:
+      - app-network
 
 
 volumes:
-    caddy_data: ~
-    caddy_config: ~
-    ###> doctrine/doctrine-bundle ###
-    db-data: ~
+  caddy_data: ~
+  caddy_config: ~
+  ###> doctrine/doctrine-bundle ###
+  db-data: ~
 ###< doctrine/doctrine-bundle ###
 
 networks:
-    app-network:
-        driver: bridge
+  app-network:
+    driver: bridge
