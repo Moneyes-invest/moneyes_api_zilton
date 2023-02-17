@@ -12,11 +12,13 @@ declare(strict_types = 1);
 namespace App\MessageHandler;
 
 use App\Entity\Account;
+use App\Entity\BinanceAccount;
 use App\Entity\Symbol;
 use App\Entity\Transaction;
 use App\Message\AllTransactionsMessage;
 use App\Message\AllTransfersMessage;
 use App\Message\OwnedTransactionsMessage;
+use App\Repository\BinanceAccountRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -34,7 +36,7 @@ class TransactionHandler
         if (null === $account) {
             throw new \Exception('Account not found');
         }
-        $accountRepository = $this->manager->getRepository($account::class);
+        $accountRepository = $this->manager->getRepository(BinanceAccount::class);
         if (!method_exists($accountRepository, 'getAccountSymbols')) {
             throw new \Exception('Method getAccountSymbols not found');
         }
@@ -51,7 +53,7 @@ class TransactionHandler
         if (null === $account) {
             throw new \Exception('Account not found');
         }
-        $accountRepository = $this->manager->getRepository($account::class);
+        $accountRepository = $this->manager->getRepository(BinanceAccount::class);
         if (!method_exists($accountRepository, 'getAccountSymbols') || !method_exists($accountRepository, 'getAllSymbols') || !method_exists($accountRepository, 'fetchTransfers')) {
             throw new \Exception('Method getAccountSymbols not found');
         }
@@ -77,7 +79,7 @@ class TransactionHandler
             throw new \Exception('Account not found');
         }
         // Fetch and save Transfers
-        $accountRepository = $this->manager->getRepository($account::class);
+        $accountRepository = $this->manager->getRepository(BinanceAccount::class);
         if (!method_exists($accountRepository, 'fetchTransfers')) {
             throw new \Exception('Method fetchTransfers not found');
         }
@@ -86,7 +88,7 @@ class TransactionHandler
 
     private function fetchTransactions(array $accountSymbols, Account $account): void
     {
-        $accountRepository = $this->manager->getRepository($account::class);
+        $accountRepository = $this->manager->getRepository(BinanceAccount::class);
         if (!method_exists($accountRepository, 'fetchTransactions')) {
             throw new \Exception('Method fetchTransactions not found');
         }
@@ -105,7 +107,7 @@ class TransactionHandler
             $codeIso = $transaction['symbol'];
 
             // If symbol is not in the database, create it
-            $symbol = $manager->getRepository(Symbol::class)->findOneBy(['id' => $codeIso]);
+            $symbol = $manager->getRepository(Symbol::class)->findOneBy(['code' => $codeIso]);
             if (null === $symbol) {
                 $newSymbol = new Symbol();
                 $newSymbol->setCode($codeIso);

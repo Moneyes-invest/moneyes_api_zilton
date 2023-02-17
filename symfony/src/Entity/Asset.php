@@ -29,14 +29,16 @@ class Asset
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private Uuid $id;
 
-    #[ORM\Column(type: 'string', length: 3, unique: true)]
+    #[ORM\Column(type: 'string', length: 10, unique: true)]
     #[Assert\NotBlank]
-    #[Assert\Length(min: 3, max: 3)]
-    #[Assert\Regex(pattern: '/^[A-Z]{3}$/')]
+    #[Assert\Length(min: 3, max: 10)]
+    #[Assert\Regex(pattern: '/^[A-Z]{3,10}$/')]
     private string $code;
+
 
     #[ORM\ManyToMany(targetEntity: Exchange::class, inversedBy: 'assets')]
     private Collection $exchange;
+
 
     public function __construct()
     {
@@ -83,4 +85,5 @@ class Asset
 
         return $this;
     }
+
 }

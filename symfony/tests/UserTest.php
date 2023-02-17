@@ -5,7 +5,6 @@ use App\Entity\User;
 
 class UserTest extends ApiTestCase
 {
-
     public function testLogin(): void
     {
         $client = static::createClient();

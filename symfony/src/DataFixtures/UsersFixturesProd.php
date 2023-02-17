@@ -35,21 +35,24 @@ class UsersFixturesProd extends Fixture implements FixtureGroupInterface
         // Create admin account
         $userAdmin = new User();
         $userAdmin->setEmail('admin@moneyes.fr')
-                  ->setUsername('moneyes')
-                  ->setName('Moneyes')
-                  ->setLastname('Invest')
-                  ->setPassword('$2y$13$H7B6mdoMiTqE7WslnduAXu8aYJ6DJOdIHKobEZBGZoFoUPiQbILjK')
-                  ->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
+            ->setUsername('moneyes')
+            ->setName('Moneyes')
+            ->setLastname('Invest')
+            ->setPassword('$2y$13$H7B6mdoMiTqE7WslnduAXu8aYJ6DJOdIHKobEZBGZoFoUPiQbILjK')
+            ->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
         $manager->persist($userAdmin);
 
-        // Create binance account
-        $binanceAccount = new BinanceAccount();
-        $binanceAccount->setUser($userAdmin)
-                            ->setPrivateKey('Qcc8KLybfKZ22UB70PQVQqWzYnEO4l0RCmFqPzrg46Uwt3bwyOgGUdF0JfnJwSnd')
-                            ->setPublicKey('pXihR7QxSJtRuPwNJ3c3z9fFIlfrXPS4j16mBRKnby8EtLkPvR8DJ3fQTtZ2ggjg');
-        $manager->persist($binanceAccount);
+        // Get Binance Exchange Reference
+        /** @phpstan-var Exchange $binanceExchange */
+        $binanceExchange = $this->getReference('binanceExchange');
+
+        $accountUserCustomer = new Account();
+        $accountUserCustomer->setUser($userAdmin)
+            ->setExchange($binanceExchange)
+            ->setPrivateKey('Qcc8KLybfKZ22UB70PQVQqWzYnEO4l0RCmFqPzrg46Uwt3bwyOgGUdF0JfnJwSnd')
+            ->setPublicKey('pXihR7QxSJtRuPwNJ3c3z9fFIlfrXPS4j16mBRKnby8EtLkPvR8DJ3fQTtZ2ggjg');
+        $manager->persist($accountUserCustomer);
 
         $manager->flush();
-        $this->addReference('binanceAccount', $binanceAccount);
     }
 }

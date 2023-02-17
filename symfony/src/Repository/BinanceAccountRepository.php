@@ -16,7 +16,6 @@ use App\Entity\Asset;
 use App\Entity\BinanceAccount;
 use App\Entity\Transfer;
 use App\Entity\User;
-use App\Interface\AccountInterface;
 use Binance\API;
 use Binance\RateLimiter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,7 +27,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method BinanceAccount[]    findAll()
  * @method BinanceAccount[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BinanceAccountRepository extends AccountRepository implements AccountInterface
+class BinanceAccountRepository extends AccountRepository # implements AccountInterface
 {
     private API $binanceApiConnexion;
 
@@ -45,8 +44,11 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
 
     public function getSymbolsList(Account $account): array
     {
+        if (null === $account->getPublicKey() || null === $account->getPrivateKey()) {
+            throw new \Exception('No API credentials provided');
+        }
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $symbolsListRaw     = $customerBinanceApi->api->exchangeInfo()['symbols'];
+        $symbolsListRaw     = $customerBinanceApi->exchangeInfo()['symbols'];
         $symbolsList        = [];
 
         foreach ($symbolsListRaw as $symbol) {
@@ -205,7 +207,7 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
     public function getAllSymbols(Account $account): array
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-        $rawSymbolsList     = $customerBinanceApi->api->exchangeInfo()['symbols'];
+        $rawSymbolsList     = $customerBinanceApi->exchangeInfo()['symbols'];
         $symbolsList        = [];
 
         foreach ($rawSymbolsList as $symbol) {
@@ -218,7 +220,7 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
     /**
      * @throws \Exception
      */
-    public function fetchTransfers(Account $account): array
+    public function fetchTransfers(Account $account)
     {
         $threeMonthsInMs            = 7776000000;
         $todayTimestampMs           = time() * 1000;
@@ -229,11 +231,11 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
         $depositHistory             = [];
         $customerBinanceApi         = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
 
+
         while ($start > $binanceCreationTimestampMs) {
             $params              = [];
             $params['startTime'] = $start;
             $params['endTime']   = $end;
-            // if $customerBinanceApi->withdrawHistory(null, $params); is not empty add it to $withdrawHistory
             $withdraw = $customerBinanceApi->withdrawHistory(null, $params);
             if (!empty($withdraw['withdrawList'])) {
                 foreach ($withdraw['withdrawList'] as $withdrawValue) {
@@ -250,7 +252,6 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
             $start = $start - $threeMonthsInMs;
             $end   = $end - $threeMonthsInMs;
         }
-
         // register transactions withdraws
         foreach ($withdrawHistory as $withdraw) {
             $this->registerTransfer($withdraw, $account, 'applyTime', 'WITHDRAW');
@@ -260,8 +261,6 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
         foreach ($depositHistory as $deposit) {
             $this->registerTransfer($deposit, $account, 'insertTime', 'DEPOSIT');
         }
-
-        return $depositHistory;
     }
 
     /**
@@ -284,7 +283,7 @@ class BinanceAccountRepository extends AccountRepository implements AccountInter
 
         $transfer->setType($type);
 
-        $asset = $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['id' => $transferValue['coin']]);
+        $asset = $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['code' => $transferValue['coin']]);
         if (null === $asset) {
             $asset = new Asset();
             $asset->setCode($transferValue['coin']);

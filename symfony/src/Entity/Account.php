@@ -27,11 +27,13 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AccountRepository::class)]
+/*
 #[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'exchange', type: 'string')]
 #[ORM\DiscriminatorMap([
     BinanceAccount::EXCHANGE => BinanceAccount::class,
 ])]
+*/
 #[ApiResource(
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['get:accounts']]),
@@ -47,7 +49,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     denormalizationContext: ['groups' => ['create:account', 'update:account']],
 )]
-abstract class Account
+/*abstract */
+class Account
 {
     public const EXCHANGE = null;
 

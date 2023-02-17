@@ -47,49 +47,12 @@ class AppFixtures extends Fixture implements FixtureGroupInterface, DependentFix
 
     public function load(ObjectManager $manager): void
     {
-        // #### USERS #####
-        // Create customer
-        $userCustomer = new User();
-        $userCustomer->setEmail($this->faker->email())
-                      ->setUsername($this->faker->userName())
-                      ->setName($this->faker->name())
-                      ->setRoles(['ROLE_USER'])
-                      ->setLastname($this->faker->lastName())
-                      ->setPassword('$2y$13$Avfr0GAnTYFWtBdm7lOi3eiZK0.frdZ4hjV2aBAu7gfdg2QFLy.EK');
-        $manager->persist($userCustomer);
-
-        // Get Binance Exchange Reference
-        /** @phpstan-var Account $binanceAccount */
-        $binanceAccount = $this->getReference('binanceAccount');
-
-        // Get BTCUSDT Symbol Reference
-        /** @phpstan-var Symbol $symbol */
-        $symbol = $this->getReference('symbolBTCUSDT');
-
-        // #### Transactions #####
-        // Create Transactions For userCustomer
-        $transactionUserCustomer = new Transaction();
-        $transactionUserCustomer->setQuantity(12)
-                                ->setDate($this->faker->dateTime())
-                                ->setType()
-                                ->setPrice(12000)
-                                ->setAccount($binanceAccount)
-                                ->setSymbol($symbol);
-        $manager->persist($transactionUserCustomer);
-
-        // #### Accounts ######
-        $accountUserCustomer = new BinanceAccount();
-        $accountUserCustomer->setUser($userCustomer)
-                            ->setPrivateKey($this->faker->md5())
-                            ->setPublicKey($this->faker->md5());
-        $manager->persist($accountUserCustomer);
-
-        $manager->flush();
     }
 
     public function getDependencies(): array
     {
         return [
+            ExchangesFixturesProd::class,
             SymbolsFixtures::class,
             UsersFixturesProd::class,
         ];

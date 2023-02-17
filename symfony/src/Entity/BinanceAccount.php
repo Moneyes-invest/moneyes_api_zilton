@@ -22,6 +22,7 @@ use App\Repository\BinanceAccountRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BinanceAccountRepository::class)]
+/*
 #[ApiResource(
     operations: [
         new GetCollection(),
@@ -32,7 +33,8 @@ use Doctrine\ORM\Mapping as ORM;
         new Delete(),
     ],
 )]
+*/
 class BinanceAccount extends Account
 {
-    public const EXCHANGE = 'binance';
+ #   public const EXCHANGE = 'binance';
 }

@@ -56,18 +56,6 @@ services:
             - app-network
 
 
-
-    proxy:
-        build: ./proxy
-        container_name: proxy
-        ports:
-            -   8888:8888
-        volumes:
-            - ./proxy:/var/www
-        networks:
-            - app-network
-
-
     ###> doctrine/doctrine-bundle ###
     database:
         image: postgres:${POSTGRES_VERSION:-14}-alpine
