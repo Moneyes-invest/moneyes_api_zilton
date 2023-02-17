@@ -25,7 +25,7 @@ if (version_compare(phpversion(), '7.0', '<=')) {
  * $api = new Binance\\API();
  * $api = new Binance\\RateLimiter($api);
  */
-class RateLimiter
+class RateLimiter extends API
 {
     private $api                       = null;
     private $weights                   = null;

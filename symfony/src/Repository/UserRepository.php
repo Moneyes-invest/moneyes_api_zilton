@@ -11,7 +11,6 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
-use App\Entity\Holding;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -64,19 +63,5 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
 
         $this->save($user, true);
-    }
-
-    /**
-     * Delete Holdings from a User.
-     */
-    public function flushHoldings(User $user): void
-    {
-        $holdings = $this->getEntityManager()->getRepository(Holding::class)->findBy(['user' => $user]);
-
-        foreach ($holdings as $holding) {
-            $this->getEntityManager()->remove($holding);
-        }
-
-        $this->getEntityManager()->flush();
     }
 }

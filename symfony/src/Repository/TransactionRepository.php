@@ -11,10 +11,7 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
-use App\Entity\Account;
-use App\Entity\Currency;
 use App\Entity\Transaction;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -49,66 +46,5 @@ class TransactionRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
-    }
-
-    public function getTransactions(User $user, ?Account $account = null, ?Currency $currency = null, ?\DateTime $latestUpdate = null): array
-    {
-        $entityManager = $this->getEntityManager();
-        // 1. if !Account and !Currency
-        if (!$account && !$currency) {
-            if (!$latestUpdate) {
-                $transactions = $entityManager->getRepository(Transaction::class)
-                                               ->findBy([
-                                                   'user' => $user,
-                                               ]);
-            } else {
-                $queryAllNewTransactions = $entityManager
-                    ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate ORDER BY t.date DESC')
-                    ->setParameter('latestUpdate', $latestUpdate);
-                $transactions = $queryAllNewTransactions->getResult();
-            }
-        }
-        // 2. if Exchange and !Currency
-        elseif (!$currency) {
-            if (!$latestUpdate) {
-                $transactions = $entityManager->getRepository(Transaction::class)
-                                              ->findBy([
-                                                  'user'     => $user,
-                                                  'account'  => $account,
-                                              ]);
-            } else {
-                $queryParameters = [
-                    'latestUpdate',
-                    'account',
-                ];
-                $queryAllNewTransactions = $entityManager
-                    ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.account > :account ORDER BY t.date DESC')
-                    ->setParameters($queryParameters);
-                $transactions = $queryAllNewTransactions->getResult();
-            }
-        }
-        // 3. if Exchange and Currency
-        else {
-            if (!$latestUpdate) {
-                $transactions = $entityManager->getRepository(Transaction::class)
-                                              ->findBy([
-                                                  'user'       => $user,
-                                                  'account'    => $account,
-                                                  'currency'   => $currency,
-                                              ]);
-            } else {
-                $queryParameters = [
-                    'latestUpdate',
-                    'account',
-                    'currency',
-                ];
-                $queryAllNewTransactions = $entityManager
-                    ->createQuery('SELECT t FROM App\Entity\Transaction t WHERE t.date > :latestUpdate AND t.account = :account AND t.currency = :currency ORDER BY t.date DESC')
-                    ->setParameters($queryParameters);
-                $transactions = $queryAllNewTransactions->getResult();
-            }
-        }
-
-        return (array) $transactions;
     }
 }

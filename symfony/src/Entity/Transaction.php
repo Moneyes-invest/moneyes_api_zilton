@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\TransactionRepository;
-use App\State\TransactionStateProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
@@ -33,7 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['get:transactions']]),
         new Get(normalizationContext: ['groups' => ['get:transactions', 'get:transaction']]),
-        new Post(processor: TransactionStateProcessor::class),
+        new Post(),
         new Put(),
         new Patch(),
         new Delete(),

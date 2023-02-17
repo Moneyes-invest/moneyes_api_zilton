@@ -12,7 +12,6 @@ declare(strict_types = 1);
 namespace App\Repository;
 
 use App\Entity\Account;
-use App\Entity\Transaction;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -29,20 +28,5 @@ class AccountRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry, string $entityClass = Account::class)
     {
         parent::__construct($registry, $entityClass);
-    }
-
-    /**
-     * Delete Transactions from a User Account.
-     */
-    public function flushTransactions(Account $account): void
-    {
-        $user         = $account->getUser();
-        $transactions = $this->getEntityManager()->getRepository(Transaction::class)->findBy(['user' => $user]);
-
-        foreach ($transactions as $transaction) {
-            $this->getEntityManager()->remove($transaction);
-        }
-
-        $this->getEntityManager()->flush();
     }
 }

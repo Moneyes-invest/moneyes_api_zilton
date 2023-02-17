@@ -44,10 +44,13 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
 
     public function getSymbolsList(Account $account): array
     {
-        if (null === $account->getPublicKey() || null === $account->getPrivateKey()) {
+        if ('' === $account->getPublicKey() || '' === $account->getPrivateKey()) {
             throw new \Exception('No API credentials provided');
         }
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
+        /**
+         * @phpstan-ignore-next-line
+         */
         $symbolsListRaw     = $customerBinanceApi->exchangeInfo()['symbols'];
         $symbolsList        = [];
 
@@ -75,6 +78,9 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         $tradesList = [];
 
         foreach ($symbolsList as $symbol) {
+            /**
+             * @phpstan-ignore-next-line
+             */
             $tradesList = array_merge($tradesList, $customerBinanceApi->history($symbol)); // Get all trades for each symbol
         } // Get all trades for each symbol
 
@@ -89,6 +95,9 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
     public function getPrice(Account $account, string $isoCode): float
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
+        /**
+         * @phpstan-ignore-next-line
+         */
         $price              = (float) $customerBinanceApi->price($isoCode);
 
         return $price;
@@ -105,6 +114,9 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
 
         return [
             [
+                /**
+                 * @phpstan-ignore-next-line
+                 */
                 $customerBinanceApi->prices(),
             ],
         ];
@@ -124,7 +136,9 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
     public function getAssets(Account $account): array
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
-
+        /**
+         * @phpstan-ignore-next-line
+         */
         $balances = $customerBinanceApi->balances();
 
         $assets = [];
@@ -149,6 +163,9 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
         $userAssets         = $this->getAssets($account);
+        /**
+         * @phpstan-ignore-next-line
+         */
         $balances           = $customerBinanceApi->balances();
 
         $totalValue = 0.0;
@@ -207,6 +224,9 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
     public function getAllSymbols(Account $account): array
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
+        /**
+         * @phpstan-ignore-next-line
+         */
         $rawSymbolsList     = $customerBinanceApi->exchangeInfo()['symbols'];
         $symbolsList        = [];
 
@@ -220,7 +240,7 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
     /**
      * @throws \Exception
      */
-    public function fetchTransfers(Account $account)
+    public function fetchTransfers(Account $account): void
     {
         $threeMonthsInMs            = 7776000000;
         $todayTimestampMs           = time() * 1000;
@@ -235,6 +255,9 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
             $params              = [];
             $params['startTime'] = $start;
             $params['endTime']   = $end;
+            /**
+             * @phpstan-ignore-next-line
+             */
             $withdraw            = $customerBinanceApi->withdrawHistory(null, $params);
             if (!empty($withdraw['withdrawList'])) {
                 foreach ($withdraw['withdrawList'] as $withdrawValue) {
@@ -242,6 +265,9 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
                 }
             }
             // same for deposit
+            /**
+             * @phpstan-ignore-next-line
+             */
             $deposit = $customerBinanceApi->depositHistory(null, $params);
             if (!empty($deposit)) {
                 foreach ($deposit as $depositValue) {
@@ -265,7 +291,7 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
     /**
      * @throws \Exception
      */
-    public function registerTransfer(mixed $transferValue, Account $account, string $time, string $type): void
+    public function registerTransfer(array $transferValue, Account $account, string $time, string $type): void
     {
         $transfer = new Transfer();
         $transfer->setAccount($account);

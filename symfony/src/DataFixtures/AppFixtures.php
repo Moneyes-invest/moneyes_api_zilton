@@ -15,19 +15,14 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Faker\Factory;
-use Faker\Generator;
 
 class AppFixtures extends Fixture implements FixtureGroupInterface, DependentFixtureInterface
 {
-    private Generator $faker;
-
     /**
      * Init Fixture Class. Load Faker.
      */
     public function __construct()
     {
-        $this->faker = Factory::create('fr_FR');
     }
 
     /**
