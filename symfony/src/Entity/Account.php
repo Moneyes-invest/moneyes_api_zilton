@@ -49,7 +49,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     denormalizationContext: ['groups' => ['create:account', 'update:account']],
 )]
-/*abstract */
+/* abstract */
 class Account
 {
     public const EXCHANGE = null;

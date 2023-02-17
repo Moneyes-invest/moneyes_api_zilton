@@ -35,10 +35,8 @@ class Asset
     #[Assert\Regex(pattern: '/^[A-Z]{3,10}$/')]
     private string $code;
 
-
     #[ORM\ManyToMany(targetEntity: Exchange::class, inversedBy: 'assets')]
     private Collection $exchange;
-
 
     public function __construct()
     {
@@ -85,5 +83,4 @@ class Asset
 
         return $this;
     }
-
 }

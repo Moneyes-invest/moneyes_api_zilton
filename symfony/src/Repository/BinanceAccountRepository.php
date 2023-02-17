@@ -27,7 +27,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method BinanceAccount[]    findAll()
  * @method BinanceAccount[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BinanceAccountRepository extends AccountRepository # implements AccountInterface
+class BinanceAccountRepository extends AccountRepository // implements AccountInterface
 {
     private API $binanceApiConnexion;
 
@@ -231,12 +231,11 @@ class BinanceAccountRepository extends AccountRepository # implements AccountInt
         $depositHistory             = [];
         $customerBinanceApi         = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
 
-
         while ($start > $binanceCreationTimestampMs) {
             $params              = [];
             $params['startTime'] = $start;
             $params['endTime']   = $end;
-            $withdraw = $customerBinanceApi->withdrawHistory(null, $params);
+            $withdraw            = $customerBinanceApi->withdrawHistory(null, $params);
             if (!empty($withdraw['withdrawList'])) {
                 foreach ($withdraw['withdrawList'] as $withdrawValue) {
                     $withdrawHistory[] = $withdrawValue;

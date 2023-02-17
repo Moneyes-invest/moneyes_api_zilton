@@ -29,7 +29,6 @@ class SyncProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-
         $idAccount = $uriVariables['id']; // user id
         $account   = $this->manager->getRepository(Account::class)->find($idAccount); // user account
 
@@ -37,7 +36,7 @@ class SyncProvider implements ProviderInterface
             return null;
         }
         $accountRepository = $this->manager->getRepository(BinanceAccount::class);
-        $holdings = $accountRepository->getAssets($account); // user holdings assets
+        $holdings          = $accountRepository->getAssets($account); // user holdings assets
         // Get all transactions for each symbol by messenger handler
         $this->bus->dispatch(new OwnedTransactionsMessage((string) $account->getId()));
         // Get all transfers
@@ -47,6 +46,5 @@ class SyncProvider implements ProviderInterface
 
         // Return Binance details endpoint
         return $holdings;
-
     }
 }

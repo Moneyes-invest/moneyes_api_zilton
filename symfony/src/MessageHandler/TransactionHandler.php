@@ -18,7 +18,6 @@ use App\Entity\Transaction;
 use App\Message\AllTransactionsMessage;
 use App\Message\AllTransfersMessage;
 use App\Message\OwnedTransactionsMessage;
-use App\Repository\BinanceAccountRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

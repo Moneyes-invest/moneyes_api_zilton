@@ -36,5 +36,5 @@ use Doctrine\ORM\Mapping as ORM;
 */
 class BinanceAccount extends Account
 {
- #   public const EXCHANGE = 'binance';
+    //   public const EXCHANGE = 'binance';
 }
