@@ -3,6 +3,7 @@ parameters:
     excludePaths:
         analyseAndScan:
             - ./src/State/UserPasswordHasher.php
+            - ./src/lib/
     scanDirectories:
         - ./src
     earlyTerminatingMethodCalls:
