@@ -1,0 +1,16 @@
+parameters:
+    level: 9
+    excludePaths:
+        analyseAndScan:
+            - ./src/State/UserPasswordHasher.php
+            - ./src/Binance/
+    scanDirectories:
+        - ./src
+    earlyTerminatingMethodCalls:
+        PHPUnit\Framework\Constraint\Constraint:
+            - fail
+    treatPhpDocTypesAsCertain: false
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    inferPrivatePropertyTypeFromConstructor: true
+    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'

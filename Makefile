@@ -67,12 +67,14 @@ disable-xdebug:
 
 db: ## Reset the database and load fixtures
 db: vendor
+	$(DOCKER_COMPOSE) stop django
 	@$(EXEC_APP) php -r 'echo "Wait database...\n"; set_time_limit(30); require __DIR__."/vendor/autoload.php"; (new \Symfony\Component\Dotenv\Dotenv())->usePutenv(true)->bootEnv(__DIR__."/.env") ;$$u=parse_url(getenv("DATABASE_URL"));set_time_limit(60);for(;;){if(@fsockopen($$u["host"],$$u["port"])){break;}echo "Waiting for database\n";sleep(1);}'
 	$(SYMFONY) doctrine:database:drop --force || true
 	$(SYMFONY) doctrine:database:create
 	$(SYMFONY) doctrine:migrations:migrate --no-interaction --allow-no-migration
 	$(SYMFONY) doctrine:fixtures:load --group=dev --no-interaction
 	$(SYMFONY) lexik:jwt:generate-keypair --overwrite
+	$(DOCKER_COMPOSE) start django
 
 migration: ## Generate a new doctrine migration
 migration: vendor
@@ -90,7 +92,7 @@ db-validate-schema: ## Validate the doctrine ORM mapping
 db-validate-schema: vendor
 	$(SYMFONY) doctrine:schema:validate
 
-composer.lock: composer.json
+composer.lock: symfony/composer.json
 	$(COMPOSER) update --lock --no-scripts --no-interaction
 
 vendor: composer.lock
@@ -143,7 +145,7 @@ local-php-security-checker: tools/local-php-security-checker-2.0.3
 security:
 	$(MAKE) local-php-security-checker arguments=""
 
-tools/phpmd/composer.lock: tools/phpmd/composer.json
+tools/phpmd/composer.lock: symfony/tools/phpmd/composer.json
 	$(COMPOSER) --working-dir=tools/phpmd update
 
 tools/phpmd/vendor: composer.lock
@@ -161,7 +163,7 @@ apply-phpmd:
 update-phpmd:
 	$(COMPOSER) --working-dir=tools/phpmd update
 
-tools/phpcpd/composer.lock: tools/phpcpd/composer.jsons
+tools/phpcpd/composer.lock: symfony/tools/phpcpd/composer.jsons
 	$(COMPOSER) --working-dir=tools/phpcpd update
 
 tools/phpcpd/vendor: composer.lock
@@ -179,7 +181,7 @@ apply-phpcpd:
 update-phpcpd:
 	$(COMPOSER) --working-dir=tools/phpcpd update
 
-tools/phpstan/composer.lock: tools/phpstan/composer.json
+tools/phpstan/composer.lock: symfony/tools/phpstan/composer.json
 	$(COMPOSER) --working-dir=tools/phpstan update
 
 tools/phpstan/vendor: composer.lock
@@ -197,7 +199,7 @@ apply-phpstan:
 update-phpstan:
 	$(COMPOSER) --working-dir=tools/phpstan update
 
-tools/php-cs-fixer/composer.lock: tools/php-cs-fixer/composer.json
+tools/php-cs-fixer/composer.lock: symfony/tools/php-cs-fixer/composer.json
 	$(COMPOSER) --working-dir=tools/php-cs-fixer update
 
 tools/php-cs-fixer/vendor: composer.lock

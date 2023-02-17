@@ -1,27 +1,27 @@
 ###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
-/vendor/
+symfony/.env.local
+symfony/.env.local.php
+symfony/.env.*.local
+symfony/config/secrets/prod/prod.decrypt.private.php
+symfony/public/bundles/
+symfony/var/
+symfony/vendor/
 .DS_Store
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
-/phpunit.xml
-.phpunit.result.cache
+symfony/phpunit.xml
+symfony.phpunit.result.cache
 ###< phpunit/phpunit ###
 
 ###< symfony/phpunit-bridge ###
-/public/uploads/
+symfony/public/uploads/
 
 ###> symfony/webpack-encore-bundle ###
-/node_modules/
-/public/build/
-npm-debug.log
-yarn-error.log
+symfony/node_modules/
+symfony/public/build/
+symfonynpm-debug.log
+symfonyyarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
 ###> symfony/phpunit-bridge ###
@@ -34,5 +34,5 @@ yarn-error.log
 .idea/
 
 ###> lexik/jwt-authentication-bundle ###
-/config/jwt/*.pem
+/symfony/config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
