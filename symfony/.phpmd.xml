@@ -101,4 +101,11 @@
             <property name="maximum" value="40" />
         </properties>
     </rule>
+
+
+    <!-- unix path -->
+    <exclude-pattern>*src/lib/*.php</exclude-pattern>
+    <!-- windows path -->
+    <exclude-pattern>*src\lib\*.php</exclude-pattern>
+
 </ruleset>
