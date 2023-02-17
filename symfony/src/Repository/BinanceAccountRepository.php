@@ -11,13 +11,13 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Binance\API;
+use App\Binance\RateLimiter;
 use App\Entity\Account;
 use App\Entity\Asset;
 use App\Entity\BinanceAccount;
 use App\Entity\Transfer;
 use App\Entity\User;
-use Binance\API;
-use Binance\RateLimiter;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -51,8 +51,8 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         /**
          * @phpstan-ignore-next-line
          */
-        $symbolsListRaw     = $customerBinanceApi->exchangeInfo()['symbols'];
-        $symbolsList        = [];
+        $symbolsListRaw = $customerBinanceApi->exchangeInfo()['symbols'];
+        $symbolsList    = [];
 
         foreach ($symbolsListRaw as $symbol) {
             $symbolsList[] = $symbol['symbol'];
@@ -98,7 +98,7 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         /**
          * @phpstan-ignore-next-line
          */
-        $price              = (float) $customerBinanceApi->price($isoCode);
+        $price = (float) $customerBinanceApi->price($isoCode);
 
         return $price;
     }
@@ -166,7 +166,7 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         /**
          * @phpstan-ignore-next-line
          */
-        $balances           = $customerBinanceApi->balances();
+        $balances = $customerBinanceApi->balances();
 
         $totalValue = 0.0;
 
@@ -227,8 +227,8 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         /**
          * @phpstan-ignore-next-line
          */
-        $rawSymbolsList     = $customerBinanceApi->exchangeInfo()['symbols'];
-        $symbolsList        = [];
+        $rawSymbolsList = $customerBinanceApi->exchangeInfo()['symbols'];
+        $symbolsList    = [];
 
         foreach ($rawSymbolsList as $symbol) {
             $symbolsList[] = $symbol['symbol'];
@@ -274,6 +274,7 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
                     $depositHistory[] = $depositValue;
                 }
             }
+
             $start = $start - $threeMonthsInMs;
             $end   = $end - $threeMonthsInMs;
         }
@@ -297,12 +298,11 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         $transfer->setAccount($account);
         $transfer->setQuantity((float) $transferValue['amount']);
         $transfer->setExternalTransferId($transferValue['id']);
-
         if ('applyTime' === $time) {
             $transfer->setDate(new \DateTime((string) $transferValue[$time]));
         } else {
             $date = new \DateTime();
-            $date->setTimestamp($transferValue[$time] / 1000);
+            $date->setTimestamp((int) ($transferValue[$time] / 1000));
             $transfer->setDate(new \DateTime($date->format('Y-m-d H:i:s')));
         }
 
@@ -327,6 +327,9 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * @throws \Exception
+     */
     private function customerBinanceApi(Account $account): RateLimiter
     {
         $api = new API($account->getPublicKey(), $account->getPrivateKey());

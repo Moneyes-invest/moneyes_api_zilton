@@ -64,9 +64,6 @@ class TransactionHandler
 
         // Fetch and save transactions for owned symbols
         $this->fetchTransactions($symbolsNotOwned, $account);
-
-        // Fetch and save Transfers
-        $accountRepository->fetchTransfers($account);
     }
 
     #[AsMessageHandler]
@@ -98,6 +95,9 @@ class TransactionHandler
         $this->saveTransactions($transactions, $account, $this->manager);
     }
 
+    /**
+     * @throws \Exception
+     */
     private function saveTransactions(array $transactions, Account $account, EntityManagerInterface $manager): void
     {
         // Register transactions
@@ -117,7 +117,7 @@ class TransactionHandler
 
             // Date
             $date = new \DateTime();
-            $date->setTimestamp($transaction['time']);
+            $date->setTimestamp((int) ($transaction['time'] / 1000));
 
             // Order Direction
             if ($transaction['isBuyer']) {
@@ -137,7 +137,7 @@ class TransactionHandler
             $newTransaction = new Transaction();
             $newTransaction->setAccount($account)
                 ->setSymbol($symbol)
-                ->setDate($date)
+                ->setDate(new \DateTime($date->format('Y-m-d H:i:s')))
                 ->setOrderDirection($orderDirection)
                 ->setPrice($transactionPrice)
                 ->setQuantity($transactionQuantity)

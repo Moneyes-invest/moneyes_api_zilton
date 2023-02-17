@@ -102,10 +102,9 @@
         </properties>
     </rule>
 
-
     <!-- unix path -->
-    <exclude-pattern>*src/lib/*.php</exclude-pattern>
+    <exclude-pattern>*src/Binance/*.php</exclude-pattern>
     <!-- windows path -->
-    <exclude-pattern>*src\lib\*.php</exclude-pattern>
+    <exclude-pattern>*src\Binance\*.php</exclude-pattern>
 
 </ruleset>

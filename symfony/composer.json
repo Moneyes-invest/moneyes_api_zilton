@@ -17,6 +17,7 @@
         "fakerphp/faker": "^1.21",
         "gesdinet/jwt-refresh-token-bundle": "^1.1",
         "hyperf/websocket-server": "^3.0",
+        "jaggedsoft/php-binance-api": "@dev",
         "knplabs/doctrine-behaviors": "^2.6",
         "lexik/jwt-authentication-bundle": "^2.16",
         "nelmio/cors-bundle": "^2.2",

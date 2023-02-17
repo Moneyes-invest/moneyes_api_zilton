@@ -9,7 +9,7 @@ declare(strict_types = 1);
  * file that was distributed with this source code.
  */
 
-namespace Binance;
+namespace App\Binance;
 
 // PHP version check
 if (version_compare(phpversion(), '7.0', '<=')) {
@@ -804,17 +804,8 @@ class API
     public function depositHistory(string $asset = null, array $params = [])
     {
         $params['sapi'] = true;
-        if (false === is_null($asset)) {
-            $params['coin'] = $asset;
-        }
-        $return = $this->httpRequest('v1/capital/deposit/hisrec', 'GET', $params, true);
 
-        // Adding for backwards compatibility with wapi
-        foreach ($return as $key => $item) {
-            $return[$key]['asset'] = $item['coin'];
-        }
-
-        return $return;
+        return $this->httpRequest('v1/capital/deposit/hisrec', 'GET', $params, true);
     }
 
     /**
@@ -1209,7 +1200,7 @@ class API
         // dont do anything, leave them do whatever they want
         if ('string' !== gettype($price)) {
             // for every other type, lets format it appropriately
-            $price = number_format($price, 8, '.', '');
+            $price = number_format((float) $price, 8, '.', '');
         }
 
         if (false === is_numeric($quantity)) {
@@ -1374,7 +1365,7 @@ class API
     }
 
     /**
-     * first Gets first key of an array.
+     * first Gets key of an array.
      *
      * $first = $api->first($array);
      *
@@ -1392,7 +1383,7 @@ class API
     }
 
     /**
-     * last Gets last key of an array.
+     * last Gets key of an array.
      *
      * $last = $api->last($array);
      *
@@ -1433,7 +1424,7 @@ class API
             $output .= "{$type}:".PHP_EOL;
             foreach ($entries as $price => $quantity) {
                 $total    = number_format($price * $quantity, 8, '.', '');
-                $quantity = str_pad(str_pad(number_format(rtrim($quantity, '.0')), 10, ' ', STR_PAD_LEFT), 15);
+                $quantity = str_pad(str_pad(number_format((float) rtrim($quantity, '.0')), 10, ' ', STR_PAD_LEFT), 15);
                 $output .= "{$price} {$quantity} {$total}".PHP_EOL;
             }
             // echo str_repeat('-', 32).PHP_EOL;
@@ -1448,13 +1439,13 @@ class API
      * @param $qty quantity
      * @param $stepSize parameter from exchangeInfo
      *
-     * @return rounded value. example: roundStep(1.2345, 0.1) = 1.2
+     * @return float value. example: roundStep(1.2345, 0.1) = 1.2
      */
     public function roundStep($qty, $stepSize = 0.1)
     {
-        $precision = strlen(substr(strrchr(rtrim($stepSize, '0'), '.'), 1));
+        $precision = strlen(substr(strrchr(rtrim((string) $stepSize, '0'), '.'), 1));
 
-        return round((($qty / $stepSize) | 0) * $stepSize, $precision);
+        return round((((float) $qty / (float) $stepSize) | 0) * $stepSize, $precision);
     }
 
     /**
@@ -1466,7 +1457,7 @@ class API
      */
     public function roundTicks($price, $tickSize)
     {
-        $precision = strlen(rtrim(substr($tickSize, strpos($tickSize, '.', 1) + 1), '0'));
+        $precision = strlen(rtrim(substr((string) $tickSize, strpos((string) $tickSize, '.', 1) + 1), '0'));
 
         return number_format($price, $precision, '.', '');
     }
@@ -1622,10 +1613,10 @@ class API
                 $loop->stop();
             });
             $this->depth($symbol, 100);
-            foreach ($this->depthQueue[$symbol] as $data) {
+            /*foreach ($this->depthQueue[$symbol] as $data) {
                 // TODO:: WTF ??? where is json and what should be in it ??
                 $this->depthHandler($json);
-            }
+            }*/
             $this->depthQueue[$symbol] = [];
             call_user_func($callback, $this, $symbol, $this->depthCache[$symbol]);
         }
@@ -2121,6 +2112,7 @@ class API
         // @codeCoverageIgnoreEnd
     }
 
+    /*
     public function getXMbxUsedWeight(): int
     {
         $this->xMbxUsedWeight;
@@ -2130,6 +2122,7 @@ class API
     {
         $this->xMbxUsedWeight1m;
     }
+    */
 
     public function isOnTestnet(): bool
     {
@@ -2490,11 +2483,11 @@ class API
         ];
 
         if (isset($header['x-mbx-used-weight'])) {
-            $this->setXMbxUsedWeight($header['x-mbx-used-weight']);
+            $this->setXMbxUsedWeight(intval($header['x-mbx-used-weight']));
         }
 
         if (isset($header['x-mbx-used-weight-1m'])) {
-            $this->setXMbxUsedWeight1m($header['x-mbx-used-weight-1m']);
+            $this->setXMbxUsedWeight1m(intval($header['x-mbx-used-weight-1m']));
         }
 
         if (isset($json['msg']) && !empty($json['msg'])) {

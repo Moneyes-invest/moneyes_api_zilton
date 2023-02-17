@@ -9,7 +9,7 @@ declare(strict_types = 1);
  * file that was distributed with this source code.
  */
 
-namespace Binance;
+namespace App\Binance;
 
 // PHP version check
 if (version_compare(phpversion(), '7.0', '<=')) {
@@ -25,7 +25,7 @@ if (version_compare(phpversion(), '7.0', '<=')) {
  * $api = new Binance\\API();
  * $api = new Binance\\RateLimiter($api);
  */
-class RateLimiter extends API
+class RateLimiter
 {
     private $api                       = null;
     private $weights                   = null;

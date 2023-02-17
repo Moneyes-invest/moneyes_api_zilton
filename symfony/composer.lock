@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "05ed12092eae124904f405012b5a4161",
+    "content-hash": "76a0fde432806bb099d0a6c787df994e",
     "packages": [
         {
             "name": "api-platform/core",
@@ -13037,7 +13037,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "jaggedsoft/php-binance-api": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
