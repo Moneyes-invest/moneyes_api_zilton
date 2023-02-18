@@ -50,7 +50,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create', 'user:update']],
-    mercure: true,
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
