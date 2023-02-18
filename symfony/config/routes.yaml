@@ -8,3 +8,5 @@ api_login_check:
     path: /api/login
 api_refresh_token:
     path: /api/login/refresh
+api_logout:
+    path: /api/token/invalidate
