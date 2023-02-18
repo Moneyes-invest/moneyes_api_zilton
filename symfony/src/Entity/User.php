@@ -43,7 +43,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/users/{id}/dashboard',
             provider: DashboardProvider::class,
         ),
-        new Post(processor: UserPasswordHasher::class),
+        new Post(uriTemplate: '/register', processor: UserPasswordHasher::class),
         new Put(processor: UserPasswordHasher::class),
         new Patch(processor: UserPasswordHasher::class),
         new Delete(),
