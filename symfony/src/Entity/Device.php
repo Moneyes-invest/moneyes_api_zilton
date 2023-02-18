@@ -1,16 +1,27 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use App\Repository\DeviceRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: DeviceRepository::class)]
 #[ApiResource(
@@ -24,9 +35,10 @@ use Doctrine\ORM\Mapping as ORM;
 class Device
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    private Uuid $id;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $osVersion = null;
@@ -55,7 +67,7 @@ class Device
     #[ORM\ManyToOne(inversedBy: 'devices')]
     private ?User $user = null;
 
-    public function getId(): ?int
+    public function getId(): Uuid
     {
         return $this->id;
     }
