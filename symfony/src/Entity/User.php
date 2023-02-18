@@ -100,9 +100,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:create', 'user:update'])]
     private ?string $plainPassword = null;
 
+    #[ORM\OneToMany(mappedBy: 'userDevice', targetEntity: Device::class)]
+    private Collection $devices;
+
     public function __construct()
     {
         $this->account      = new ArrayCollection();
+        $this->devices      = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -248,6 +252,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Device>
+     */
+    public function getDevices(): Collection
+    {
+        return $this->devices;
+    }
+
+    public function addDevice(Device $device): self
+    {
+        if (!$this->devices->contains($device)) {
+            $this->devices->add($device);
+            $device->setUserDevice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDevice(Device $device): self
+    {
+        if ($this->devices->removeElement($device)) {
+            // set the owning side to null (unless already changed)
+            if ($device->getUserDevice() === $this) {
+                $device->setUserDevice(null);
+            }
+        }
 
         return $this;
     }

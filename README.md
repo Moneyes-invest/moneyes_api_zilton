@@ -11,8 +11,11 @@
 ## EasyAdmin (Non à jour)
 ``http//localhost:8080/admin``
 ## Un fois le dev terminé faire
-``make pre-commit``
-pour tester et formater le code
+1. `make pre-commit` pour tester et formater le code
+2. `make db-validate-schema` pour valider la base de données
+3. `make test`pour lancer les tests unitaires
+
+Si tout est ok, faire un commit et un push
 ## Rebase lors d'un conflit
 ``git pull --rebase origin nomdelabranch``
 ``git push --force-with-lease``

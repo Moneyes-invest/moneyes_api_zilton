@@ -64,7 +64,7 @@ class Device
     private ?string $appVersion = null;
 
     #[ORM\ManyToOne(inversedBy: 'devices')]
-    private ?User $user = null;
+    private ?User $userDevice = null;
 
     public function getId(): Uuid
     {
@@ -167,14 +167,14 @@ class Device
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUserDevice(): ?User
     {
-        return $this->user;
+        return $this->userDevice;
     }
 
-    public function setUser(?User $user): self
+    public function setUserDevice(?User $userDevice): self
     {
-        $this->user = $user;
+        $this->userDevice = $userDevice;
 
         return $this;
     }
