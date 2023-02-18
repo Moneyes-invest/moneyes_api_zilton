@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
 use App\State\DashboardProvider;
+use App\State\UserLogoutProcessor;
 use App\State\UserPasswordHasher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -44,6 +45,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: DashboardProvider::class,
         ),
         new Post(uriTemplate: '/register', processor: UserPasswordHasher::class),
+        new Post(uriTemplate: '/users/{id}/logout', processor: UserLogoutProcessor::class),
         new Put(processor: UserPasswordHasher::class),
         new Patch(processor: UserPasswordHasher::class),
         new Delete(),
