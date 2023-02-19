@@ -66,7 +66,7 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
     /**
      * @throws \Exception
      */
-    public function fetchTransactions(Account $account, ?array $symbolsBalance = null, ?\DateTime $previousUpdate = null): array
+    public function fetchTransactions(Account $account, ?array $symbolsBalance = null, ?bool $new = false): array
     {
         $customerBinanceApi = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
 
@@ -80,10 +80,22 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         $tradesList = [];
 
         foreach ($symbolsList as $symbol) {
-            /**
-             * @phpstan-ignore-next-line
-             */
-            $tradesList = array_merge($tradesList, $customerBinanceApi->history($symbol)); // Get all trades for each symbol
+            if ($new) {
+                $symbolEntity    = $this->getEntityManager()->getRepository(Symbol::class)->findOneBy(['code' => $symbol]);
+                $lastTransaction =  $this->getEntityManager()->getRepository(Transaction::class)->findOneBy(['account' => $account, 'symbol' => $symbolEntity], ['date' => 'DESC']);
+                if ($lastTransaction instanceof Transaction) {
+                    $latestTransactionId = $lastTransaction->getExternalTransactionId();
+                    /**
+                     * @phpstan-ignore-next-line
+                     */
+                    $tradesList = array_merge($tradesList, $customerBinanceApi->history($symbol, 500, $latestTransactionId));
+                }
+            } else {
+                /**
+                 * @phpstan-ignore-next-line
+                 */
+                $tradesList = array_merge($tradesList, $customerBinanceApi->history($symbol)); // Get all trades for each symbol
+            }
         } // Get all trades for each symbol
 
         return $tradesList;
@@ -260,7 +272,7 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
                 /**
                  * @phpstan-ignore-next-line
                  *
-                 * Because $latestDate is check with if
+                 * //TODO: set Date from Transfer to not null
                  */
                 $latestDate = $lastTransfer->getDate()->getTimestamp() * 1000;
                 if ($latestDate > $start) {

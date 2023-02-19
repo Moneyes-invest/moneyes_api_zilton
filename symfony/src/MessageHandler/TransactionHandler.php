@@ -15,6 +15,7 @@ use App\Entity\Account;
 use App\Entity\BinanceAccount;
 use App\Message\AllTransactionsMessage;
 use App\Message\AllTransfersMessage;
+use App\Message\NewTransactions;
 use App\Message\OwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -80,14 +81,37 @@ class TransactionHandler
         $accountRepository->fetchTransfers($account);
     }
 
-    private function fetchTransactions(array $accountSymbols, Account $account): void
+    #[AsMessageHandler]
+    public function handleNewTransaction(NewTransactions $message): void
+    {
+        $accountId      = $message->getAccountId();
+        $account        = $this->manager->getRepository(Account::class)->find($accountId);
+        if (null === $account) {
+            throw new \Exception('Account not found');
+        }
+        $accountRepository = $this->manager->getRepository(BinanceAccount::class);
+        if (!method_exists($accountRepository, 'getAccountSymbols')) {
+            throw new \Exception('Method getAccountSymbols not found');
+        }
+        $allSymbols     = $accountRepository->getAllSymbols($account); // all symbols
+
+        // Fetch and save transactions for owned symbols
+        $this->fetchTransactions($allSymbols, $account, true);
+    }
+
+    private function fetchTransactions(array $accountSymbols, Account $account, ?bool $new = false): void
     {
         $accountRepository = $this->manager->getRepository(BinanceAccount::class);
         if (!method_exists($accountRepository, 'fetchTransactions')) {
             throw new \Exception('Method fetchTransactions not found');
         }
         // Fetch transactions for owned symbols
-        $transactions = $accountRepository->fetchTransactions($account, $accountSymbols);
+
+        if ($new) {
+            $transactions = $accountRepository->fetchTransactions($account, $accountSymbols, true);
+        } else {
+            $transactions = $accountRepository->fetchTransactions($account, $accountSymbols);
+        }
 
         // Save transactions into database
         $accountRepository->registerTransaction($transactions, $account, $this->manager);

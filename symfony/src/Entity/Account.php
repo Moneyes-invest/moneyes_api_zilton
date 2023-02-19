@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Repository\AccountRepository;
 use App\State\AccountDetailProvider;
 use App\State\SyncProvider;
+use App\State\UpdateAccountProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -45,6 +46,10 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(
             uriTemplate: '/accounts/{id}/sync',
             provider: SyncProvider::class,
+        ),
+        new Get(
+            uriTemplate: '/accounts/{id}/update',
+            provider: UpdateAccountProvider::class,
         ),
     ],
     denormalizationContext: ['groups' => ['create:account', 'update:account']],
