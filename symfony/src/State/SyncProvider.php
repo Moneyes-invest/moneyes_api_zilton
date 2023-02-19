@@ -17,6 +17,7 @@ use App\Entity\Account;
 use App\Entity\BinanceAccount;
 use App\Message\AllTransactionsMessage;
 use App\Message\AllTransfersMessage;
+use App\Message\NewTransactions;
 use App\Message\OwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -43,6 +44,8 @@ class SyncProvider implements ProviderInterface
         $this->bus->dispatch(new AllTransfersMessage((string) $account->getId()));
         // Get the rest of transactions (all symbols - user holdings)
         $this->bus->dispatch(new AllTransactionsMessage((string) $account->getId()));
+
+        $this->bus->dispatch(new NewTransactions((string) $account->getId()));
 
         // Return Binance details endpoint
         return $holdings;
