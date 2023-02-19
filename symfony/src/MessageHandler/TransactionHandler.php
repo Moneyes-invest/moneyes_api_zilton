@@ -92,60 +92,8 @@ class TransactionHandler
         $transactions = $accountRepository->fetchTransactions($account, $accountSymbols);
 
         // Save transactions into database
-        $this->saveTransactions($transactions, $account, $this->manager);
+        $accountRepository->registerTransaction($transactions, $account, $this->manager);
     }
 
-    /**
-     * @throws \Exception
-     */
-    private function saveTransactions(array $transactions, Account $account, EntityManagerInterface $manager): void
-    {
-        // Register transactions
-        foreach ($transactions as $transaction) {
-            // Code ISO
-            $codeIso = $transaction['symbol'];
 
-            // If symbol is not in the database, create it
-            $symbol = $manager->getRepository(Symbol::class)->findOneBy(['code' => $codeIso]);
-            if (null === $symbol) {
-                $newSymbol = new Symbol();
-                $newSymbol->setCode($codeIso);
-                $symbol = $newSymbol;
-                $manager->persist($symbol);
-                $manager->flush();
-            }
-
-            // Date
-            $date = new \DateTime();
-            $date->setTimestamp((int) ($transaction['time'] / 1000));
-
-            // Order Direction
-            if ($transaction['isBuyer']) {
-                $orderDirection = 'BUY';
-            } else {
-                $orderDirection = 'SELL';
-            }
-
-            // Transaction ID
-            // $transactionExists = $this->manager->getRepository(Transaction::class)->findOneBy(['transactionExchangeId' => $exchangeTradeId]);
-
-            $transactionPrice      = (float) $transaction['price'];
-            $transactionQuantity   = (float) $transaction['qty'];
-            $externalTransactionId = (string) $transaction['id'];
-
-            // if (null === $transactionExists && $binanceExchange instanceof Exchange) {
-            $newTransaction = new Transaction();
-            $newTransaction->setAccount($account)
-                ->setSymbol($symbol)
-                ->setDate(new \DateTime($date->format('Y-m-d H:i:s')))
-                ->setOrderDirection($orderDirection)
-                ->setPrice($transactionPrice)
-                ->setQuantity($transactionQuantity)
-                ->setExternalTransactionId($externalTransactionId);
-
-            $manager->persist($newTransaction);
-            $manager->flush();
-            // }
-        }
-    }
 }

@@ -16,6 +16,8 @@ use App\Binance\RateLimiter;
 use App\Entity\Account;
 use App\Entity\Asset;
 use App\Entity\BinanceAccount;
+use App\Entity\Symbol;
+use App\Entity\Transaction;
 use App\Entity\Transfer;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -297,6 +299,10 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         $transfer = new Transfer();
         $transfer->setAccount($account);
         $transfer->setQuantity((float) $transferValue['amount']);
+        $existingTransfer = $this->getEntityManager()->getRepository(Transfer::class)->findOneBy(['externalTransferId' => $transferValue['id']]);
+        if (null !== $existingTransfer) {
+            return;
+        } // if transfer already exists
         $transfer->setExternalTransferId($transferValue['id']);
         if ('applyTime' === $time) {
             $transfer->setDate(new \DateTime((string) $transferValue[$time]));
@@ -325,6 +331,63 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
 
         $this->getEntityManager()->persist($transfer);
         $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function registerTransaction(array $transactions, Account $account, EntityManagerInterface $manager): void
+    {
+        // Register transactions
+        foreach ($transactions as $transaction) {
+            // Code ISO
+            $codeIso = $transaction['symbol'];
+
+            // If symbol is not in the database, create it
+            $symbol = $manager->getRepository(Symbol::class)->findOneBy(['code' => $codeIso]);
+            if (null === $symbol) {
+                $newSymbol = new Symbol();
+                $newSymbol->setCode($codeIso);
+                $symbol = $newSymbol;
+                $manager->persist($symbol);
+                $manager->flush();
+            }
+
+            // Date
+            $date = new \DateTime();
+            $date->setTimestamp((int) ($transaction['time'] / 1000));
+
+            // Order Direction
+            if ($transaction['isBuyer']) {
+                $orderDirection = 'BUY';
+            } else {
+                $orderDirection = 'SELL';
+            }
+
+            //Check if transaction already exists
+            $transactionExists = $manager->getRepository(Transaction::class)->findOneBy(['externalTransactionId' => $transaction['id']]);
+            if (null !== $transactionExists) {
+                continue;
+            }
+
+            $transactionPrice      = (float) $transaction['price'];
+            $transactionQuantity   = (float) $transaction['qty'];
+            $externalTransactionId = (string) $transaction['id'];
+
+            // if (null === $transactionExists && $binanceExchange instanceof Exchange) {
+            $newTransaction = new Transaction();
+            $newTransaction->setAccount($account)
+                ->setSymbol($symbol)
+                ->setDate(new \DateTime($date->format('Y-m-d H:i:s')))
+                ->setOrderDirection($orderDirection)
+                ->setPrice($transactionPrice)
+                ->setQuantity($transactionQuantity)
+                ->setExternalTransactionId($externalTransactionId);
+
+            $manager->persist($newTransaction);
+            $manager->flush();
+            // }
+        }
     }
 
     /**
