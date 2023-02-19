@@ -242,7 +242,7 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
     /**
      * @throws \Exception
      */
-    public function fetchTransfers(Account $account): void
+    public function fetchTransfers(Account $account, ?bool $new = false): void
     {
         $threeMonthsInMs            = 7776000000;
         $todayTimestampMs           = time() * 1000;
@@ -252,8 +252,20 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         $withdrawHistory            = [];
         $depositHistory             = [];
         $customerBinanceApi         = $this->customerBinanceApi($account); // Connect to Binance API with customer's credentials
+        $limit = $binanceCreationTimestampMs;
 
-        while ($start > $binanceCreationTimestampMs) {
+        if ($new) {
+            $lastTransfer = $this->getEntityManager()->getRepository(Transfer::class)->findOneBy(['account'=> $account], ['date' => 'DESC']);
+            if (null !== $lastTransfer) {
+                $latestDate = $lastTransfer->getDate()->getTimestamp() * 1000;
+                if ($latestDate > $start){
+                    $start = $latestDate + 1 ;
+                }
+                $limit = $latestDate;
+            }
+        }
+
+        while ($start > $limit) {
             $params              = [];
             $params['startTime'] = $start;
             $params['endTime']   = $end;
