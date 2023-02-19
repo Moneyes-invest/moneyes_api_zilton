@@ -14,6 +14,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
+use App\Entity\BinanceAccount;
 use App\Message\NewTransactions;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,10 +46,14 @@ class UpdateAccountProvider implements ProviderInterface
                 404,
                 ['Content-Type' => 'application/json']);
         }
+
+        // Get all new transactions
         $this->bus->dispatch(new NewTransactions((string) $account->getId()));
+        // Get all new transfers
+        $this->manager->getRepository(BinanceAccount::class)->fetchTransfers($account, true);
 
         $jsonResponse = json_encode([
-            'New User Transactions are fetching',
+            'New User Transactions and new Transfers are fetching',
         ]);
         if (false === $jsonResponse) {
             throw new \RuntimeException('Unable to encode response');
