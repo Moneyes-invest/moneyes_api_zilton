@@ -14,7 +14,6 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
-use App\Entity\BinanceAccount;
 use App\Entity\Holding;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -55,7 +54,7 @@ class DashboardProvider implements ProviderInterface
                 ];
             }
         }
-        
+
         return [
             'accounts' => $accountArray,
         ];

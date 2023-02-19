@@ -13,8 +13,6 @@ namespace App\MessageHandler;
 
 use App\Entity\Account;
 use App\Entity\BinanceAccount;
-use App\Entity\Symbol;
-use App\Entity\Transaction;
 use App\Message\AllTransactionsMessage;
 use App\Message\AllTransfersMessage;
 use App\Message\OwnedTransactionsMessage;
@@ -94,6 +92,4 @@ class TransactionHandler
         // Save transactions into database
         $accountRepository->registerTransaction($transactions, $account, $this->manager);
     }
-
-
 }
