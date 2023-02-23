@@ -1,17 +1,21 @@
 version: '3.8'
 
 services:
-    php:
-        build:
-            context: symfony/
-            target: php_dev
-        volumes:
-            - ./symfony:/srv/app:rw,cached
-            - ./symfony/docker/php/conf.d/app.dev.ini:/usr/local/etc/php/conf.d/app.ini
-            - /src/app/vendor
-        environment:
-            XDEBUG_MODE: "${XDEBUG_MODE:-debug}"
-            XDEBUG_IDE_KEY: "${XDEBUG_IDE_KEY:-PHPSTORM}"
-        extra_hosts:
-            # Ensure that host.docker.internal is correctly defined on Linux
-            - host.docker.internal:host-gateway
+  php:
+    build:
+      context: symfony/
+      target: php_dev
+    volumes:
+      - ./symfony:/srv/app:rw,cached
+      - ./symfony/docker/php/conf.d/app.dev.ini:/usr/local/etc/php/conf.d/app.ini
+      - /src/app/vendor
+    environment:
+      XDEBUG_MODE: "${XDEBUG_MODE:-debug}"
+      XDEBUG_IDE_KEY: "${XDEBUG_IDE_KEY:-PHPSTORM}"
+    extra_hosts:
+      # Ensure that host.docker.internal is correctly defined on Linux
+      - host.docker.internal:host-gateway
+
+  mercure:
+    ports:
+      - "80"
