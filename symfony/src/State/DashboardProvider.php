@@ -18,17 +18,18 @@ use App\Entity\BinanceAccount;
 use App\Entity\Holding;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class DashboardProvider implements ProviderInterface
 {
-    public function __construct(private readonly EntityManagerInterface $manager)
+    public function __construct(private readonly EntityManagerInterface $manager, private readonly Security $security)
     {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $accountArray   = [];
-        $user           = $this->manager->getRepository(User::class)->find($uriVariables['id']);
+        $user           = $this->security->getUser();
         if (!$user instanceof User) {
             return ["L'utilisateur n'existe pas"];
         }
