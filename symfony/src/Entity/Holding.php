@@ -37,6 +37,9 @@ class Holding
     #[ORM\Column(type: Types::DATETIME_MUTABLE, length: 255)]
     private ?\DateTimeInterface $date = null;
 
+    #[ORM\Column]
+    private ?float $averagePurchasePrice = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -86,6 +89,18 @@ class Holding
     public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getAveragePurchasePrice(): ?float
+    {
+        return $this->averagePurchasePrice;
+    }
+
+    public function setAveragePurchasePrice(float $averagePurchasePrice): self
+    {
+        $this->averagePurchasePrice = $averagePurchasePrice;
 
         return $this;
     }

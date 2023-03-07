@@ -86,9 +86,10 @@ services:
 
   django:
     build: django/
+    container_name: django
     command: python manage.py runserver 0.0.0.0:3333
     volumes:
-      - ./django/app:/usr/src/app/
+      - ./django/performance:/usr/src/performance/
     ports:
       - 3333:3333
     env_file:
