@@ -199,3 +199,14 @@ class User(models.Model):
     class Meta:
         managed = False
         db_table = 'user'
+
+
+class AssetPrices(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    asset = models.ForeignKey(Asset, models.DO_NOTHING)
+    timestamp = models.BigIntegerField() # Unix timestamp in milliseconds
+    price = models.FloatField()
+    asset_price = models.CharField(max_length=255, default='USD')
+
+    class Meta:
+        db_table = 'asset_prices'

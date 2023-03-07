@@ -1,5 +1,5 @@
 from datetime import datetime, time
-from app.models import Transaction, Holding, Transfer, Asset
+from app.models import Transaction, Holding, Transfer, Asset, AssetPrices
 import pandas as pd
 from pycoingecko import CoinGeckoAPI
 import requests
@@ -38,7 +38,8 @@ def calculate_holdings(transactions: object) -> object:
 
         # get all transfers
         asset = "1edb7455-d2fd-66ec-8dc1-2586db133bdb"
-        day_transfers = Transfer.objects.filter(date__gte=start_date, date__lte=end_date, asset=asset)
+        asset = Asset.objects.get(id=asset)
+        day_transfers = Transfer.objects.filter(date__gte=start_date, date__lte=end_date, asset=asset.id)
 
         # Get all transactions between start and end date
         day_transactions = transactions.filter(date__gte=start_date, date__lte=end_date)
@@ -77,16 +78,7 @@ def calculate_holdings(transactions: object) -> object:
 
         # ---- Get Price ----
         # end to timestamp seconds
-        date = int(end / 1000)
-
-        response = requests.get(
-            f'https://min-api.cryptocompare.com/data/v2/histohour?fsym=BTC&tsym=USD&limit=1&toTs={date}')
-
-        data = response.json()
-        if data['Response'] == 'Error':
-            price = 0
-        else:
-            price = data['Data']['Data'][0]['close']
+        price = get_price(asset, end)
 
 
         PEd = price
@@ -150,7 +142,6 @@ def calculate_holdings(transactions: object) -> object:
         r = r * 100
 
         # get Asset id asset
-        asset = Asset.objects.get(id=asset)
 
         # Create new holding
         with connection.cursor() as cursor:
@@ -179,3 +170,30 @@ def calculate_holdings(transactions: object) -> object:
 def create_holdings(day_transactions):
     # TODO : Create holdings with transactions
     pass
+
+
+
+def get_price(asset: object, timestamp: int) -> float:
+    # Check if price exists in asset_prices
+    timestamp_seconds = int(timestamp / 1000)
+
+    try:
+        asset_price = AssetPrices.objects.get(asset=asset, timestamp=timestamp)
+        return asset_price.price
+    except AssetPrices.DoesNotExist:
+        asset_symbol = asset.code
+        response = requests.get(
+            f'https://min-api.cryptocompare.com/data/v2/histohour?fsym={asset_symbol}&tsym=USD&limit=1&toTs={timestamp_seconds}')
+
+        data = response.json()
+        if data['Response'] == 'Error':
+            return 0
+        else:
+            price = data['Data']['Data'][0]['close']
+            # Save price in asset_prices
+            asset_price = AssetPrices(asset=asset, timestamp=timestamp, price=price)
+            asset_price.save()
+            return price
+
+
+
