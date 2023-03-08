@@ -17,7 +17,6 @@ use App\Entity\Account;
 use App\Entity\BinanceAccount;
 use App\Message\AllTransactionsMessage;
 use App\Message\AllTransfersMessage;
-use App\Message\NewTransactions;
 use App\Message\OwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -32,10 +31,14 @@ class SyncProvider implements ProviderInterface
     {
         $idAccount = $uriVariables['id']; // user id
         $account   = $this->manager->getRepository(Account::class)->find($idAccount); // user account
-
         if (!$account instanceof Account) {
             return null;
         }
+
+        $account->setSynchroStatus(Account::SYNCHRO_IN_PROGRESS);
+        $account->setStartedAt(new \DateTime());
+        $this->manager->flush();
+
         $accountRepository = $this->manager->getRepository(BinanceAccount::class);
         $holdings          = $accountRepository->getAssets($account); // user holdings assets
         // Get all transactions for each symbol by messenger handler
@@ -44,8 +47,6 @@ class SyncProvider implements ProviderInterface
         $this->bus->dispatch(new AllTransfersMessage((string) $account->getId()));
         // Get the rest of transactions (all symbols - user holdings)
         $this->bus->dispatch(new AllTransactionsMessage((string) $account->getId()));
-
-        $this->bus->dispatch(new NewTransactions((string) $account->getId()));
 
         // Return Binance details endpoint
         return $holdings;
