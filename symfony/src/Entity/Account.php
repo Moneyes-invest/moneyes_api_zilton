@@ -14,6 +14,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\AccountRepository;
 use App\State\AccountDetailProvider;
 use App\State\SyncProvider;
@@ -51,6 +52,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/accounts/{id}/update',
             provider: UpdateAccountProvider::class,
         ),
+        new Post(),
     ],
     denormalizationContext: ['groups' => ['create:account', 'update:account']],
 )]

@@ -43,7 +43,7 @@ class Exchange
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(groups: ['create:exchange'])]
-    #[Groups(['create:exchange'])]
+    #[Groups(['create:exchange', 'get:exchanges'])]
     private string $label;
 
     #[ORM\ManyToMany(targetEntity: Asset::class, mappedBy: 'exchange')]
