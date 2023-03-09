@@ -28,9 +28,6 @@ def calculate_holdings(transactions: object) -> object:
 
     # Loop through all days
     while True:
-        index += 1
-        if index > 10:
-            break
         # start timestamp ms to date
         start_date = datetime.fromtimestamp(start / 1000)
         # end timestamp ms to date
@@ -141,18 +138,8 @@ def calculate_holdings(transactions: object) -> object:
         # Add to return value
         r = r * 100
 
-        # get Asset id asset
-
         # Create new holding
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                INSERT INTO holding (date, account_id, quantity, asset_id, return_on_investment)
-                VALUES (%s, %s, %s, %s, %s)
-                """,
-                (end_date,first_transaction.account.id , THd, asset.id, r)
-            )
-
+        save_holding(end_date, first_transaction.account.id, THd, asset.id, r)
 
         return_value.append(str(start_date) + " => " + str(VSd) + " : "+ str(VEd) + " : " + str(Cd) + " : "  + str(r) + "%")
 
@@ -167,11 +154,20 @@ def calculate_holdings(transactions: object) -> object:
 
     return return_value
 
-def create_holdings(day_transactions):
-    # TODO : Create holdings with transactions
-    pass
-
-
+def save_holding(date, account_id, quantity, asset_id, return_on_investment):
+    # Check if holding exists
+    try:
+        holding = Holding.objects.get(date=date, account_id=account_id, asset_id=asset_id)
+    except Holding.DoesNotExist:
+        # Create new holding
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO holding (date, account_id, quantity, asset_id, return_on_investment)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                (date, account_id, quantity, asset_id, return_on_investment)
+            )
 
 def get_price(asset: object, timestamp: int) -> float:
     # Check if price exists in asset_prices
@@ -184,7 +180,6 @@ def get_price(asset: object, timestamp: int) -> float:
         asset_symbol = asset.code
         response = requests.get(
             f'https://min-api.cryptocompare.com/data/v2/histohour?fsym={asset_symbol}&tsym=USD&limit=1&toTs={timestamp_seconds}')
-
         data = response.json()
         if data['Response'] == 'Error':
             return 0
