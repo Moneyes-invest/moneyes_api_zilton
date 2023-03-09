@@ -14,6 +14,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\AccountRepository;
 use App\State\AccountDetailProvider;
 use App\State\SyncProvider;
@@ -51,6 +52,9 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/accounts/{id}/update',
             provider: UpdateAccountProvider::class,
         ),
+        new Post(
+            uriTemplate: '/accounts',
+        ),
     ],
     denormalizationContext: ['groups' => ['create:account', 'update:account']],
 )]
@@ -67,10 +71,9 @@ class Account
     private Uuid $id;
 
     #[ORM\ManyToOne(cascade: ['persist'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['get:account', 'create:account'])]
-    #[Assert\NotBlank(groups: ['create:account'])]
-    private Exchange $exchange;
+    private ?Exchange $exchange = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]
@@ -96,7 +99,7 @@ class Account
         $this->transfers = new ArrayCollection();
     }
 
-    public function getExchange(): Exchange
+    public function getExchange(): ?Exchange
     {
         return $this->exchange;
     }
