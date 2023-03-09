@@ -82,7 +82,13 @@ services:
       - app-network
   ###< doctrine/doctrine-bundle ###
 
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.7-management
+    ports: [5672, 15672]
+
   mercure:
+    container_name: mercure
     image: dunglas/mercure
     restart: unless-stopped
     environment:
@@ -104,6 +110,7 @@ services:
 
   django:
     build: django/
+    container_name: django
     command: python manage.py runserver 0.0.0.0:3333
     volumes:
       - ./django/app:/usr/src/app/
@@ -115,7 +122,6 @@ services:
       - database
     networks:
       - app-network
-
 
 volumes:
   caddy_data: ~
