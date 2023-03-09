@@ -73,7 +73,7 @@ class Account
     #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: true)]
     #[Groups(['get:account', 'create:account'])]
-    private ?Exchange $exchange;
+    private ?Exchange $exchange = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]

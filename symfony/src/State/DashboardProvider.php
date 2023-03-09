@@ -28,7 +28,6 @@ class DashboardProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
-        $accountArray   = [];
         $user           = $this->security->getUser();
         if (!$user instanceof User) {
             return ["L'utilisateur n'existe pas"];
@@ -43,34 +42,30 @@ class DashboardProvider implements ProviderInterface
             if (!$account instanceof Account) {
                 continue;
             }
-            # Check if account have exchange
+            // Check if account have exchange
             if (!$account->getExchange()) {
                 $exchangeLabel = 'Unknown';
-            }
-            else {
+            } else {
                 $exchangeLabel = $account->getExchange()->getLabel();
             }
 
-
-            # If account exchangeLabel is Binance
-            if ($exchangeLabel === 'Binance') {
+            // If account exchangeLabel is Binance
+            if ('Binance' === $exchangeLabel) {
                 $balanceBinance = $this->manager->getRepository(BinanceAccount::class)->getAssets($account);
-                $returnArray[] = [
+                $returnArray[]  = [
                     'exchange' => $exchangeLabel,
-                    'balance' => $balanceBinance,
+                    'balance'  => $balanceBinance,
                 ];
-            }
-            else {
-                # Get recent holdings for this account for each asset
-                $holdings = $this->manager->getRepository(Account::class)->getBalance($account);
+            } else {
+                // Get recent holdings for this account for each asset
+                $holdings      = $this->manager->getRepository(Account::class)->getBalance($account);
                 $returnArray[] = [
                     'exchange' => $exchangeLabel,
-                    'balance' => $holdings,
+                    'balance'  => $holdings,
                 ];
             }
 
             /*
-
             $holdingRepository = $this->manager->getRepository(Holding::class);
             $holdings          = $holdingRepository->findBy(['account' => $account]);
 
@@ -86,9 +81,7 @@ class DashboardProvider implements ProviderInterface
             */
         }
 
-
         return $returnArray;
-
         /*
         return [
             'accounts' => $accountArray,

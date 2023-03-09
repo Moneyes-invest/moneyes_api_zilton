@@ -31,20 +31,18 @@ class AccountRepository extends ServiceEntityRepository
         parent::__construct($registry, $entityClass);
     }
 
-
     public function getBalance(Account $account): array
     {
         $balance = [];
-        # Get all holdings order by date DESC LIMIT 1
+        // Get all holdings order by date DESC LIMIT 1
         $holdings = $this->getEntityManager()->getRepository(Holding::class)->findBy(['account' => $account], ['date' => 'DESC'], 1);
         foreach ($holdings as $holding) {
             if (!$holding instanceof Holding) {
                 continue;
             }
             $balance[] = [
-                "asset" => $holding->getAsset()->getCode(),
-                "balance" => $holding->getQuantity(),
-
+                'asset'   => $holding->getAsset()->getCode(),
+                'balance' => $holding->getQuantity(),
             ];
         }
 
