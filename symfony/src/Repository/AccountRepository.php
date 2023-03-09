@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace App\Repository;
 
 use App\Entity\Account;
+use App\Entity\Holding;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -28,5 +29,25 @@ class AccountRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry, string $entityClass = Account::class)
     {
         parent::__construct($registry, $entityClass);
+    }
+
+
+    public function getBalance(Account $account): array
+    {
+        $balance = [];
+        # Get all holdings order by date DESC LIMIT 1
+        $holdings = $this->getEntityManager()->getRepository(Holding::class)->findBy(['account' => $account], ['date' => 'DESC'], 1);
+        foreach ($holdings as $holding) {
+            if (!$holding instanceof Holding) {
+                continue;
+            }
+            $balance[] = [
+                "asset" => $holding->getAsset()->getCode(),
+                "balance" => $holding->getQuantity(),
+
+            ];
+        }
+
+        return $balance;
     }
 }
