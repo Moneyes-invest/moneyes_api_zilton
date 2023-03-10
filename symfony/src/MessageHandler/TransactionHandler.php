@@ -41,13 +41,13 @@ class TransactionHandler
         }
         $accountSymbols = $accountRepository->getAccountSymbols($account);
         // Fetch and save transactions for owned symbols
-        $error = null;
+        $errors = null;
         try {
             $this->fetchTransactions($accountSymbols, $account);
         } catch (\Exception $e) {
-            $error = $e->getMessage();
+            $errors = $e->getTrace();
         }
-        $account->setSynchroStep(step: Account::STEP_TRANSACTION_SYMBOL_OWNED, startedAt: new \DateTime(), endedAt: new \DateTime(), error: $error);
+        $account->setSynchroStep(step: Account::STEP_TRANSACTION_SYMBOL_OWNED, startedAt: new \DateTime(), endedAt: new \DateTime(), errors: $errors);
         $this->manager->flush();
     }
 
@@ -71,13 +71,13 @@ class TransactionHandler
         $symbolsNotOwned = array_diff($allSymbols, $accountSymbols); // symbols not owned by user
 
         // Fetch and save transactions for owned symbols
-        $error = null;
+        $errors = null;
         try {
             $this->fetchTransactions($symbolsNotOwned, $account);
         } catch (\Exception $e) {
-            $error = $e->getMessage();
+            $errors = $e->getTrace();
         }
-        $account->setSynchroStep(step: Account::STEP_TRANSACTION_SYMBOL_NOT_OWNED, startedAt: new \DateTime(), endedAt: new \DateTime(), error: $error);
+        $account->setSynchroStep(step: Account::STEP_TRANSACTION_SYMBOL_NOT_OWNED, startedAt: new \DateTime(), endedAt: new \DateTime(), errors: $errors);
         $this->manager->flush();
     }
 
@@ -96,13 +96,14 @@ class TransactionHandler
         if (!method_exists($accountRepository, 'fetchTransfers')) {
             throw new \Exception('Method fetchTransfers not found');
         }
-        $error = null;
+
+        $errors = null;
         try {
             $accountRepository->fetchTransfers($account);
         } catch (\Exception $e) {
-            $error = $e->getMessage();
+            $errors = $e->getTrace();
         }
-        $account->setSynchroStep(step: Account::STEP_FETCH_TRANSFERS, startedAt: $startDate, endedAt: new \DateTime(), error: $error);
+        $account->setSynchroStep(step: Account::STEP_FETCH_TRANSFERS, startedAt: $startDate, endedAt: new \DateTime(), errors: $errors);
         $this->manager->flush();
     }
 

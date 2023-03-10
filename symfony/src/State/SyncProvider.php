@@ -34,9 +34,10 @@ class SyncProvider implements ProviderInterface
         if (!$account instanceof Account) {
             return null;
         }
-
-        $account->setSynchroStatus(Account::SYNCHRO_IN_PROGRESS);
-        $account->setStartedAt(new \DateTime());
+        if ($account->getSynchroStatus() === Account::SYNCHRO_IN_PROGRESS) {
+            throw new \Exception('Synchronization already in progress');
+        }
+        $account->resetSynchro();
         $this->manager->flush();
 
         $accountRepository = $this->manager->getRepository(BinanceAccount::class);

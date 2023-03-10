@@ -228,10 +228,26 @@ class Account
         return $this;
     }
 
-    public function setSynchroStep(string $step, \DateTime $startedAt, \DateTime $endedAt, ?string $error = null): self
+    public function getSynchroStatus(): ?string
+    {
+        return $this->synchro['status'] ?? null;
+    }
+
+    public function resetSynchro(): self
+    {
+        $this->synchro = [
+            'status'    => self::SYNCHRO_IN_PROGRESS,
+            'startedAt' => new \DateTime(),
+            'step'      => map(self::STEPS, fn ($step) => [$step => null]),
+        ];
+
+        return $this;
+    }
+
+    public function setSynchroStep(string $step, \DateTime $startedAt, \DateTime $endedAt, ?array $errors = null): self
     {
         $this->synchro['step'][$step] = [
-            'error'     => $error,
+            'error'     => $errors,
             'startedAt' => $startedAt,
             'endedAt'   => $endedAt,
         ];
