@@ -32,7 +32,7 @@ class Holding
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Asset $asset = null;
+    private Asset $asset;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, length: 255)]
     private ?\DateTimeInterface $date = null;
@@ -66,12 +66,12 @@ class Holding
         return $this;
     }
 
-    public function getAsset(): ?Asset
+    public function getAsset(): Asset
     {
         return $this->asset;
     }
 
-    public function setAsset(?Asset $asset): self
+    public function setAsset(Asset $asset): self
     {
         $this->asset = $asset;
 

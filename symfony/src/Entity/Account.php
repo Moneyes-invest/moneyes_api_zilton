@@ -91,10 +91,9 @@ class Account
     private Uuid $id;
 
     #[ORM\ManyToOne(cascade: ['persist'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['get:account', 'create:account'])]
-    #[Assert\NotBlank(groups: ['create:account'])]
-    private Exchange $exchange;
+    private ?Exchange $exchange = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]
@@ -129,7 +128,7 @@ class Account
         ];
     }
 
-    public function getExchange(): Exchange
+    public function getExchange(): ?Exchange
     {
         return $this->exchange;
     }
