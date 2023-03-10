@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -23,17 +23,16 @@ class AccountDetailProvider implements ProviderInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $manager,
-        private readonly Security               $security,
+        private readonly Security $security,
         #[Autowire('@api_platform.doctrine.orm.state.item_provider')]
-        private readonly ProviderInterface      $ormProvider
-    )
-    {
+        private readonly ProviderInterface $ormProvider
+    ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?array
     {
         $jsonReturn = [
-            'holdings' => [],
+            'holdings'     => [],
             'accountLabel' => '',
         ];
         $user = $this->security->getUser();
@@ -46,7 +45,7 @@ class AccountDetailProvider implements ProviderInterface
             throw new \Exception('You are not allowed to access this account');
         }
         $jsonReturn['accountLabel'] = 'Binance';
-        $holdings = $this->manager->getRepository(Holding::class)->findBy(['account' => $account]);
+        $holdings                   = $this->manager->getRepository(Holding::class)->findBy(['account' => $account]);
         foreach ($holdings as $index => $holding) {
             $jsonReturn['holdings'][$index] = [
                 'quantity' => $holding->getQuantity(),

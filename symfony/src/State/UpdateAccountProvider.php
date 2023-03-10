@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -26,12 +26,11 @@ class UpdateAccountProvider implements ProviderInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $manager,
-        private readonly MessageBusInterface    $bus,
-        private readonly Security               $security,
+        private readonly MessageBusInterface $bus,
+        private readonly Security $security,
         #[Autowire('@api_platform.doctrine.orm.state.item_provider')]
-        private readonly ProviderInterface      $ormProvider
-    )
-    {
+        private readonly ProviderInterface $ormProvider
+    ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): Response
@@ -56,7 +55,7 @@ class UpdateAccountProvider implements ProviderInterface
             throw new \Exception('You are not allowed to update this account');
         }
         // Get all new transactions
-        $this->bus->dispatch(new NewTransactions((string)$account->getId()));
+        $this->bus->dispatch(new NewTransactions((string) $account->getId()));
         // Get all new transfers
         $this->manager->getRepository(BinanceAccount::class)->fetchTransfers($account, true);
 

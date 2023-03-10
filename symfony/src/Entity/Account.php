@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /*
  * This file is part of the Moneyes API project.
@@ -69,13 +69,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 /* abstract */
 class Account
 {
-    public const EXCHANGE = null;
-    public const SYNCHRO_IN_PROGRESS = 'in_progress';
-    public const SYNCHRO_DONE = 'done';
-    public const SYNCHRO_ERROR = 'error';
-    public const STEP_TRANSACTION_SYMBOL_OWNED = 'symbol_owned';
+    public const EXCHANGE                          = null;
+    public const SYNCHRO_IN_PROGRESS               = 'in_progress';
+    public const SYNCHRO_DONE                      = 'done';
+    public const SYNCHRO_ERROR                     = 'error';
+    public const STEP_TRANSACTION_SYMBOL_OWNED     = 'symbol_owned';
     public const STEP_TRANSACTION_SYMBOL_NOT_OWNED = 'symbol_not_owned';
-    public const STEP_FETCH_TRANSFERS = 'fetch_transfers';
+    public const STEP_FETCH_TRANSFERS              = 'fetch_transfers';
 
     public const STEPS = [
         self::STEP_FETCH_TRANSFERS,
@@ -122,10 +122,10 @@ class Account
     public function __construct()
     {
         $this->transfers = new ArrayCollection();
-        $this->synchro = [
-            'status' => null,
+        $this->synchro   = [
+            'status'    => null,
             'startedAt' => null,
-            'step' => map(self::STEPS, fn($step) => [$step => null]),
+            'step'      => map(self::STEPS, fn ($step) => [$step => null]),
         ];
     }
 
@@ -239,9 +239,9 @@ class Account
     public function resetSynchro(): self
     {
         $this->synchro = [
-            'status' => self::SYNCHRO_IN_PROGRESS,
+            'status'    => self::SYNCHRO_IN_PROGRESS,
             'startedAt' => new \DateTime(),
-            'step' => map(self::STEPS, fn($step) => [$step => null]),
+            'step'      => map(self::STEPS, fn ($step) => [$step => null]),
         ];
 
         return $this;
@@ -250,9 +250,9 @@ class Account
     public function setSynchroStep(string $step, \DateTime $startedAt, \DateTime $endedAt, ?array $errors = null): self
     {
         $this->synchro['step'][$step] = [
-            'error' => $errors,
+            'error'     => $errors,
             'startedAt' => $startedAt,
-            'endedAt' => $endedAt,
+            'endedAt'   => $endedAt,
         ];
 
         return $this;
