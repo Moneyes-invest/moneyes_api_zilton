@@ -263,8 +263,6 @@ class Account
 
         foreach (self::STEPS as $step) {
             if (!is_array($this->synchro['step']) || false === array_key_exists($step, $this->synchro['step'])) {
-                $this->synchro['status'] = self::SYNCHRO_IN_PROGRESS;
-
                 return;
             }
         }
