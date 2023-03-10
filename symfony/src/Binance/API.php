@@ -2360,7 +2360,7 @@ class API
                 $this->downloadCurlCaBundle();
             }
         }
-
+        start_over:
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_VERBOSE, $this->httpDebug);
         $query = http_build_query($params, '', '&');
@@ -2465,7 +2465,11 @@ class API
         if (curl_errno($curl) > 0) {
             // should always output error, not only on httpdebug
             // not outputing errors, hides it from users and ends up with tickets on github
-            throw new \Exception('Curl error: '.curl_error($curl));
+            # throw new \Exception('Curl error: '.curl_error($curl));
+            if (str_contains(curl_error($curl), "Failed to connect")){
+                echo "Restarting curl..." .PHP_EOL;
+                goto start_over;
+            }
         }
 
         $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);

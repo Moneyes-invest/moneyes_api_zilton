@@ -29,7 +29,7 @@ class RateLimiter
 {
     private $api                       = null;
     private $weights                   = null;
-    private $ordersfunctions           = null;
+    private     $ordersfunctions           = null;
     private $exchangeRequestsRateLimit = 10;
     private $exchangeOrdersRateLimit   = 10;
     private $exchangeOrdersDailyLimit  = 10;
@@ -65,7 +65,7 @@ class RateLimiter
             'getRequestCount'   => 0,
             'getTransfered'     => 0,
             'highstock'         => 1,
-            'history'           => 5,
+            'history'           => 10,
             'keepAlive'         => 0,
             'kline'             => 1,
             'last'              => 0,
@@ -230,7 +230,7 @@ class RateLimiter
                 array_shift($this->ordersQueue);
                 $oldest = $this->ordersQueue[0] ?? time();
             }
-            echo 'Rate limiting in effect for orders '.PHP_EOL;
+            echo 'Rate limiting in effect for orders' . PHP_EOL;
             sleep(1);
         }
     }

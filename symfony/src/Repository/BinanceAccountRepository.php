@@ -22,6 +22,7 @@ use App\Entity\Transfer;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use mysql_xdevapi\Exception;
 
 /**
  * @method BinanceAccount|null find($id, $lockMode = null, $lockVersion = null)
@@ -78,6 +79,8 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         } // Get the list of symbols
 
         $tradesList = [];
+        $total = count($symbolsList);
+        $fetched = 0;
 
         foreach ($symbolsList as $symbol) {
             if ($new) {
@@ -88,14 +91,21 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
                     /**
                      * @phpstan-ignore-next-line
                      */
-                    $tradesList = array_merge($tradesList, $customerBinanceApi->history($symbol, 500, $latestTransactionId));
+                    try {
+                        $tradesList = array_merge($tradesList, $customerBinanceApi->history($symbol, 500, $latestTransactionId));
+                    }
+                    catch (Exception $exception){
+                        throw new \Exception("problème dans le tradelist " . $symbol);
+                    }
                 }
             } else {
                 /**
                  * @phpstan-ignore-next-line
                  */
                 $tradesList = array_merge($tradesList, $customerBinanceApi->history($symbol)); // Get all trades for each symbol
+                echo "Fetched transactions for " . $symbol . " | " . $fetched . "/" . $total . " => " . $total-$fetched . " remaining." . PHP_EOL;
             }
+            $fetched++;
         } // Get all trades for each symbol
 
         return $tradesList;
