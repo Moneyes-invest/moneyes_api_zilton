@@ -14,6 +14,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\AccountRepository;
 use App\State\AccountDetailProvider;
 use App\State\SyncProvider;
@@ -41,23 +42,27 @@ use Symfony\Component\Validator\Constraints as Assert;
 */
 #[ApiResource(
     operations: [
-        new GetCollection(normalizationContext: ['groups' => ['get:accounts']]),
-        new Get(normalizationContext: ['groups' => ['get:accounts', 'get:account']]),
+        new GetCollection(normalizationContext: ['groups' => ['get:accounts']], security: 'is_granted("ROLE_ADMIN")'),
+        new Get(normalizationContext: ['groups' => ['get:accounts', 'get:account']], security: 'object.getUser() == user or is_granted("ROLE_ADMIN")'),
         new Get(
             uriTemplate: '/accounts/{id}/detail',
+            security: 'object.getUser() == user or is_granted("ROLE_ADMIN")',
             provider: AccountDetailProvider::class,
         ),
         new Get(
             uriTemplate: '/accounts/{id}/sync',
+            security: 'object.getUser() == user or is_granted("ROLE_ADMIN")',
             provider: SyncProvider::class,
         ),
         new Get(
             uriTemplate: '/accounts/{id}/update',
+            security: 'object.getUser() == user or is_granted("ROLE_ADMIN")',
             provider: UpdateAccountProvider::class,
         ),
         new Get(
             uriTemplate: '/accounts/{id}/sync_status',
             normalizationContext: ['groups' => ['get:synchro']],
+            security: 'object.getUser() == user or is_granted("ROLE_ADMIN")',
             provider: SyncStatusProvider::class,
         ),
     ],
