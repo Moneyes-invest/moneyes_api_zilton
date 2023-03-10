@@ -47,7 +47,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: DashboardProvider::class,
         ),
         new Post(uriTemplate: '/register', processor: UserPasswordHasher::class),
-        new Delete(uriTemplate: '/user/{id}', security: 'is_granted(\'ROLE_ADMIN\')'),
+        new Delete(uriTemplate: '/user/{id}', security: 'is_granted("ROLE_ADMIN")'),
     ],
     normalizationContext: ['groups' => [self::GROUP_READ]],
     denormalizationContext: ['groups' => [self::GROUP_CREATE, self::GROUP_UPDATE]],

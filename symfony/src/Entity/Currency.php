@@ -20,7 +20,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: CurrencyRepository::class)]
-#[ApiResource()]
 class Currency
 {
     #[ORM\Id]

@@ -28,17 +28,6 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
-#[ApiResource(
-    operations: [
-        new GetCollection(normalizationContext: ['groups' => ['get:transactions']]),
-        new Get(normalizationContext: ['groups' => ['get:transactions', 'get:transaction']]),
-        new Post(),
-        new Put(),
-        new Patch(),
-        new Delete(),
-    ],
-    denormalizationContext: ['groups' => ['create:transaction', 'update:transaction']],
-)]
 class Transaction
 {
     #[ORM\Id]
