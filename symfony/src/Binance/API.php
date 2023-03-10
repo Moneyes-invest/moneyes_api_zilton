@@ -26,10 +26,12 @@ if (version_compare(phpversion(), '7.0', '<=')) {
  */
 class API
 {
-    protected $base          = 'https://api.binance.com/api/'; // /< REST endpoint for the currency exchange
+    public const BASE_API = "https://api1.binance.com";
+
+    protected $base          = self::BASE_API . '/api/'; // /< REST endpoint for the currency exchange
     protected $baseTestnet   = 'https://testnet.binance.vision/api/'; // /< Testnet REST endpoint for the currency exchange
-    protected $wapi          = 'https://api.binance.com/wapi/'; // /< REST endpoint for the withdrawals
-    protected $sapi          = 'https://api.binance.com/sapi/'; // /< REST endpoint for the supporting network API
+    protected $wapi          =  self::BASE_API . '/wapi/'; // /< REST endpoint for the withdrawals
+    protected $sapi          =  self::BASE_API . '/sapi/'; // /< REST endpoint for the supporting network API
     protected $stream        = 'wss://stream.binance.com:9443/ws/'; // /< Endpoint for establishing websocket connections
     protected $streamTestnet = 'wss://testnet.binance.vision/ws/'; // /< Testnet endpoint for establishing websocket connections
     protected $api_key; // /< API key that you created in the binance website member area
