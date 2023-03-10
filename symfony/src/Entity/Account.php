@@ -18,10 +18,14 @@ use ApiPlatform\Metadata\Post;
 use App\Repository\AccountRepository;
 use App\State\AccountDetailProvider;
 use App\State\SyncProvider;
+use App\State\SyncStatusProvider;
 use App\State\UpdateAccountProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
+use function React\Promise\map;
+
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -38,8 +42,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 */
 #[ApiResource(
     operations: [
-        new GetCollection(normalizationContext: ['groups' => ['get:accounts']]),
-        new Get(normalizationContext: ['groups' => ['get:accounts', 'get:account']]),
+        new GetCollection(normalizationContext: ['groups' => ['get:accounts']], security: 'is_granted("ROLE_ADMIN")'),
+        new Get(normalizationContext: ['groups' => ['get:accounts', 'get:account']], security: 'object.getUser() == user or is_granted("ROLE_ADMIN")'),
         new Get(
             uriTemplate: '/accounts/{id}/detail',
             provider: AccountDetailProvider::class,
@@ -52,16 +56,32 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/accounts/{id}/update',
             provider: UpdateAccountProvider::class,
         ),
-        new Post(
-            uriTemplate: '/accounts',
+        new Get(
+            uriTemplate: '/accounts/{id}/sync_status',
+            normalizationContext: ['groups' => ['get:synchro']],
+            security: 'object.getUser() == user or is_granted("ROLE_ADMIN")',
+            provider: SyncStatusProvider::class,
         ),
+        new Post(),
     ],
     denormalizationContext: ['groups' => ['create:account', 'update:account']],
 )]
 /* abstract */
 class Account
 {
-    public const EXCHANGE = null;
+    public const EXCHANGE                          = null;
+    public const SYNCHRO_IN_PROGRESS               = 'in_progress';
+    public const SYNCHRO_DONE                      = 'done';
+    public const SYNCHRO_ERROR                     = 'error';
+    public const STEP_TRANSACTION_SYMBOL_OWNED     = 'symbol_owned';
+    public const STEP_TRANSACTION_SYMBOL_NOT_OWNED = 'symbol_not_owned';
+    public const STEP_FETCH_TRANSFERS              = 'fetch_transfers';
+
+    public const STEPS = [
+        self::STEP_FETCH_TRANSFERS,
+        self::STEP_TRANSACTION_SYMBOL_OWNED,
+        self::STEP_TRANSACTION_SYMBOL_NOT_OWNED,
+    ];
 
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
@@ -91,12 +111,21 @@ class Account
     #[Assert\NotBlank(groups: ['create:account'])]
     private User $user;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['get:synchro', 'get:account'])]
+    private array $synchro = [];
+
     #[ORM\OneToMany(mappedBy: 'account', targetEntity: Transfer::class, orphanRemoval: true)]
     private Collection $transfers;
 
     public function __construct()
     {
         $this->transfers = new ArrayCollection();
+        $this->synchro   = [
+            'status'    => null,
+            'startedAt' => null,
+            'step'      => map(self::STEPS, fn ($step) => [$step => null]),
+        ];
     }
 
     public function getExchange(): ?Exchange
@@ -180,5 +209,74 @@ class Account
         }
 
         return $this;
+    }
+
+    public function getSynchro(): array
+    {
+        return $this->synchro;
+    }
+
+    public function setStartedAt(\DateTime $startedAt): self
+    {
+        $this->synchro['startedAt'] = $startedAt;
+
+        return $this;
+    }
+
+    public function setSynchroStatus(string $status): self
+    {
+        $this->synchro['status'] = $status;
+
+        return $this;
+    }
+
+    public function getSynchroStatus(): ?string
+    {
+        return $this->synchro['status'] ?? null;
+    }
+
+    public function resetSynchro(): self
+    {
+        $this->synchro = [
+            'status'    => self::SYNCHRO_IN_PROGRESS,
+            'startedAt' => new \DateTime(),
+            'step'      => map(self::STEPS, fn ($step) => [$step => null]),
+        ];
+
+        return $this;
+    }
+
+    public function setSynchroStep(string $step, \DateTime $startedAt, \DateTime $endedAt, ?array $errors = null): self
+    {
+        $this->synchro['step'][$step] = [
+            'error'     => $errors,
+            'startedAt' => $startedAt,
+            'endedAt'   => $endedAt,
+        ];
+
+        return $this;
+    }
+
+    public function checkSynchroStatus(): void
+    {
+        if (null === $this->synchro['startedAt']) {
+            return;
+        }
+
+        foreach (self::STEPS as $step) {
+            if (!is_array($this->synchro['step']) || false === array_key_exists($step, $this->synchro['step'])) {
+                return;
+            }
+        }
+
+        foreach ($this->synchro['step'] as $step) {
+            if (null !== $step['error']) {
+                $this->synchro['status'] = self::SYNCHRO_ERROR;
+
+                return;
+            }
+        }
+
+        $this->synchro['status'] = self::SYNCHRO_DONE;
     }
 }
