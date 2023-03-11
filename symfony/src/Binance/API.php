@@ -63,6 +63,13 @@ class API
     protected $xMbxUsedWeight1m = 0;
 
     /**
+     * Save the lase weight used.
+     *
+     * @var int
+     */
+    public int $last_used_weight = 0;
+
+    /**
      * Constructor for the class,
      * send as many argument as you want.
      *
@@ -2460,7 +2467,11 @@ class API
             }
         }
 
-        $output = curl_exec($curl);
+        try {
+            $output = curl_exec($curl);
+        } catch (\Exception $e) {
+            throw new \Exception('Curl EXEC error: '.$e->getMessage());
+        }
         // Check if any error occurred
         if (curl_errno($curl) > 0) {
             // should always output error, not only on httpdebug
@@ -2475,6 +2486,10 @@ class API
         $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         $header      = $this->get_headers_from_curl_response($output);
         $output      = substr($output, $header_size);
+
+        if (isset($header['x-mbx-used-weight'])) {
+            $this->setLastUsedWeight(intval($header['x-mbx-used-weight']));
+        }
 
         curl_close($curl);
 
@@ -2985,5 +3000,21 @@ class API
     private function getWsEndpoint(): string
     {
         return $this->useTestnet ? $this->streamTestnet : $this->stream;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastUsedWeight(): int
+    {
+        return $this->last_used_weight;
+    }
+
+    /**
+     * @param int $last_used_weight
+     */
+    public function setLastUsedWeight(int $last_used_weight): void
+    {
+        $this->last_used_weight = $last_used_weight;
     }
 }
