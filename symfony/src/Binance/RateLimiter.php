@@ -27,6 +27,7 @@ if (version_compare(phpversion(), '7.0', '<=')) {
  */
 class RateLimiter
 {
+    public const REQUEST_WEIGHT        = 1200;
     private $api                       = null;
     private $weights                   = null;
     private $ordersfunctions           = null;
@@ -65,7 +66,7 @@ class RateLimiter
             'getRequestCount'   => 0,
             'getTransfered'     => 0,
             'highstock'         => 1,
-            'history'           => 5,
+            'history'           => 10,
             'keepAlive'         => 0,
             'kline'             => 1,
             'last'              => 0,
@@ -100,7 +101,6 @@ class RateLimiter
             'buy',
             'buyTest',
             'cancel',
-            'history',
             'marketBuy',
             'marketBuyTest',
             'marketSell',
@@ -149,7 +149,7 @@ class RateLimiter
         $weight = $this->weights[$name] ?? false;
 
         if ($weight && $weight > 0) {
-            $this->requestsPerMinute();
+            $this->requestsPerMinute($weight);
             if (true === in_array($name, $this->ordersfunctions)) {
                 $this->ordersPerSecond();
                 $this->ordersPerDay();
@@ -199,21 +199,36 @@ class RateLimiter
         }
     }
 
-    private function requestsPerMinute()
+    private function requestsPerMinute(int $weight)
     {
         // requests per minute restrictions
         if (0 === count($this->requestsQueue)) {
             return;
         }
 
-        while (count($this->requestsQueue) > $this->exchangeOrdersDailyLimit) {
-            $oldest = $this->requestsQueue[0] ?? time();
-            while ($oldest < time() - 60) {
-                array_shift($this->requestsQueue);
-                $oldest = $this->requestsQueue[0] ?? time();
+        // Test if $this->api exists
+        if (false === isset($this->api)) {
+            $usedWeight = 0;
+        } else {
+            $usedWeight = $this->api->getLastUsedWeight();
+        }
+
+        // If weight is reset to 0, reset the queue
+        if ($weight === $usedWeight) {
+            $this->requestsQueue = [];
+        }
+
+        echo 'Used weight: '.$usedWeight.' with queue '.count($this->requestsQueue).PHP_EOL;
+
+        if (($usedWeight + $weight) >= self::REQUEST_WEIGHT) {
+            // test if $this->requestsQueue[0] exists
+            if (false === isset($this->requestsQueue[0])) {
+                $this->requestsQueue[0] = time();
             }
-            echo 'Rate limiting in effect for requests '.PHP_EOL;
-            sleep(1);
+            $timeToWait = 60 - (time() - $this->requestsQueue[0]);
+            echo 'Rate limiting in effect for requests. Waiting '.$timeToWait.' seconds '.PHP_EOL;
+            sleep($timeToWait);
+            $this->requestsQueue = [];
         }
     }
 
@@ -230,7 +245,7 @@ class RateLimiter
                 array_shift($this->ordersQueue);
                 $oldest = $this->ordersQueue[0] ?? time();
             }
-            echo 'Rate limiting in effect for orders '.PHP_EOL;
+            echo 'Rate limiting in effect for orders'.PHP_EOL;
             sleep(1);
         }
     }

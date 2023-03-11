@@ -125,6 +125,9 @@ class TransactionHandler
         $this->fetchTransactions($allSymbols, $account, true);
     }
 
+    /**
+     * @throws \Exception
+     */
     private function fetchTransactions(array $accountSymbols, Account $account, ?bool $new = false): void
     {
         $accountRepository = $this->manager->getRepository(BinanceAccount::class);

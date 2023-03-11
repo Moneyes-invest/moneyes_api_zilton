@@ -26,10 +26,15 @@ if (version_compare(phpversion(), '7.0', '<=')) {
  */
 class API
 {
-    protected $base          = 'https://api.binance.com/api/'; // /< REST endpoint for the currency exchange
+    public const BASE_API = 'https://api1.binance.com';
+
+    /** Save the lase weight used. */
+    public int $last_used_weight = 0;
+
+    protected $base          = self::BASE_API.'/api/'; // /< REST endpoint for the currency exchange
     protected $baseTestnet   = 'https://testnet.binance.vision/api/'; // /< Testnet REST endpoint for the currency exchange
-    protected $wapi          = 'https://api.binance.com/wapi/'; // /< REST endpoint for the withdrawals
-    protected $sapi          = 'https://api.binance.com/sapi/'; // /< REST endpoint for the supporting network API
+    protected $wapi          =  self::BASE_API.'/wapi/'; // /< REST endpoint for the withdrawals
+    protected $sapi          =  self::BASE_API.'/sapi/'; // /< REST endpoint for the supporting network API
     protected $stream        = 'wss://stream.binance.com:9443/ws/'; // /< Endpoint for establishing websocket connections
     protected $streamTestnet = 'wss://testnet.binance.vision/ws/'; // /< Testnet endpoint for establishing websocket connections
     protected $api_key; // /< API key that you created in the binance website member area
@@ -2234,6 +2239,16 @@ class API
         return $arr;
     }
 
+    public function getLastUsedWeight(): int
+    {
+        return $this->last_used_weight;
+    }
+
+    public function setLastUsedWeight(int $last_used_weight): void
+    {
+        $this->last_used_weight = $last_used_weight;
+    }
+
     /**
      * If no paramaters are supplied in the constructor, this function will attempt
      * to load the api_key and api_secret from the users home directory in the file
@@ -2358,7 +2373,7 @@ class API
                 $this->downloadCurlCaBundle();
             }
         }
-
+        start_over:
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_VERBOSE, $this->httpDebug);
         $query = http_build_query($params, '', '&');
@@ -2458,17 +2473,29 @@ class API
             }
         }
 
-        $output = curl_exec($curl);
+        try {
+            $output = curl_exec($curl);
+        } catch (\Exception $e) {
+            throw new \Exception('Curl EXEC error: '.$e->getMessage());
+        }
         // Check if any error occurred
         if (curl_errno($curl) > 0) {
             // should always output error, not only on httpdebug
             // not outputing errors, hides it from users and ends up with tickets on github
-            throw new \Exception('Curl error: '.curl_error($curl));
+            // throw new \Exception('Curl error: '.curl_error($curl));
+            if (str_contains(curl_error($curl), 'Failed to connect')) {
+                echo 'Restarting curl...'.PHP_EOL;
+                goto start_over;
+            }
         }
 
         $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         $header      = $this->get_headers_from_curl_response($output);
         $output      = substr($output, $header_size);
+
+        if (isset($header['x-mbx-used-weight'])) {
+            $this->setLastUsedWeight(intval($header['x-mbx-used-weight']));
+        }
 
         curl_close($curl);
 
