@@ -26,12 +26,15 @@ if (version_compare(phpversion(), '7.0', '<=')) {
  */
 class API
 {
-    public const BASE_API = "https://api1.binance.com";
+    public const BASE_API = 'https://api1.binance.com';
 
-    protected $base          = self::BASE_API . '/api/'; // /< REST endpoint for the currency exchange
+    /** Save the lase weight used. */
+    public int $last_used_weight = 0;
+
+    protected $base          = self::BASE_API.'/api/'; // /< REST endpoint for the currency exchange
     protected $baseTestnet   = 'https://testnet.binance.vision/api/'; // /< Testnet REST endpoint for the currency exchange
-    protected $wapi          =  self::BASE_API . '/wapi/'; // /< REST endpoint for the withdrawals
-    protected $sapi          =  self::BASE_API . '/sapi/'; // /< REST endpoint for the supporting network API
+    protected $wapi          =  self::BASE_API.'/wapi/'; // /< REST endpoint for the withdrawals
+    protected $sapi          =  self::BASE_API.'/sapi/'; // /< REST endpoint for the supporting network API
     protected $stream        = 'wss://stream.binance.com:9443/ws/'; // /< Endpoint for establishing websocket connections
     protected $streamTestnet = 'wss://testnet.binance.vision/ws/'; // /< Testnet endpoint for establishing websocket connections
     protected $api_key; // /< API key that you created in the binance website member area
@@ -61,13 +64,6 @@ class API
 
     protected $xMbxUsedWeight   = 0;
     protected $xMbxUsedWeight1m = 0;
-
-    /**
-     * Save the lase weight used.
-     *
-     * @var int
-     */
-    public int $last_used_weight = 0;
 
     /**
      * Constructor for the class,
@@ -2243,6 +2239,16 @@ class API
         return $arr;
     }
 
+    public function getLastUsedWeight(): int
+    {
+        return $this->last_used_weight;
+    }
+
+    public function setLastUsedWeight(int $last_used_weight): void
+    {
+        $this->last_used_weight = $last_used_weight;
+    }
+
     /**
      * If no paramaters are supplied in the constructor, this function will attempt
      * to load the api_key and api_secret from the users home directory in the file
@@ -2476,9 +2482,9 @@ class API
         if (curl_errno($curl) > 0) {
             // should always output error, not only on httpdebug
             // not outputing errors, hides it from users and ends up with tickets on github
-            # throw new \Exception('Curl error: '.curl_error($curl));
-            if (str_contains(curl_error($curl), "Failed to connect")){
-                echo "Restarting curl..." .PHP_EOL;
+            // throw new \Exception('Curl error: '.curl_error($curl));
+            if (str_contains(curl_error($curl), 'Failed to connect')) {
+                echo 'Restarting curl...'.PHP_EOL;
                 goto start_over;
             }
         }
@@ -3000,21 +3006,5 @@ class API
     private function getWsEndpoint(): string
     {
         return $this->useTestnet ? $this->streamTestnet : $this->stream;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLastUsedWeight(): int
-    {
-        return $this->last_used_weight;
-    }
-
-    /**
-     * @param int $last_used_weight
-     */
-    public function setLastUsedWeight(int $last_used_weight): void
-    {
-        $this->last_used_weight = $last_used_weight;
     }
 }

@@ -17,7 +17,6 @@ use App\Entity\Account;
 use App\Entity\BinanceAccount;
 use App\Message\AllTransactionsMessage;
 use App\Message\AllTransfersMessage;
-use App\Message\NewTransactions;
 use App\Message\OwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;

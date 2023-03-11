@@ -18,7 +18,6 @@ use App\Message\AllTransfersMessage;
 use App\Message\NewTransactions;
 use App\Message\OwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 class TransactionHandler
@@ -33,11 +32,11 @@ class TransactionHandler
         $accountId      = $message->getAccountId();
         $account        = $this->manager->getRepository(Account::class)->find($accountId);
         if (null === $account) {
-            throw new Exception('Account not found');
+            throw new \Exception('Account not found');
         }
         $accountRepository = $this->manager->getRepository(BinanceAccount::class);
         if (!method_exists($accountRepository, 'getAccountSymbols')) {
-            throw new Exception('Method getAccountSymbols not found');
+            throw new \Exception('Method getAccountSymbols not found');
         }
         $accountSymbols = $accountRepository->getAccountSymbols($account);
         // Fetch and save transactions for owned symbols
@@ -50,11 +49,11 @@ class TransactionHandler
         $accountId         = $message->getAccountId();
         $account           = $this->manager->getRepository(Account::class)->find($accountId);
         if (null === $account) {
-            throw new Exception('Account not found');
+            throw new \Exception('Account not found');
         }
         $accountRepository = $this->manager->getRepository(BinanceAccount::class);
         if (!method_exists($accountRepository, 'getAccountSymbols') || !method_exists($accountRepository, 'getAllSymbols') || !method_exists($accountRepository, 'fetchTransfers')) {
-            throw new Exception('Method getAccountSymbols not found');
+            throw new \Exception('Method getAccountSymbols not found');
         }
         $accountSymbols = $accountRepository->getAccountSymbols($account); // user account symbols
         $allSymbols     = $accountRepository->getAllSymbols($account); // all symbols
@@ -72,12 +71,12 @@ class TransactionHandler
         $accountId = $message->getAccountId();
         $account   = $this->manager->getRepository(Account::class)->find($accountId);
         if (null === $account) {
-            throw new Exception('Account not found');
+            throw new \Exception('Account not found');
         }
         // Fetch and save Transfers
         $accountRepository = $this->manager->getRepository(BinanceAccount::class);
         if (!method_exists($accountRepository, 'fetchTransfers')) {
-            throw new Exception('Method fetchTransfers not found');
+            throw new \Exception('Method fetchTransfers not found');
         }
         $accountRepository->fetchTransfers($account);
     }
@@ -88,11 +87,11 @@ class TransactionHandler
         $accountId      = $message->getAccountId();
         $account        = $this->manager->getRepository(Account::class)->find($accountId);
         if (null === $account) {
-            throw new Exception('Account not found');
+            throw new \Exception('Account not found');
         }
         $accountRepository = $this->manager->getRepository(BinanceAccount::class);
         if (!method_exists($accountRepository, 'getAccountSymbols')) {
-            throw new Exception('Method getAccountSymbols not found');
+            throw new \Exception('Method getAccountSymbols not found');
         }
         $allSymbols     = $accountRepository->getAllSymbols($account); // all symbols
 
@@ -101,13 +100,13 @@ class TransactionHandler
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function fetchTransactions(array $accountSymbols, Account $account, ?bool $new = false): void
     {
         $accountRepository = $this->manager->getRepository(BinanceAccount::class);
         if (!method_exists($accountRepository, 'fetchTransactions')) {
-            throw new Exception('Method fetchTransactions not found');
+            throw new \Exception('Method fetchTransactions not found');
         }
         // Fetch transactions for owned symbols
 

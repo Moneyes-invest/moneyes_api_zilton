@@ -27,18 +27,16 @@ if (version_compare(phpversion(), '7.0', '<=')) {
  */
 class RateLimiter
 {
+    public const REQUEST_WEIGHT        = 1200;
     private $api                       = null;
     private $weights                   = null;
-    private     $ordersfunctions           = null;
+    private $ordersfunctions           = null;
     private $exchangeRequestsRateLimit = 10;
     private $exchangeOrdersRateLimit   = 10;
     private $exchangeOrdersDailyLimit  = 10;
     private $requestsQueue             = [];
     private $ordersQueue               = [];
     private $ordersDayQueue            = [];
-
-    public const REQUEST_WEIGHT = 1200;
-
 
     public function __construct($api)
     {
@@ -208,33 +206,30 @@ class RateLimiter
             return;
         }
 
-        # Test if $this->api exists
+        // Test if $this->api exists
         if (false === isset($this->api)) {
             $usedWeight = 0;
-        }
-        else {
+        } else {
             $usedWeight = $this->api->getLastUsedWeight();
         }
 
-
-        # If weight is reset to 0, reset the queue
+        // If weight is reset to 0, reset the queue
         if ($weight === $usedWeight) {
             $this->requestsQueue = [];
         }
 
-        echo 'Used weight: ' . $usedWeight . ' with queue ' . count($this->requestsQueue). PHP_EOL;
+        echo 'Used weight: '.$usedWeight.' with queue '.count($this->requestsQueue).PHP_EOL;
 
         if (($usedWeight + $weight) >= self::REQUEST_WEIGHT) {
-            # test if $this->requestsQueue[0] exists
+            // test if $this->requestsQueue[0] exists
             if (false === isset($this->requestsQueue[0])) {
                 $this->requestsQueue[0] = time();
             }
             $timeToWait = 60 - (time() - $this->requestsQueue[0]);
-            echo 'Rate limiting in effect for requests. Waiting ' . $timeToWait . " seconds " . PHP_EOL;
+            echo 'Rate limiting in effect for requests. Waiting '.$timeToWait.' seconds '.PHP_EOL;
             sleep($timeToWait);
             $this->requestsQueue = [];
         }
-
     }
 
     private function ordersPerSecond()
@@ -250,7 +245,7 @@ class RateLimiter
                 array_shift($this->ordersQueue);
                 $oldest = $this->ordersQueue[0] ?? time();
             }
-            echo 'Rate limiting in effect for orders' . PHP_EOL;
+            echo 'Rate limiting in effect for orders'.PHP_EOL;
             sleep(1);
         }
     }
