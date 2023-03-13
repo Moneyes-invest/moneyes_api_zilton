@@ -7843,7 +7843,7 @@
                 "localization"
             ],
             "support": {
-                "source": "https://github.com/symfony/intl/tree/v6.2.5"
+                "source": "https://github.com/symfony/intl/tree/v6.2.7"
             },
             "funding": [
                 {
