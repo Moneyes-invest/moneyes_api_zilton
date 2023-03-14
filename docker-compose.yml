@@ -28,7 +28,7 @@ services:
       php:
         condition: service_healthy
     environment:
-      SERVER_NAME: ${SERVER_NAME:-localhost:80 caddy:80}
+      SERVER_NAME: ec2-13-37-170-167.eu-west-3.compute.amazonaws.com
       PHP_SOCKET: ${PHP_SOCKET:-php:9000}
       MAINTENANCE_MODE: 0
     volumes:
@@ -38,11 +38,11 @@ services:
     ports:
       # HTTP
       - target: 80
-        published: 8080
+        published: 80
         protocol: tcp
       # HTTPS
       - target: 443
-        published: 8443
+        published: 443
         protocol: tcp
       # HTTP/3
       - target: 443
@@ -135,3 +135,5 @@ volumes:
 networks:
   app-network:
     driver: bridge
+    # ouvrir publiquement le network
+
