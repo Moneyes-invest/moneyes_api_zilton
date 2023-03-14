@@ -12,7 +12,7 @@ class HoldingsViewSet(viewsets.ModelViewSet):
     @staticmethod
     def generate_holdings(request, id):
         # Get all account transactions
-        symbol = "1edb3b74-96e9-63f0-89ec-4bbc31885670"
+        symbol = "1edbf3e0-8a8f-6472-af84-a15f96965f13"
         transactions = Transaction.objects.filter(account=id, symbol=symbol)
 
 

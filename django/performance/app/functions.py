@@ -34,7 +34,7 @@ def calculate_holdings(transactions: object) -> object:
         end_date = datetime.fromtimestamp(end / 1000)
 
         # get all transfers
-        asset = "1edb7455-d2fd-66ec-8dc1-2586db133bdb"
+        asset = "1edbf3e3-603e-638c-92fa-e3fc836ff955"
         asset = Asset.objects.get(id=asset)
         day_transfers = Transfer.objects.filter(date__gte=start_date, date__lte=end_date, asset=asset.id)
 
