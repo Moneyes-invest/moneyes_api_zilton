@@ -14,12 +14,10 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
 use App\State\DashboardProvider;
+use App\State\ProfileProvider;
 use App\State\UserPasswordHasher;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -37,37 +35,44 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: '`user`')]
 #[ApiResource(
     operations: [
-        new GetCollection(normalizationContext: ['groups' => ['get:users']]),
-        new Get(normalizationContext: ['groups' => ['get:users', 'get:user', 'get:transactions']]),
         new Get(
-            uriTemplate: '/users/{id}/dashboard',
+            uriTemplate: '/profile',
+            security: 'is_authenticated()',
+            name: 'get_profile',
+            provider: ProfileProvider::class,
+        ),
+        new Get(
+            uriTemplate: '/user/dashboard',
+            security: 'is_authenticated()',
             provider: DashboardProvider::class,
         ),
         new Post(uriTemplate: '/register', processor: UserPasswordHasher::class),
-        new Put(processor: UserPasswordHasher::class),
-        new Patch(processor: UserPasswordHasher::class),
-        new Delete(),
+        new Delete(uriTemplate: '/user/{id}', security: 'is_granted("ROLE_ADMIN")'),
     ],
-    normalizationContext: ['groups' => ['user:read']],
-    denormalizationContext: ['groups' => ['user:create', 'user:update']],
+    normalizationContext: ['groups' => [self::GROUP_READ]],
+    denormalizationContext: ['groups' => [self::GROUP_CREATE, self::GROUP_UPDATE]],
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    public const GROUP_READ   = 'user:read';
+    public const GROUP_CREATE = 'user:create';
+    public const GROUP_UPDATE = 'user:update';
+
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    #[Groups(['get:users'])]
+    #[Groups([self::GROUP_READ])]
     private Uuid $id;
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Groups([self::GROUP_READ, self::GROUP_CREATE, self::GROUP_UPDATE])]
     private string $email;
 
     #[ORM\Column]
     #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups(['user:create', 'user:update'])]
+    #[Groups([self::GROUP_READ, self::GROUP_CREATE, self::GROUP_UPDATE])]
     private array $roles = [];
 
     /** @var string The hashed password */
@@ -75,21 +80,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['get:users', 'user:create', 'user:update'])]
+    #[Groups([self::GROUP_READ, self::GROUP_CREATE, self::GROUP_UPDATE])]
     private string $username;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['get:user', 'user:create', 'user:update'])]
+    #[Groups([self::GROUP_READ, self::GROUP_CREATE, self::GROUP_UPDATE])]
     private \DateTimeInterface $birthdate;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups(['get:users', 'user:create', 'user:update'])]
+    #[Groups([self::GROUP_READ, self::GROUP_CREATE, self::GROUP_UPDATE])]
     private string $name;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups(['get:users', 'user:create', 'user:update'])]
+    #[Groups([self::GROUP_READ, self::GROUP_CREATE, self::GROUP_UPDATE])]
     private string $lastname;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Account::class)]
@@ -97,7 +102,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups(['user:create', 'user:update'])]
+    #[Groups([self::GROUP_CREATE, self::GROUP_UPDATE])]
     private ?string $plainPassword = null;
 
     #[ORM\OneToMany(mappedBy: 'userDevice', targetEntity: Device::class)]
@@ -105,8 +110,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->account      = new ArrayCollection();
-        $this->devices      = new ArrayCollection();
+        $this->account = new ArrayCollection();
+        $this->devices = new ArrayCollection();
     }
 
     public function __toString(): string

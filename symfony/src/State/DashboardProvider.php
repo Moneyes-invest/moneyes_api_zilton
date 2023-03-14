@@ -18,17 +18,17 @@ use App\Entity\BinanceAccount;
 use App\Entity\Holding;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class DashboardProvider implements ProviderInterface
 {
-    public function __construct(private readonly EntityManagerInterface $manager)
+    public function __construct(private readonly EntityManagerInterface $manager, private readonly Security $security)
     {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
-        $accountArray   = [];
-        $user           = $this->manager->getRepository(User::class)->find($uriVariables['id']);
+        $user           = $this->security->getUser();
         if (!$user instanceof User) {
             return ["L'utilisateur n'existe pas"];
         }
@@ -37,11 +37,35 @@ class DashboardProvider implements ProviderInterface
             return ["L'utilisateur n'a pas de compte"];
         }
 
+        $returnArray    = [];
         foreach ($accounts as $account) {
             if (!$account instanceof Account) {
                 continue;
             }
-            $exchangeLabel     = $account::EXCHANGE;
+            // Check if account have exchange
+            if (!$account->getExchange()) {
+                $exchangeLabel = 'Unknown';
+            } else {
+                $exchangeLabel = $account->getExchange()->getLabel();
+            }
+
+            // If account exchangeLabel is Binance
+            if ('Binance' === $exchangeLabel) {
+                $balanceBinance = $this->manager->getRepository(BinanceAccount::class)->getAssets($account);
+                $returnArray[]  = [
+                    'exchange' => $exchangeLabel,
+                    'balance'  => $balanceBinance,
+                ];
+            } else {
+                // Get recent holdings for this account for each asset
+                $holdings      = $this->manager->getRepository(Account::class)->getBalance($account);
+                $returnArray[] = [
+                    'exchange' => $exchangeLabel,
+                    'balance'  => $holdings,
+                ];
+            }
+
+            /*
             $holdingRepository = $this->manager->getRepository(Holding::class);
             $holdings          = $holdingRepository->findBy(['account' => $account]);
 
@@ -54,14 +78,10 @@ class DashboardProvider implements ProviderInterface
                     'quantity'                => $holding->getQuantity(),
                 ];
             }
+            */
         }
 
-        $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($accounts[0], null, true);
-
-        return [
-            $transactions,
-        ];
-
+        return $returnArray;
         /*
         return [
             'accounts' => $accountArray,

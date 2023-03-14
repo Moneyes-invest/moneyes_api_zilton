@@ -54,7 +54,6 @@ security:
         - { path: ^/api/login/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: PUBLIC_ACCESS }
         - { path: ^/,       roles: IS_AUTHENTICATED_FULLY }
-        # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
     security:
