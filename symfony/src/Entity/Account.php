@@ -59,7 +59,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(
             uriTemplate: '/accounts/{id}/sync_status',
             normalizationContext: ['groups' => ['get:synchro']],
-            security: 'object.getUser() == user or is_granted("ROLE_ADMIN")',
+            security: 'is_granted("ROLE_ADMIN")',
             provider: SyncStatusProvider::class,
         ),
         new Post(),
