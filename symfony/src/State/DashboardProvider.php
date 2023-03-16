@@ -61,6 +61,7 @@ class DashboardProvider implements ProviderInterface
                 $holdings      = $this->manager->getRepository(Account::class)->getBalance($account);
                 $returnArray[] = [
                     'exchange' => $exchangeLabel,
+                    'account_id' => $account->getId(),
                     'balance'  => $holdings,
                 ];
             }
