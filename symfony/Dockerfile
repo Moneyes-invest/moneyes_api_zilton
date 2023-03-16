@@ -104,6 +104,16 @@ RUN set -eux; \
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
 
+
+
+# Supervisor messenger
+# RUN apk update && apk add --no-cache supervisor openssh nginx
+# COPY docker/php/supervisor/supervisord.conf /etc/supervisord.conf
+# RUN supervisorctl -c /etc/supervisord.conf
+# RUN supervisorctl reread
+# CMD ["supervisorctl", "reread"]
+
+
 FROM caddy:${CADDY_VERSION} as caddy
 
 COPY --link docker/caddy/maintenance.html /etc/caddy/maintenance.html
