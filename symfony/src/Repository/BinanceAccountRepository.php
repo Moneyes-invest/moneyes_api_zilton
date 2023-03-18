@@ -177,11 +177,7 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
             }
         }
 
-        return array([
-            "account_name" => $account->getName(),
-            "assets" => $assets
-        ]
-        );
+        return $assets;
     }
 
     /**

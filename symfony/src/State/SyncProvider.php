@@ -62,6 +62,9 @@ class SyncProvider implements ProviderInterface
         $this->bus->dispatch(new AllTransactionsMessage((string) $account->getId()));
 
         // Return Binance details endpoint
-        return $holdings;
+        return array(
+            'account_name' => $account->getName(),
+            'holdings'     => $holdings,
+        );
     }
 }
