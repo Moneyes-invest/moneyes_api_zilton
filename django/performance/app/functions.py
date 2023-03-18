@@ -189,4 +189,6 @@ def get_price(asset: object, timestamp: int) -> float:
             return price
 
 
+def account_asset_return(account: object, asset: object):
+    
 
