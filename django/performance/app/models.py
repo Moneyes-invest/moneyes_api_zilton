@@ -210,3 +210,14 @@ class AssetPrices(models.Model):
 
     class Meta:
         db_table = 'asset_prices'
+
+
+class AccountAssetReturn(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    account = models.ForeignKey(Account, models.DO_NOTHING)
+    asset = models.ForeignKey(Asset, models.DO_NOTHING)
+    date = models.DateTimeField()
+    return_on_investment = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'account_asset_return'

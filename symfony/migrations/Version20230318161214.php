@@ -1,13 +1,6 @@
 <?php
 
-declare(strict_types = 1);
-
-/*
- * This file is part of the Moneyes API project.
- * (c) Moneyes
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
@@ -17,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230223161411 extends AbstractMigration
+final class Version20230318161214 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -54,7 +47,7 @@ final class Version20230223161411 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN device.user_device_id IS \'(DC2Type:uuid)\'');
         $this->addSql('CREATE TABLE exchange (id UUID NOT NULL, label VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('COMMENT ON COLUMN exchange.id IS \'(DC2Type:uuid)\'');
-        $this->addSql('CREATE TABLE holding (id INT NOT NULL, account_id UUID NOT NULL, asset_id UUID NOT NULL, quantity DOUBLE PRECISION NOT NULL, date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE holding (id INT NOT NULL, account_id UUID NOT NULL, asset_id UUID NOT NULL, quantity DOUBLE PRECISION NOT NULL, date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, average_purchase_price DOUBLE PRECISION NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_5BBFD8169B6B5FBA ON holding (account_id)');
         $this->addSql('CREATE INDEX IDX_5BBFD8165DA1941 ON holding (asset_id)');
         $this->addSql('COMMENT ON COLUMN holding.account_id IS \'(DC2Type:uuid)\'');

@@ -34,7 +34,7 @@ def calculate_holdings(transactions: object) -> object:
         end_date = datetime.fromtimestamp(end / 1000)
 
         # get all transfers
-        asset = "1edbf3e3-603e-638c-92fa-e3fc836ff955"
+        asset = "1edc5a86-f31f-6f8e-84a0-e191da076c73" # BTC
         asset = Asset.objects.get(id=asset)
         day_transfers = Transfer.objects.filter(date__gte=start_date, date__lte=end_date, asset=asset.id)
 
@@ -92,8 +92,6 @@ def calculate_holdings(transactions: object) -> object:
 
 
         VEd =  THd * PEd
-
-
 
 
         # ---- Calculate Cash-flow for this day ----
