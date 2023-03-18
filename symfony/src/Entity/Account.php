@@ -118,6 +118,9 @@ class Account
     #[ORM\OneToMany(mappedBy: 'account', targetEntity: Transfer::class, orphanRemoval: true)]
     private Collection $transfers;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $name = null;
+
     public function __construct()
     {
         $this->transfers = new ArrayCollection();
@@ -278,5 +281,17 @@ class Account
         }
 
         $this->synchro['status'] = self::SYNCHRO_DONE;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
     }
 }
