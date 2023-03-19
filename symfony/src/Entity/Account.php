@@ -59,7 +59,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(
             uriTemplate: '/accounts/{id}/sync_status',
             normalizationContext: ['groups' => ['get:synchro']],
-            security: 'object.getUser() == user or is_granted("ROLE_ADMIN")',
+            security: 'is_granted("ROLE_ADMIN")',
             provider: SyncStatusProvider::class,
         ),
         new Post(),
@@ -117,6 +117,9 @@ class Account
 
     #[ORM\OneToMany(mappedBy: 'account', targetEntity: Transfer::class, orphanRemoval: true)]
     private Collection $transfers;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $name = null;
 
     public function __construct()
     {
@@ -278,5 +281,17 @@ class Account
         }
 
         $this->synchro['status'] = self::SYNCHRO_DONE;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
     }
 }
