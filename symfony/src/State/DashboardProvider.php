@@ -16,6 +16,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
 use App\Entity\BinanceAccount;
 use App\Entity\Holding;
+use App\Entity\Symbol;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -38,29 +39,18 @@ class DashboardProvider implements ProviderInterface
             return ["L'utilisateur n'a pas de compte"];
         }
 
-        foreach ($accounts as $account) {
-            if (!$account instanceof Account) {
-                continue;
-            }
-            $exchangeLabel     = $account::EXCHANGE;
-            $holdingRepository = $this->manager->getRepository(Holding::class);
-            $holdings          = $holdingRepository->findBy(['account' => $account]);
-
-            foreach ($holdings as $holding) {
-                if (!$holding instanceof Holding) {
-                    continue;
-                }
-                $accountArray[$exchangeLabel]['holdings'][] = [
-                    'currency'                => $holding->getAsset()?->getCode(),
-                    'quantity'                => $holding->getQuantity(),
-                ];
-            }
-        }
-
         $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($accounts[0], null, true);
 
+        /*
         return [
             $transactions,
+        ];
+        */
+
+        $asset = $this->manager->getRepository(Symbol::class)->findAsset("DFSDFS");
+
+        return [
+            $asset,
         ];
 
         /*

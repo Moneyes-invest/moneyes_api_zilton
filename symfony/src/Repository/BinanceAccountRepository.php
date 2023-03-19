@@ -403,6 +403,10 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
             $transactionQuantity   = (float) $transaction['qty'];
             $externalTransactionId = (string) $transaction['id'];
 
+            # Find asset of symbol transaction
+            $asset = $manager->getRepository(Symbol::class)->findAsset($symbol->getCode());
+
+
             // if (null === $transactionExists && $binanceExchange instanceof Exchange) {
             $newTransaction = new Transaction();
             $newTransaction->setAccount($account)
@@ -411,6 +415,7 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
                 ->setOrderDirection($orderDirection)
                 ->setPrice($transactionPrice)
                 ->setQuantity($transactionQuantity)
+                ->setAsset($asset)
                 ->setExternalTransactionId($externalTransactionId);
 
             $manager->persist($newTransaction);

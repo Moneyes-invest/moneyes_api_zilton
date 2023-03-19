@@ -6,25 +6,44 @@ import requests
 from django.db import connection
 
 
+# function test with update parameter boolean default to false
 
-
-def calculate_holdings(transactions: object) -> object:
+def calculate_holdings(transactions: object, update=False) -> object:
     # Order by date DESC
     transactions = transactions.order_by('-date')
     # Get first transaction
     first_transaction = transactions.last()
-    # Get date of first transaction
-    date = first_transaction.date
-    # Get start of day timestamp
-    start = int(datetime.combine(date, time.min).timestamp() * 1000)
-    # Get end of day timestamp
-    end = int(datetime.combine(date, time.max).timestamp() * 1000)
+
+    last_holding = Holding.objects.filter(account=transactions[0].account, asset=transactions[0].asset).order_by('-date').first()
+
+    # If update is false
+    if not update or last_holding is None:
+        # Get date of first transaction
+        date = first_transaction.date
+        # Get start of day timestamp
+        start = int(datetime.combine(date, time.min).timestamp() * 1000)
+        # Get end of day timestamp
+        end = int(datetime.combine(date, time.max).timestamp() * 1000)
+        VEd = 0
+    else:
+        # Get last holding
+        date = last_holding.date
+        date_time = int(datetime.combine(date, time.max).timestamp() * 1000)
+        date_time = date_time - 3600000
+        # Get start of day timestamp
+        start = int(datetime.combine(date, time.min).timestamp() * 1000)
+        # Get end of day timestamp
+        end = int(datetime.combine(date, time.max).timestamp() * 1000)
+        VEd = last_holding.quantity * get_price(last_holding.asset, date_time)
 
     return_value = []
 
     index = 0
     price = 0
-    VEd = 0
+
+    # Find asset with symbol
+
+    asset = transactions[0].asset
 
     # Loop through all days
     while True:
@@ -33,15 +52,15 @@ def calculate_holdings(transactions: object) -> object:
         # end timestamp ms to date
         end_date = datetime.fromtimestamp(end / 1000)
 
+        if start_date.date() == datetime.today().date():
+            break
+
         # get all transfers
-        asset = "1edc5a86-f31f-6f8e-84a0-e191da076c73" # BTC
-        asset = Asset.objects.get(id=asset)
         day_transfers = Transfer.objects.filter(date__gte=start_date, date__lte=end_date, asset=asset.id)
 
         # Get all transactions between start and end date
         day_transactions = transactions.filter(date__gte=start_date, date__lte=end_date)
         # Store queryset day_transactions into holdings array if not empty
-
 
         # Calculate return value for this day
 
@@ -77,10 +96,8 @@ def calculate_holdings(transactions: object) -> object:
         # end to timestamp seconds
         price = get_price(asset, end)
 
-
         PEd = price
         PEdm1 = price
-
 
         # Calculate Value Start Day = Value End Day -1
         VSd = VEd
@@ -90,9 +107,7 @@ def calculate_holdings(transactions: object) -> object:
             else:
                 VSd = 0
 
-
-        VEd =  THd * PEd
-
+        VEd = THd * PEd
 
         # ---- Calculate Cash-flow for this day ----
         # Cash-flow day sum transactions quantity * price
@@ -108,22 +123,20 @@ def calculate_holdings(transactions: object) -> object:
         # Cash-flow day
         Cd = Cdn + Cdm
 
-
         # ---- Calculate Sum Cash-flow * weight for all transfers and transactions ----
         # Sum Cash-flow * weight for all transactions
         Sn = 0
         for transaction in day_transactions:
             Cn = transaction.quantity * transaction.price
-            Wn = ( 8640000 - transaction.date.timestamp() * 1000 ) / 8640000
+            Wn = (8640000 - transaction.date.timestamp() * 1000) / 8640000
             Sn += Cn * Wn
 
         # Sum Cash-flow * weight for all transfers
         Sm = 0
         for transfer in day_transfers:
             Cm = transfer.quantity * price
-            Wm = ( 8640000 - transfer.date.timestamp() * 1000 ) / 8640000
+            Wm = (8640000 - transfer.date.timestamp() * 1000) / 8640000
             Sm += Cm * Wm
-
 
         # ---- Calculate Return Value ----
         numerator = VEd - VSd - Cd
@@ -139,8 +152,8 @@ def calculate_holdings(transactions: object) -> object:
         # Create new holding
         save_holding(end_date, first_transaction.account.id, THd, asset.id, r)
 
-        return_value.append(str(start_date) + " => " + str(VSd) + " : "+ str(VEd) + " : " + str(Cd) + " : "  + str(r) + "%")
-
+        return_value.append(
+            asset.code + " -- "+ str(start_date) + " => " + str(VSd) + " : " + str(VEd) + " : " + str(Cd) + " : " + str(r) + "%")
 
         # create_holdings(day_transactions)
         # Get next day
@@ -151,6 +164,7 @@ def calculate_holdings(transactions: object) -> object:
             break
 
     return return_value
+
 
 def save_holding(date, account_id, quantity, asset_id, return_on_investment):
     # Check if holding exists
@@ -166,6 +180,7 @@ def save_holding(date, account_id, quantity, asset_id, return_on_investment):
                 """,
                 (date, account_id, quantity, asset_id, return_on_investment)
             )
+
 
 def get_price(asset: object, timestamp: int) -> float:
     # Check if price exists in asset_prices
@@ -190,5 +205,27 @@ def get_price(asset: object, timestamp: int) -> float:
 
 
 def account_asset_return(account: object, asset: object):
-    
+    # Check if asset exists in account
+    try:
+        holdings = Holding.objects.filter(account=account, asset=asset)
+    except Holding.DoesNotExist:
+        return 0
 
+    # Check if asset has any holdings
+    if holdings.count() == 0:
+        return 0
+
+    # Order holdings by date ASC
+    holdings = holdings.order_by('date')
+
+    Vs = 0.0000001
+    previous_return = 0.0000001
+
+    for holding in holdings:
+        Ve = holding.return_on_investment
+        if Ve == 0:
+            Ve = 0.0000001
+        previous_return = previous_return * (Ve / Vs)
+        Vs = Ve
+
+    return previous_return

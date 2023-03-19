@@ -19,7 +19,7 @@ COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
 # fetch models from database
-# RUN python manage.py inspectdb > models.py
+# RUN python manage.py inspectdb > app/models/symfony_models.py
 # RUN python manage.py migrate
 
 # copy project
