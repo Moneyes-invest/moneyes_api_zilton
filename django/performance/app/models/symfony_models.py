@@ -14,7 +14,6 @@ class Account(models.Model):
     user = models.ForeignKey('User', models.DO_NOTHING)
     private_key = models.CharField(max_length=255, blank=True, null=True)
     public_key = models.CharField(max_length=255, blank=True, null=True)
-    exchange_0 = models.CharField(db_column='exchange', max_length=255)  # Field renamed because of name conflict.
 
     class Meta:
         managed = False
@@ -23,7 +22,7 @@ class Account(models.Model):
 
 class Asset(models.Model):
     id = models.UUIDField(primary_key=True)
-    code = models.CharField(unique=True, max_length=3)
+    code = models.CharField(unique=True, max_length=10)
 
     class Meta:
         managed = False
@@ -40,77 +39,10 @@ class AssetExchange(models.Model):
         unique_together = (('asset', 'exchange'),)
 
 
-class AuthGroup(models.Model):
-    name = models.CharField(unique=True, max_length=150)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group'
-
-
-class AuthGroupPermissions(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission'),)
-
-
-class AuthPermission(models.Model):
-    name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
-    codename = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_permission'
-        unique_together = (('content_type', 'codename'),)
-
-
-class AuthUser(models.Model):
-    password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.BooleanField()
-    username = models.CharField(unique=True, max_length=150)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    email = models.CharField(max_length=254)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
-    date_joined = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user'
-
-
-class AuthUserGroups(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user_groups'
-        unique_together = (('user', 'group'),)
-
-
-class AuthUserUserPermissions(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user_user_permissions'
-        unique_together = (('user', 'permission'),)
-
-
 class BinanceAccount(models.Model):
-    id = models.OneToOneField(Account, models.DO_NOTHING, db_column='id', primary_key=True)
+    id = models.UUIDField(primary_key=True)
+    private_key = models.CharField(max_length=255, blank=True, null=True)
+    public_key = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -127,49 +59,21 @@ class Currency(models.Model):
         db_table = 'currency'
 
 
-class DjangoAdminLog(models.Model):
-    action_time = models.DateTimeField()
-    object_id = models.TextField(blank=True, null=True)
-    object_repr = models.CharField(max_length=200)
-    action_flag = models.SmallIntegerField()
-    change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+class Device(models.Model):
+    id = models.UUIDField(primary_key=True)
+    user_device = models.ForeignKey('User', models.DO_NOTHING, blank=True, null=True)
+    os_version = models.CharField(max_length=255, blank=True, null=True)
+    lang = models.CharField(max_length=255, blank=True, null=True)
+    os_name = models.CharField(max_length=255, blank=True, null=True)
+    device_uuid = models.CharField(max_length=255, blank=True, null=True)
+    device_type = models.CharField(max_length=255, blank=True, null=True)
+    device_name = models.CharField(max_length=255, blank=True, null=True)
+    device_model = models.CharField(max_length=255, blank=True, null=True)
+    app_version = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'django_admin_log'
-
-
-class DjangoContentType(models.Model):
-    app_label = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
-
-
-class DjangoMigrations(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    app = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    applied = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_migrations'
-
-
-class DjangoSession(models.Model):
-    session_key = models.CharField(primary_key=True, max_length=40)
-    session_data = models.TextField()
-    expire_date = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_session'
+        db_table = 'device'
 
 
 class DoctrineMigrationVersions(models.Model):
@@ -189,18 +93,6 @@ class Exchange(models.Model):
     class Meta:
         managed = False
         db_table = 'exchange'
-
-
-class Holding(models.Model):
-    id = models.IntegerField(primary_key=True)
-    account = models.ForeignKey(Account, models.DO_NOTHING)
-    asset = models.ForeignKey(Asset, models.DO_NOTHING)
-    quantity = models.FloatField()
-    date = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'holding'
 
 
 class MessengerMessages(models.Model):
@@ -251,7 +143,7 @@ class Transaction(models.Model):
     id = models.UUIDField(primary_key=True)
     account = models.ForeignKey(Account, models.DO_NOTHING)
     symbol = models.ForeignKey(Symbol, models.DO_NOTHING)
-    asset_fees = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True)
+    asset_fees = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True, related_name='transaction_asset_fees')
     date = models.DateTimeField()
     type = models.CharField(max_length=255)
     order_direction = models.CharField(max_length=255)
@@ -259,6 +151,7 @@ class Transaction(models.Model):
     price = models.FloatField()
     quantity = models.FloatField()
     external_transaction_id = models.CharField(max_length=255, blank=True, null=True)
+    asset = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True, related_name='transaction_asset')
 
     class Meta:
         managed = False
@@ -267,8 +160,8 @@ class Transaction(models.Model):
 
 class Transfer(models.Model):
     id = models.IntegerField(primary_key=True)
-    asset = models.ForeignKey(Asset, models.DO_NOTHING)
-    asset_fees = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True)
+    asset = models.ForeignKey(Asset, models.DO_NOTHING, related_name='transfer_asset')
+    asset_fees = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True, related_name='transfer_asset_fees')
     account = models.ForeignKey(Account, models.DO_NOTHING)
     date = models.DateTimeField()
     quantity = models.FloatField()
