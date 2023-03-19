@@ -29,7 +29,7 @@ class HoldingsViewSet(viewsets.ModelViewSet):
             if last_holding is not None:
                 if last_holding.date.date() >= (datetime.today() - timedelta(days=1)).date():
                     continue
-            holdings = calculate_holdings(transactions, True)
+            holdings = calculate_holdings(transactions)
             return_value.append(holdings)
 
         return Response(return_value)

@@ -1,5 +1,5 @@
 from datetime import datetime, time
-from app.models import Transaction, Holding, Transfer, Asset, AssetPrices
+from app.models import Transaction, Holding, Transfer, Asset, AssetPrices, AccountAssetReturn
 import pandas as pd
 from pycoingecko import CoinGeckoAPI
 import requests
@@ -40,6 +40,8 @@ def calculate_holdings(transactions: object, update=False) -> object:
 
     index = 0
     price = 0
+    previous_return = 0.0000001
+
 
     # Find asset with symbol
 
@@ -153,12 +155,21 @@ def calculate_holdings(transactions: object, update=False) -> object:
         save_holding(end_date, first_transaction.account.id, THd, asset.id, r)
 
         return_value.append(
-            asset.code + " -- "+ str(start_date) + " => " + str(VSd) + " : " + str(VEd) + " : " + str(Cd) + " : " + str(r) + "%")
+            asset.code + " -- "+ str(end_date) + " => " + str(VSd) + " : " + str(VEd) + " : " + str(Cd) + " : " + str(r) + "%")
+
+
+        # Save account asset return
+        if r == 0:
+            r = 0.0000001
+
+        account_asset_return( first_transaction.account, asset, end_date, r, previous_return)
+
 
         # create_holdings(day_transactions)
         # Get next day
         start = start + 86400000  # 24 hours in milliseconds
         end = end + 86400000  # 24 hours in milliseconds
+        previous_return = r
         # Break if start is greater than now
         if start > int(datetime.now().timestamp() * 1000):
             break
@@ -204,28 +215,19 @@ def get_price(asset: object, timestamp: int) -> float:
             return price
 
 
-def account_asset_return(account: object, asset: object):
-    # Check if asset exists in account
+def account_asset_return(account: object, asset: object, date: datetime, return_on_investment: float = 0.0000001, previous_return: float = 0.0000001):
+
+    account_asset_return_value = previous_return / return_on_investment
+
+    # If AccountAssetReturn exists for this account and asset
     try:
-        holdings = Holding.objects.filter(account=account, asset=asset)
-    except Holding.DoesNotExist:
-        return 0
+        account_asset_return = AccountAssetReturn.objects.get(account=account, asset=asset)
+        account_asset_return.return_on_investment = account_asset_return_value
+        account_asset_return.date = date
+        account_asset_return.save()
+    except AccountAssetReturn.DoesNotExist:
+        # Create new AccountAssetReturn
+        account_asset_return = AccountAssetReturn(account=account, asset=asset, return_on_investment=account_asset_return_value, date=date)
+        account_asset_return.save()
 
-    # Check if asset has any holdings
-    if holdings.count() == 0:
-        return 0
-
-    # Order holdings by date ASC
-    holdings = holdings.order_by('date')
-
-    Vs = 0.0000001
-    previous_return = 0.0000001
-
-    for holding in holdings:
-        Ve = holding.return_on_investment
-        if Ve == 0:
-            Ve = 0.0000001
-        previous_return = previous_return * (Ve / Vs)
-        Vs = Ve
-
-    return previous_return
+    return account_asset_return_value
