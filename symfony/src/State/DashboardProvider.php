@@ -29,7 +29,6 @@ class DashboardProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
-        $accountArray   = [];
         $user           = $this->security->getUser();
         if (!$user instanceof User) {
             return ["L'utilisateur n'existe pas"];
@@ -39,19 +38,53 @@ class DashboardProvider implements ProviderInterface
             return ["L'utilisateur n'a pas de compte"];
         }
 
-        $transactions = $this->manager->getRepository(BinanceAccount::class)->fetchTransactions($accounts[0], null, true);
+        $returnArray    = [];
+        foreach ($accounts as $account) {
+            if (!$account instanceof Account) {
+                continue;
+            }
+            // Check if account have exchange
+            if (!$account->getExchange()) {
+                $exchangeLabel = 'Unknown';
+            } else {
+                $exchangeLabel = $account->getExchange()->getLabel();
+            }
 
-        /*
-        return [
-            $transactions,
-        ];
-        */
+            // If account exchangeLabel is Binance
+            if ('Binance' === $exchangeLabel) {
+                $balanceBinance = $this->manager->getRepository(BinanceAccount::class)->getAssets($account);
+                $returnArray[]  = [
+                    'exchange' => $exchangeLabel,
+                    'account_id' => $account->getId(),
+                    'balance'  => $balanceBinance,
+                ];
+            } else {
+                // Get recent holdings for this account for each asset
+                $holdings      = $this->manager->getRepository(Account::class)->getBalance($account);
+                $returnArray[] = [
+                    'exchange' => $exchangeLabel,
+                    'account_id' => $account->getId(),
+                    'balance'  => $holdings,
+                ];
+            }
 
-        $asset = $this->manager->getRepository(Symbol::class)->findAsset("DFSDFS");
+            /*
+            $holdingRepository = $this->manager->getRepository(Holding::class);
+            $holdings          = $holdingRepository->findBy(['account' => $account]);
 
-        return [
-            $asset,
-        ];
+            foreach ($holdings as $holding) {
+                if (!$holding instanceof Holding) {
+                    continue;
+                }
+                $accountArray[$exchangeLabel]['holdings'][] = [
+                    'currency'                => $holding->getAsset()?->getCode(),
+                    'quantity'                => $holding->getQuantity(),
+                ];
+            }
+            */
+        }
+
+        return $returnArray;
 
         /*
         return [

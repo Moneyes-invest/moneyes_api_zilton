@@ -38,11 +38,11 @@ services:
     ports:
       # HTTP
       - target: 80
-        published: 8080
+        published: 80
         protocol: tcp
       # HTTPS
       - target: 443
-        published: 8443
+        published: 443
         protocol: tcp
       # HTTP/3
       - target: 443
@@ -82,7 +82,31 @@ services:
       - app-network
   ###< doctrine/doctrine-bundle ###
 
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.7-management
+    ports: [5672, 15672]
 
+  mercure:
+    container_name: mercure
+    image: dunglas/mercure
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: ':80'
+      MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      # Set the URL of your Symfony project (without trailing slash!) as value of the cors_origins directive
+      MERCURE_EXTRA_DIRECTIVES: |
+        cors_origins *
+    # Comment the following line to disable the development mode
+    command: /usr/bin/caddy run --config /etc/caddy/Caddyfile.dev
+    volumes:
+      - mercure_data:/data
+      - mercure_config:/config
+    ports:
+      - 55667:80
+    networks:
+      - app-network
 
   django:
     build: django/
@@ -99,14 +123,17 @@ services:
     networks:
       - app-network
 
-
 volumes:
   caddy_data: ~
   caddy_config: ~
   ###> doctrine/doctrine-bundle ###
   db-data: ~
+  mercure_data: ~
+  mercure_config: ~
 ###< doctrine/doctrine-bundle ###
 
 networks:
   app-network:
     driver: bridge
+    # ouvrir publiquement le network
+

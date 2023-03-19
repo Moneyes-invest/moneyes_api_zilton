@@ -30,6 +30,7 @@ class TransactionHandler
     public function handleFetchTransactionsOfSymbolsOwned(OwnedTransactionsMessage $message): void
     {
         $accountId      = $message->getAccountId();
+        /** @var Account $account */
         $account        = $this->manager->getRepository(Account::class)->find($accountId);
         if (null === $account) {
             throw new \Exception('Account not found');
@@ -40,13 +41,21 @@ class TransactionHandler
         }
         $accountSymbols = $accountRepository->getAccountSymbols($account);
         // Fetch and save transactions for owned symbols
-        $this->fetchTransactions($accountSymbols, $account);
+        $errors = null;
+        try {
+            $this->fetchTransactions($accountSymbols, $account);
+        } catch (\Exception $e) {
+            $errors = $e->getTrace();
+        }
+        $account->setSynchroStep(step: Account::STEP_TRANSACTION_SYMBOL_OWNED, startedAt: new \DateTime(), endedAt: new \DateTime(), errors: $errors);
+        $this->manager->flush();
     }
 
     #[AsMessageHandler]
     public function handleFetchTransactionsOfSymbolsNotOwned(AllTransactionsMessage $message): void
     {
         $accountId         = $message->getAccountId();
+        /** @var Account $account */
         $account           = $this->manager->getRepository(Account::class)->find($accountId);
         if (null === $account) {
             throw new \Exception('Account not found');
@@ -62,13 +71,22 @@ class TransactionHandler
         $symbolsNotOwned = array_diff($allSymbols, $accountSymbols); // symbols not owned by user
 
         // Fetch and save transactions for owned symbols
-        $this->fetchTransactions($symbolsNotOwned, $account);
+        $errors = null;
+        try {
+            $this->fetchTransactions($symbolsNotOwned, $account);
+        } catch (\Exception $e) {
+            $errors = $e->getTrace();
+        }
+        $account->setSynchroStep(step: Account::STEP_TRANSACTION_SYMBOL_NOT_OWNED, startedAt: new \DateTime(), endedAt: new \DateTime(), errors: $errors);
+        $this->manager->flush();
     }
 
     #[AsMessageHandler]
     public function handleFetchTransfers(AllTransfersMessage $message): void
     {
+        $startDate = new \DateTime();
         $accountId = $message->getAccountId();
+        /** @var Account $account */
         $account   = $this->manager->getRepository(Account::class)->find($accountId);
         if (null === $account) {
             throw new \Exception('Account not found');
@@ -78,7 +96,15 @@ class TransactionHandler
         if (!method_exists($accountRepository, 'fetchTransfers')) {
             throw new \Exception('Method fetchTransfers not found');
         }
-        $accountRepository->fetchTransfers($account);
+
+        $errors = null;
+        try {
+            $accountRepository->fetchTransfers($account);
+        } catch (\Exception $e) {
+            $errors = $e->getTrace();
+        }
+        $account->setSynchroStep(step: Account::STEP_FETCH_TRANSFERS, startedAt: $startDate, endedAt: new \DateTime(), errors: $errors);
+        $this->manager->flush();
     }
 
     #[AsMessageHandler]
@@ -99,6 +125,9 @@ class TransactionHandler
         $this->fetchTransactions($allSymbols, $account, true);
     }
 
+    /**
+     * @throws \Exception
+     */
     private function fetchTransactions(array $accountSymbols, Account $account, ?bool $new = false): void
     {
         $accountRepository = $this->manager->getRepository(BinanceAccount::class);

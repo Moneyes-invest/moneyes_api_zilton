@@ -32,11 +32,11 @@ class ProfileProvider implements ProviderInterface
         if (!$user instanceof User) {
             return ["Vous n'êtes pas connecté"];
         }
-        $uriVariables['id'] = $user->getId();
+        $uriVariables['id'] = $user->getId()->toRfc4122();
 
         /** @var User $provide */
-        $provide = $this->ormProvider->provide($operation, $uriVariables, $context);
+        //$provide = $this->ormProvider->provide($operation, $uriVariables, $context);
 
-        return $provide;
+        return $user;
     }
 }
