@@ -15,6 +15,7 @@ class HoldingsViewSet(viewsets.ModelViewSet):
 
         # Get all transactions for account and group by asset
         assets = Transaction.objects.filter(account=id).values('asset').distinct()
+
         for asset in assets:
             # check if asset is not null
             if asset['asset'] is None:

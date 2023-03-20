@@ -14,6 +14,8 @@ def calculate_holdings(transactions: object, update=False) -> object:
     # Get first transaction
     first_transaction = transactions.last()
 
+    # check if last holding exists
+
     last_holding = Holding.objects.filter(account=transactions[0].account, asset=transactions[0].asset).order_by('-date').first()
 
     # If update is false
@@ -183,15 +185,8 @@ def save_holding(date, account_id, quantity, asset_id, return_on_investment):
         holding = Holding.objects.get(date=date, account_id=account_id, asset_id=asset_id)
     except Holding.DoesNotExist:
         # Create new holding
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                INSERT INTO holding (date, account_id, quantity, asset_id, return_on_investment)
-                VALUES (%s, %s, %s, %s, %s)
-                """,
-                (date, account_id, quantity, asset_id, return_on_investment)
-            )
-
+        new_holding = Holding(date=date, account_id=account_id, quantity=quantity, asset_id=asset_id, return_on_investment=return_on_investment)
+        new_holding.save()
 
 def get_price(asset: object, timestamp: int) -> float:
     # Check if price exists in asset_prices
@@ -210,7 +205,7 @@ def get_price(asset: object, timestamp: int) -> float:
         else:
             price = data['Data']['Data'][0]['close']
             # Save price in asset_prices
-            asset_price = AssetPrices(asset=asset, timestamp=timestamp, price=price)
+            asset_price = AssetPrices(asset=asset, timestamp=timestamp, price=price, asset_price='USD')
             asset_price.save()
             return price
 

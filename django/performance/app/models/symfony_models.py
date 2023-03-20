@@ -10,14 +10,28 @@ from django.db import models
 
 class Account(models.Model):
     id = models.UUIDField(primary_key=True)
-    exchange = models.ForeignKey('Exchange', models.DO_NOTHING)
+    exchange = models.ForeignKey('Exchange', models.DO_NOTHING, blank=True, null=True)
     user = models.ForeignKey('User', models.DO_NOTHING)
     private_key = models.CharField(max_length=255, blank=True, null=True)
     public_key = models.CharField(max_length=255, blank=True, null=True)
+    synchro = models.TextField(blank=True, null=True)  # This field type is a guess.
+    name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'account'
+
+
+class AccountAssetReturn(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    account = models.ForeignKey(Account, models.DO_NOTHING)
+    asset = models.ForeignKey('Asset', models.DO_NOTHING)
+    date = models.DateTimeField()
+    return_on_investment = models.FloatField()
+
+    class Meta:
+        managed = False
+        db_table = 'account_asset_return'
 
 
 class Asset(models.Model):
@@ -39,10 +53,24 @@ class AssetExchange(models.Model):
         unique_together = (('asset', 'exchange'),)
 
 
+class AssetPrices(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    asset = models.ForeignKey(Asset, models.DO_NOTHING)
+    timestamp = models.BigIntegerField()
+    price = models.FloatField()
+    asset_price = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'asset_prices'
+
+
 class BinanceAccount(models.Model):
     id = models.UUIDField(primary_key=True)
     private_key = models.CharField(max_length=255, blank=True, null=True)
     public_key = models.CharField(max_length=255, blank=True, null=True)
+    synchro = models.TextField(blank=True, null=True)  # This field type is a guess.
+    name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -95,6 +123,19 @@ class Exchange(models.Model):
         db_table = 'exchange'
 
 
+class Holding(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    account = models.ForeignKey(Account, models.DO_NOTHING)
+    asset = models.ForeignKey(Asset, models.DO_NOTHING)
+    quantity = models.FloatField()
+    date = models.DateTimeField()
+    return_on_investment = models.FloatField()
+
+    class Meta:
+        managed = False
+        db_table = 'holding'
+
+
 class MessengerMessages(models.Model):
     id = models.BigAutoField(primary_key=True)
     body = models.TextField()
@@ -143,7 +184,7 @@ class Transaction(models.Model):
     id = models.UUIDField(primary_key=True)
     account = models.ForeignKey(Account, models.DO_NOTHING)
     symbol = models.ForeignKey(Symbol, models.DO_NOTHING)
-    asset_fees = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True, related_name='transaction_asset_fees')
+    asset_fees = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True, related_name='asset_fees_transaction')
     date = models.DateTimeField()
     type = models.CharField(max_length=255)
     order_direction = models.CharField(max_length=255)
@@ -151,7 +192,7 @@ class Transaction(models.Model):
     price = models.FloatField()
     quantity = models.FloatField()
     external_transaction_id = models.CharField(max_length=255, blank=True, null=True)
-    asset = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True, related_name='transaction_asset')
+    asset = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True, related_name='asset_transaction')
 
     class Meta:
         managed = False
@@ -160,8 +201,8 @@ class Transaction(models.Model):
 
 class Transfer(models.Model):
     id = models.IntegerField(primary_key=True)
-    asset = models.ForeignKey(Asset, models.DO_NOTHING, related_name='transfer_asset')
-    asset_fees = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True, related_name='transfer_asset_fees')
+    asset = models.ForeignKey(Asset, models.DO_NOTHING, related_name='asset')
+    asset_fees = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True, related_name='asset_fees')
     account = models.ForeignKey(Account, models.DO_NOTHING)
     date = models.DateTimeField()
     quantity = models.FloatField()

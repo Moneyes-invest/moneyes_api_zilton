@@ -16,6 +16,7 @@ use App\Binance\RateLimiter;
 use App\Entity\Account;
 use App\Entity\Asset;
 use App\Entity\BinanceAccount;
+use App\Entity\Holding;
 use App\Entity\Symbol;
 use App\Entity\Transaction;
 use App\Entity\Transfer;
@@ -167,12 +168,23 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
 
         $assets = [];
 
+
+
         foreach ($balances as $asset => $balance) {
             $floatBalanceAssetBalance = (float)$balance['available'] + (float)$balance['onOrder'];
+            $assetEntity = $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['code' => $asset]);
+            $previousBalance = $this->getEntityManager()->getRepository(Holding::class)->findOneBy(['account' => $account, 'asset' => $assetEntity], ['date' => 'DESC']);
+            if (!$previousBalance instanceof Holding) {
+                $previousBalance = 0;
+            }
+            else {
+                $previousBalance = $previousBalance->getQuantity();
+            }
             if ($floatBalanceAssetBalance > 0) {
                 $assets[] = [
                     'asset' => $asset,  // Asset's ISO code
                     'balance' => $floatBalanceAssetBalance, // Asset's balance
+                    'previousBalance' => $previousBalance, // Asset's balance
                 ];
             }
         }
