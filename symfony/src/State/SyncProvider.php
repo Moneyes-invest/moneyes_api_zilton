@@ -19,6 +19,7 @@ use App\Message\AllTransactionsMessage;
 use App\Message\AllTransfersMessage;
 use App\Message\OwnedTransactionsMessage;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -34,6 +35,9 @@ class SyncProvider implements ProviderInterface
     ) {
     }
 
+    /**
+     * @throws Exception
+     */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $user = $this->security->getUser();
@@ -42,12 +46,16 @@ class SyncProvider implements ProviderInterface
         if (!$account instanceof Account) {
             return null;
         }
+        // Check if account is binance
+        if (!$account->getExchange() || 'Binance' !== $account->getExchange()->getLabel()) {
+            throw new Exception('This account is not a Binance account');
+        }
         if ($account->getUser() !== $user && !$this->security->isGranted('ROLE_ADMIN')) {
-            throw new \Exception('You are not allowed to synchronize this account');
+            throw new Exception('You are not allowed to synchronize this account');
         }
         // Check security here
         if (Account::SYNCHRO_IN_PROGRESS === $account->getSynchroStatus()) {
-            throw new \Exception('Synchronization already in progress');
+            throw new Exception('Synchronization already in progress');
         }
         $account->resetSynchro();
         $this->manager->flush();
