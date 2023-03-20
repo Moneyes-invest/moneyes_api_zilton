@@ -55,16 +55,18 @@ class DashboardProvider implements ProviderInterface
                 $balanceBinance = $this->manager->getRepository(BinanceAccount::class)->getAssets($account);
                 $returnArray[]  = [
                     'exchange' => $exchangeLabel,
+                    'account_name' => 'Binance',
                     'account_id' => $account->getId(),
                     'balance'  => $balanceBinance,
                 ];
             } else {
                 // Get recent holdings for this account for each asset
-                $holdings      = $this->manager->getRepository(Account::class)->getBalance($account);
+                //$holdings      = $this->manager->getRepository(Account::class)->getBalance($account);
                 $returnArray[] = [
                     'exchange' => $exchangeLabel,
+                    'account_name' => $account->getName(),
                     'account_id' => $account->getId(),
-                    'balance'  => $holdings,
+                    //'balance'  => $holdings,
                 ];
             }
 
