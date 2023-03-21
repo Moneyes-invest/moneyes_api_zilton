@@ -119,6 +119,7 @@ class Account
     private Collection $transfers;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['get:account', 'create:account'])]
     private ?string $name = null;
 
     public function __construct()

@@ -72,6 +72,10 @@ class Transaction
     #[ORM\ManyToOne]
     private ?Asset $assetFees = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Asset $asset = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -205,6 +209,18 @@ class Transaction
     public function setAssetFees(?Asset $assetFees): self
     {
         $this->assetFees = $assetFees;
+
+        return $this;
+    }
+
+    public function getAsset(): ?Asset
+    {
+        return $this->asset;
+    }
+
+    public function setAsset(?Asset $asset): self
+    {
+        $this->asset = $asset;
 
         return $this;
     }

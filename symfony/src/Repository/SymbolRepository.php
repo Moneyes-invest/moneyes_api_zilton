@@ -11,6 +11,7 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Entity\Asset;
 use App\Entity\Symbol;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -48,28 +49,17 @@ class SymbolRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Symbol[] Returns an array of Symbol objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findAsset(string $codeSymbol): ?Asset
+    {
+        # for i in 0 len(codeSymbol) - 1
+        for ($i = 0; $i < strlen($codeSymbol) - 1; $i++) {
+            $asset = $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['code' => substr($codeSymbol, 0, $i + 1)]);
 
-//    public function findOneBySomeField($value): ?Symbol
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+            if ($asset) {
+                return $asset;
+            }
+        }
+        return null;
+    }
+
 }
