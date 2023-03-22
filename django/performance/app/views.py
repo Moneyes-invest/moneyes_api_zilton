@@ -16,6 +16,7 @@ class HoldingsViewSet(viewsets.ModelViewSet):
         # Get all transactions for account and group by asset
         assets = Transaction.objects.filter(account=id).values('asset').distinct()
 
+
         for asset in assets:
             # check if asset is not null
             if asset['asset'] is None:
@@ -30,7 +31,7 @@ class HoldingsViewSet(viewsets.ModelViewSet):
             if last_holding is not None:
                 if last_holding.date.date() >= (datetime.today() - timedelta(days=1)).date():
                     continue
-            holdings = calculate_holdings(transactions)
+            holdings = calculate_holdings(transactions, update=True)
             return_value.append(holdings)
 
         return Response(return_value)

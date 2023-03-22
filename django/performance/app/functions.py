@@ -4,6 +4,8 @@ import pandas as pd
 from pycoingecko import CoinGeckoAPI
 import requests
 from django.db import connection
+import json
+from django.core import serializers
 
 
 # function test with update parameter boolean default to false
@@ -43,6 +45,7 @@ def calculate_holdings(transactions: object, update=False) -> object:
     index = 0
     price = 0
     previous_return = 0.0000001
+    THd = 0
 
 
     # Find asset with symbol
@@ -84,16 +87,9 @@ def calculate_holdings(transactions: object, update=False) -> object:
         # Calculate Total Holdings last day
         end_date_last_day = end - 86400000
         end_date_last_day = datetime.fromtimestamp(end_date_last_day / 1000)
-        try:
-            THdm1 = Holding.objects.filter(date=end_date_last_day).last()
-            if THdm1 is None:
-                THdm1 = 0
-            else:
-                THdm1 = THdm1.quantity
-        except Holding.DoesNotExist:
-            THdm1 = 0
 
-        # Calculate Total Holdings Day
+
+        THdm1 = THd
         THd = THdm1 + Sqn + Sqm
 
         # ---- Get Price ----
@@ -105,12 +101,13 @@ def calculate_holdings(transactions: object, update=False) -> object:
 
         # Calculate Value Start Day = Value End Day -1
         VSd = VEd
+        """
         if VSd == 0:
             if day_transactions.last() is not None:
                 VSd = day_transactions.last().quantity * day_transactions.last().price
             else:
                 VSd = 0
-
+        """
         VEd = THd * PEd
 
         # ---- Calculate Cash-flow for this day ----
@@ -157,7 +154,7 @@ def calculate_holdings(transactions: object, update=False) -> object:
         save_holding(end_date, first_transaction.account.id, THd, asset.id, r)
 
         return_value.append(
-            asset.code + " -- "+ str(end_date) + " => " + str(VSd) + " : " + str(VEd) + " : " + str(Cd) + " : " + str(r) + "%")
+            asset.code + " -- "+ str(end_date) + " => VSD " + str(VSd) + " | VED : " + str(VEd) + " : " + str(Cd) + " : " + str(r) + "%")
 
 
         # Save account asset return
