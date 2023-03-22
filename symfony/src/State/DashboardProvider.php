@@ -66,7 +66,7 @@ class DashboardProvider implements ProviderInterface
                     'exchange' => $exchangeLabel,
                     'account_name' => $account->getName(),
                     'account_id' => $account->getId(),
-                    //'balance'  => $holdings,
+                    'balance'  => [],
                 ];
             }
 
