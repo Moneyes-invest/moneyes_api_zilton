@@ -28,7 +28,7 @@ services:
       php:
         condition: service_healthy
     environment:
-      SERVER_NAME: coucou
+      SERVER_NAME: ${SERVER_NAME:-localhost:80 caddy:80}
       PHP_SOCKET: ${PHP_SOCKET:-php:9000}
       MAINTENANCE_MODE: 0
     volumes:
