@@ -33,8 +33,8 @@ class API
 
     protected $base          = self::BASE_API.'/api/'; // /< REST endpoint for the currency exchange
     protected $baseTestnet   = 'https://testnet.binance.vision/api/'; // /< Testnet REST endpoint for the currency exchange
-    protected $wapi          =  self::BASE_API.'/wapi/'; // /< REST endpoint for the withdrawals
-    protected $sapi          =  self::BASE_API.'/sapi/'; // /< REST endpoint for the supporting network API
+    protected $wapi          = self::BASE_API.'/wapi/'; // /< REST endpoint for the withdrawals
+    protected $sapi          = self::BASE_API.'/sapi/'; // /< REST endpoint for the supporting network API
     protected $stream        = 'wss://stream.binance.com:9443/ws/'; // /< Endpoint for establishing websocket connections
     protected $streamTestnet = 'wss://testnet.binance.vision/ws/'; // /< Testnet endpoint for establishing websocket connections
     protected $api_key; // /< API key that you created in the binance website member area
@@ -140,20 +140,21 @@ class API
      * -TAKE_PROFIT_LIMIT
      * -LIMIT_MAKER.
      *
-     * You should check the @see exchangeInfo for each currency to determine
-     * what types of orders can be placed against specific pairs
+     * You should check the @param $symbol string the currency symbol
      *
-     * $quantity = 1;
-     * $price = 0.0005;
-     * $order = $api->buy("BNBBTC", $quantity, $price);
-     *
-     * @param $symbol string the currency symbol
      * @param $quantity string the quantity required
      * @param $price string price per unit you want to spend
      * @param $type string type of order
      * @param $flags array addtional options for order type
      *
      * @return array with error message or the order details
+     *
+     * @see exchangeInfo for each currency to determine
+     * what types of orders can be placed against specific pairs
+     *
+     * $quantity = 1;
+     * $price = 0.0005;
+     * $order = $api->buy("BNBBTC", $quantity, $price);
      */
     public function buy(string $symbol, $quantity, $price, string $type = 'LIMIT', array $flags = [])
     {
@@ -163,8 +164,6 @@ class API
     /**
      * buyTest attempts to create a TEST currency order.
      *
-     * @see buy()
-     *
      * @param $symbol string the currency symbol
      * @param $quantity string the quantity required
      * @param $price string price per unit you want to spend
@@ -172,6 +171,8 @@ class API
      * @param $flags array config
      *
      * @return array with error message or empty or the order details
+     *
+     * @see buy()
      */
     public function buyTest(string $symbol, $quantity, $price, string $type = 'LIMIT', array $flags = [])
     {
@@ -189,20 +190,21 @@ class API
      * -TAKE_PROFIT_LIMIT
      * -LIMIT_MAKER.
      *
-     * You should check the @see exchangeInfo for each currency to determine
-     * what types of orders can be placed against specific pairs
+     * You should check the @param $symbol string the currency symbol
      *
-     * $quantity = 1;
-     * $price = 0.0005;
-     * $order = $api->sell("BNBBTC", $quantity, $price);
-     *
-     * @param $symbol string the currency symbol
      * @param $quantity string the quantity required
      * @param $price string price per unit you want to spend
      * @param $type string type of order
      * @param $flags array addtional options for order type
      *
      * @return array with error message or the order details
+     *
+     * @see exchangeInfo for each currency to determine
+     * what types of orders can be placed against specific pairs
+     *
+     * $quantity = 1;
+     * $price = 0.0005;
+     * $order = $api->sell("BNBBTC", $quantity, $price);
      */
     public function sell(string $symbol, $quantity, $price, string $type = 'LIMIT', array $flags = [])
     {
@@ -212,8 +214,6 @@ class API
     /**
      * sellTest attempts to create a TEST currency order.
      *
-     * @see sell()
-     *
      * @param $symbol string the currency symbol
      * @param $quantity string the quantity required
      * @param $price string price per unit you want to spend
@@ -221,6 +221,8 @@ class API
      * @param $flags array config
      *
      * @return array with error message or empty or the order details
+     *
+     * @see sell()
      */
     public function sellTest(string $symbol, $quantity, $price, string $type = 'LIMIT', array $flags = [])
     {
@@ -249,13 +251,13 @@ class API
     /**
      * marketQuoteBuyTest attempts to create a TEST currency order at given market price.
      *
-     * @see marketBuy()
-     *
      * @param $symbol string the currency symbol
      * @param $quantity string the quantity of the quote to use
      * @param $flags array additional options for order type
      *
      * @return array with error message or the order details
+     *
+     * @see marketBuy()
      */
     public function marketQuoteBuyTest(string $symbol, $quantity, array $flags = [])
     {
@@ -284,13 +286,13 @@ class API
     /**
      * marketBuyTest attempts to create a TEST currency order at given market price.
      *
-     * @see marketBuy()
-     *
      * @param $symbol string the currency symbol
      * @param $quantity string the quantity required
      * @param $flags array addtional options for order type
      *
      * @return array with error message or the order details
+     *
+     * @see marketBuy()
      */
     public function marketBuyTest(string $symbol, $quantity, array $flags = [])
     {
@@ -339,13 +341,13 @@ class API
     /**
      * marketQuoteSellTest attempts to create a TEST currency order at given market price.
      *
-     * @see marketSellTest()
-     *
      * @param $symbol string the currency symbol
      * @param $quantity string the quantity of the quote you want to obtain
      * @param $flags array additional options for order type
      *
      * @return array with error message or the order details
+     *
+     * @see marketSellTest()
      */
     public function marketQuoteSellTest(string $symbol, $quantity, array $flags = [])
     {
@@ -377,13 +379,13 @@ class API
     /**
      * marketSellTest attempts to create a TEST currency order at given market price.
      *
-     * @see marketSellTest()
-     *
      * @param $symbol string the currency symbol
      * @param $quantity string the quantity required
      * @param $flags array addtional options for order type
      *
      * @return array with error message or the order details
+     *
+     * @see marketSellTest()
      */
     public function marketSellTest(string $symbol, $quantity, array $flags = [])
     {
@@ -616,13 +618,13 @@ class API
             return [
                 'success'     => 1,
                 'assetDetail' => $arr,
-                ];
+            ];
         }
 
         return [
             'success'     => 0,
             'assetDetail' => [],
-            ];
+        ];
     }
 
     /**
@@ -836,7 +838,7 @@ class API
         // Wrapping in array for backwards compatibility with wapi
         $return = [
             'withdrawList' => $this->httpRequest('v1/capital/withdraw/history', 'GET', $params, true),
-            ];
+        ];
 
         // Adding for backwards compatibility with wapi
         $return['success'] = 1;
@@ -847,13 +849,13 @@ class API
     /**
      * withdrawFee - Get the withdrawal fee for an asset.
      *
-     * @property int $weight 1
-     *
      * @param string $asset (mandatory)  An asset, e.g. BTC
      *
      * @throws \Exception
      *
      * @return array containing the response
+     *
+     * @property int $weight 1
      */
     public function withdrawFee(string $asset)
     {
@@ -1068,6 +1070,30 @@ class API
         return $this->balanceData($account, $priceData);
     }
 
+    public function checkApiKeys(): bool
+    {
+        $apiRestrictions = $this->httpRequest('v1/account/apiRestrictions', 'GET', [
+            'timestamp' => $this->getTimestamp(),
+            'sapi'      => 'true',
+        ], true);
+        if (false === is_array($apiRestrictions)) {
+            return false;
+        }
+        if (empty($apiRestrictions['enableReading'])) {
+            return false;
+        }
+        if ((true === $apiRestrictions['ipRestrict']) || !isset($apiRestrictions['ipRestrict'])) {
+            return false;
+        }
+        foreach ($apiRestrictions as $key => $value) {
+            if ('enableReading' !== $key && 'ipRestrict' !== $key && true === $value) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * coins get list coins.
      *
@@ -1174,11 +1200,6 @@ class API
      * order formats the orders before sending them to the curl wrapper function
      * You can call this function directly or use the helper functions.
      *
-     * @see buy()
-     * @see sell()
-     * @see marketBuy()
-     * @see marketSell() $this->httpRequest( "https://api.binance.com/api/v1/ticker/24hr");
-     *
      * @param $side string typically "BUY" or "SELL"
      * @param $symbol string to buy or sell
      * @param $quantity string in the order
@@ -1190,6 +1211,11 @@ class API
      * @throws \Exception
      *
      * @return array containing the response
+     *
+     * @see buy()
+     * @see sell()
+     * @see marketBuy()
+     * @see marketSell() $this->httpRequest( "https://api.binance.com/api/v1/ticker/24hr");
      */
     public function order(string $side, string $symbol, $quantity, $price, string $type = 'LIMIT', array $flags = [], bool $test = false)
     {
@@ -1418,9 +1444,9 @@ class API
     {
         $output = '';
         foreach ([
-            'asks',
-            'bids',
-        ] as $type) {
+                     'asks',
+                     'bids',
+                 ] as $type) {
             $entries = $array[$type];
             if ('asks' === $type) {
                 $entries = array_reverse($entries);
@@ -2151,9 +2177,9 @@ class API
         $arr        = [];
         $api_status = $this->httpRequest('v3/ping', 'GET');
         if (empty($api_status)) {
-            $arr['api']['status']  = 'ping ok';
+            $arr['api']['status'] = 'ping ok';
         } else {
-            $arr['api']['status']  = $api_status;
+            $arr['api']['status'] = $api_status;
         }
 
         $arr['sapi'] = $this->httpRequest('v1/system/status', 'GET', ['sapi' => true], true);
@@ -2186,7 +2212,7 @@ class API
         $params = [
             'sapi' => true,
             'type' => $type,
-            ];
+        ];
 
         if ($startTime > 0) {
             $params['startTime'] = $startTime;
@@ -2348,11 +2374,6 @@ class API
      * httpRequest curl wrapper for all http api requests.
      * You can't call this function directly, use the helper functions.
      *
-     * @see buy()
-     * @see sell()
-     * @see marketBuy()
-     * @see marketSell() $this->httpRequest( "https://api.binance.com/api/v1/ticker/24hr");
-     *
      * @param $url string the endpoint to query, typically includes query string
      * @param $method string this should be typically GET, POST or DELETE
      * @param $params array addtional options for the request
@@ -2361,6 +2382,11 @@ class API
      * @throws \Exception
      *
      * @return array containing the response
+     *
+     * @see buy()
+     * @see sell()
+     * @see marketBuy()
+     * @see marketSell() $this->httpRequest( "https://api.binance.com/api/v1/ticker/24hr");
      */
     protected function httpRequest(string $url, string $method = 'GET', array $params = [], bool $signed = false)
     {
@@ -2422,12 +2448,10 @@ class API
             curl_setopt($curl, CURLOPT_HTTPHEADER, [
                 'X-MBX-APIKEY: '.$this->api_key,
             ]);
-        }
-        // params so buildquery string and append to url
+        } // params so buildquery string and append to url
         elseif (count($params) > 0) {
             curl_setopt($curl, CURLOPT_URL, $this->getRestEndpoint().$url.'?'.$query);
-        }
-        // no params so just the base url
+        } // no params so just the base url
         else {
             curl_setopt($curl, CURLOPT_URL, $this->getRestEndpoint().$url);
             curl_setopt($curl, CURLOPT_HTTPHEADER, [
@@ -2996,6 +3020,11 @@ class API
     protected function setXMbxUsedWeight1m(int $usedWeight1m): void
     {
         $this->xMbxUsedWeight1m = $usedWeight1m;
+    }
+
+    private function getTimestamp(): int
+    {
+        return (int) (microtime(true) * 1000);
     }
 
     private function getRestEndpoint(): string
