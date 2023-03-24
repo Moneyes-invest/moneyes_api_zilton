@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Repository\AccountRepository;
 use App\State\AccountDetailProvider;
+use App\State\PostAccountProcessor;
 use App\State\SyncProvider;
 use App\State\SyncStatusProvider;
 use App\State\UpdateAccountProvider;
@@ -62,7 +63,9 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: 'is_granted("ROLE_ADMIN")',
             provider: SyncStatusProvider::class,
         ),
-        new Post(),
+        new Post(
+            processor: PostAccountProcessor::class,
+        ),
     ],
     denormalizationContext: ['groups' => ['create:account', 'update:account']],
 )]
@@ -101,7 +104,7 @@ class Account
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]
-    private?string $publicKey = null;
+    private ?string $publicKey = null;
 
     #[ORM\ManyToOne(inversedBy: 'account')]
     #[ORM\JoinColumn(nullable: false)]
