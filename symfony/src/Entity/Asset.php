@@ -23,29 +23,24 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: AssetRepository::class)]
 class Asset
 {
+    #[ORM\Column(length: 255)]
     #[ORM\Id]
-    #[ORM\Column(type: UuidType::NAME, unique: true)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private Uuid $id;
+    private string $id;
 
-    #[ORM\Column(type: 'string', length: 10, unique: true)]
+    #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank]
-    #[Assert\Length(min: 3, max: 10)]
-    #[Assert\Regex(pattern: '/^[A-Z]{3,10}$/')]
     private string $code;
 
     #[ORM\ManyToMany(targetEntity: Exchange::class, inversedBy: 'assets')]
     private Collection $exchange;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $name = null;
+
+
     public function __construct()
     {
         $this->exchange = new ArrayCollection();
-    }
-
-    public function getId(): Uuid
-    {
-        return $this->id;
     }
 
     /**
@@ -80,6 +75,30 @@ class Asset
     public function setCode(string $code): self
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function setId(string $id): self
+    {
+        $this->id = $id;
 
         return $this;
     }

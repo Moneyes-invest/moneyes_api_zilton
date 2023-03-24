@@ -36,3 +36,5 @@ symfonyyarn-error.log
 ###> lexik/jwt-authentication-bundle ###
 /symfony/config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
+
+catch_me.pem
