@@ -35,8 +35,9 @@ class AccountAssetReturn(models.Model):
 
 
 class Asset(models.Model):
-    id = models.UUIDField(primary_key=True)
-    code = models.CharField(unique=True, max_length=10)
+    id = models.CharField(primary_key=True, max_length=255)
+    code = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False

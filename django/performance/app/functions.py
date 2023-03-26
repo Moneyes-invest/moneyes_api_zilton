@@ -97,7 +97,6 @@ def calculate_holdings(transactions: object, update=False) -> object:
         price = get_price(asset, end)
 
         PEd = price
-        PEdm1 = price
 
         # Calculate Value Start Day = Value End Day -1
         VSd = VEd
@@ -187,7 +186,11 @@ def save_holding(date, account_id, quantity, asset_id, return_on_investment):
 
 def get_price(asset: object, timestamp: int) -> float:
     # Check if price exists in asset_prices
+    timestamp = timestamp + 1 # Convert 23:59:59 to 00:00:00 (for CoinGecko)
     timestamp_seconds = int(timestamp / 1000)
+
+
+    # ADD Asset Price (Default EUR)
 
     try:
         asset_price = AssetPrices.objects.get(asset=asset, timestamp=timestamp)
