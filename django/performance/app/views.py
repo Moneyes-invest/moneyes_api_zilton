@@ -13,16 +13,6 @@ class HoldingsViewSet(viewsets.ModelViewSet):
 
     @staticmethod
     def generate_holdings(request, id):
-        cg = CoinGeckoAPI()
-        # prices = cg.get_coin_market_chart_by_id(id='bitcoin', vs_currency='usd', days=1)
-
-        price = Prices([Asset.objects.get(id='bitcoin'), Asset.objects.get(id='ethereum')])
-        price.start()
-
-
-        return Response('fetched')
-
-        """
         return_value = []
 
         # Get all transactions for account and group by asset
@@ -47,4 +37,3 @@ class HoldingsViewSet(viewsets.ModelViewSet):
             return_value.append(holdings)
 
         return Response(return_value)
-        """

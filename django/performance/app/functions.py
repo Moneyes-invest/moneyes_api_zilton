@@ -1,5 +1,5 @@
 from datetime import datetime, time
-from app.models import Transaction, Holding, Transfer, Asset, AssetPrices, AccountAssetReturn
+from app.models import Transaction, Holding, Transfer, Asset, AssetPrices, AccountAssetReturn, Prices
 import pandas as pd
 from pycoingecko import CoinGeckoAPI
 import requests
@@ -153,7 +153,7 @@ def calculate_holdings(transactions: object, update=False) -> object:
         save_holding(end_date, first_transaction.account.id, THd, asset.id, r)
 
         return_value.append(
-            asset.code + " -- "+ str(end_date) + " => VSD " + str(VSd) + " | VED : " + str(VEd) + " : " + str(Cd) + " : " + str(r) + "%")
+            asset.code + " -- "+ str(price) + " -- " + str(end_date) + " => VSD " + str(VSd) + " | VED : " + str(VEd) + " : " + str(Cd) + " : " + str(r) + "%")
 
 
         # Save account asset return
@@ -187,28 +187,10 @@ def save_holding(date, account_id, quantity, asset_id, return_on_investment):
 def get_price(asset: object, timestamp: int) -> float:
     # Check if price exists in asset_prices
     timestamp = timestamp + 1 # Convert 23:59:59 to 00:00:00 (for CoinGecko)
-    timestamp_seconds = int(timestamp / 1000)
 
-
-    # ADD Asset Price (Default EUR)
-
-    try:
-        asset_price = AssetPrices.objects.get(asset=asset, timestamp=timestamp)
-        return asset_price.price
-    except AssetPrices.DoesNotExist:
-        asset_symbol = asset.code
-        response = requests.get(
-            f'https://min-api.cryptocompare.com/data/v2/histohour?fsym={asset_symbol}&tsym=USD&limit=1&toTs={timestamp_seconds}')
-        data = response.json()
-        if data['Response'] == 'Error':
-            return 0
-        else:
-            price = data['Data']['Data'][0]['close']
-            # Save price in asset_prices
-            asset_price = AssetPrices(asset=asset, timestamp=timestamp, price=price, asset_price='USD')
-            asset_price.save()
-            return price
-
+    price = Prices([asset])
+    price.start()
+    return price.get_price(asset, timestamp)
 
 def account_asset_return(account: object, asset: object, date: datetime, return_on_investment: float = 0.0000001, previous_return: float = 0.0000001):
 
