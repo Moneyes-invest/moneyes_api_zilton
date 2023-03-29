@@ -364,8 +364,8 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         }
 
         $transfer->setType($type);
-
-        $asset = $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['code' => $transferValue['coin']]);
+        $code = strtolower($transferValue['coin']);
+        $asset = $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['code' => $code]);
         if (null === $asset) {
             $asset = new Asset();
             $asset->setCode($transferValue['coin']);
@@ -449,7 +449,7 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
     /**
      * @throws \Exception
      */
-    private function customerBinanceApi(Account $account): RateLimiter
+    public function customerBinanceApi(Account $account): RateLimiter
     {
         $api = new API($account->getPublicKey(), $account->getPrivateKey());
 
