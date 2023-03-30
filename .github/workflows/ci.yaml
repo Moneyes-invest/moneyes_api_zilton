@@ -32,7 +32,7 @@ jobs:
                     done
                     exit 1
             -   name: Check HTTP reachability
-                run: curl -v -o /dev/null http://localhost:8080
+                run: curl -v -o /dev/null http://localhost
             -   name: Run PHPUnit tests
                 id: phpunit
                 continue-on-error: true
