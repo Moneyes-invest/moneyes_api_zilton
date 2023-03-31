@@ -365,7 +365,8 @@ class BinanceAccountRepository extends AccountRepository // implements AccountIn
         $asset = $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['code' => $code]);
         if (null === $asset) {
             $asset = new Asset();
-            $asset->setCode($transferValue['coin']);
+            $asset->setCode($code);
+            $asset->setId($code);
             $this->getEntityManager()->persist($asset);
             $this->getEntityManager()->flush();
         }
