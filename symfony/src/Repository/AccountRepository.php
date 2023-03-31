@@ -43,6 +43,7 @@ class AccountRepository extends ServiceEntityRepository
             $balance[] = [
                 'asset'   => $holding->getAsset()->getCode(),
                 'balance' => $holding->getQuantity(),
+                'asset_return' => 0,
             ];
         }
 

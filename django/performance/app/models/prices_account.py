@@ -37,13 +37,16 @@ class Prices:
                 self.fetch_prices(asset)
             continue
 
-    def fetch_prices(self, asset, date=None):
+    def fetch_prices(self, asset, date=None, interval='daily'):
         if date is None:
             date = 'max'
         else:
             date = date
-        prices = self.cg.get_coin_market_chart_by_id(id=asset.id, vs_currency='eur', days=date)
-        prices = prices['prices']
+        try:
+            prices = self.cg.get_coin_market_chart_by_id(id=asset.id, vs_currency='eur', days=date, interval=interval)
+            prices = prices['prices']
+        except Exception:
+            prices = []
         for price in prices:
             # check if price already exist
             try:

@@ -14,6 +14,7 @@ namespace App\Repository;
 use App\Binance\API;
 use App\Binance\RateLimiter;
 use App\Entity\Account;
+use App\Entity\AccountAssetReturn;
 use App\Entity\Asset;
 use App\Entity\BinanceAccount;
 use App\Entity\Holding;

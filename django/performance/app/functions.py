@@ -157,10 +157,10 @@ def calculate_holdings(transactions: object, update=False) -> object:
 
 
         # Save account asset return
-        if r == 0:
-            r = 0.0000001
+        # if r == 0:
+        #    r = 0.0000001
 
-        account_asset_return( first_transaction.account, asset, end_date, r, previous_return)
+        # account_asset_return( first_transaction.account, asset, end_date, r, previous_return)
 
 
         # create_holdings(day_transactions)
@@ -188,23 +188,34 @@ def get_price(asset: object, timestamp: int) -> float:
     # Check if price exists in asset_prices
     timestamp = timestamp + 1 # Convert 23:59:59 to 00:00:00 (for CoinGecko)
 
+
+
     price = Prices([asset])
     price.start()
     return price.get_price(asset, timestamp)
 
-def account_asset_return(account: object, asset: object, date: datetime, return_on_investment: float = 0.0000001, previous_return: float = 0.0000001):
+def account_asset_return(account: object, asset: object):
 
-    account_asset_return_value = previous_return / return_on_investment
+    # Get all holdings for this account and asset
+    holdings = Holding.objects.filter(account=account, asset=asset).order_by('date')
 
-    # If AccountAssetReturn exists for this account and asset
-    try:
-        account_asset_return = AccountAssetReturn.objects.get(account=account, asset=asset)
-        account_asset_return.return_on_investment = account_asset_return_value
-        account_asset_return.date = date
-        account_asset_return.save()
-    except AccountAssetReturn.DoesNotExist:
-        # Create new AccountAssetReturn
-        account_asset_return = AccountAssetReturn(account=account, asset=asset, return_on_investment=account_asset_return_value, date=date)
-        account_asset_return.save()
+    return_asset_account = 1
+    # get first holding.return_on_investment
+    return_holding = holdings.first().return_on_investment
 
-    return account_asset_return_value
+    for holding in holdings:
+        # Check if it is the last holding
+        if holding == holdings.last():
+            break
+        next_holding = holdings.filter(date__gt=holding.date).first()
+        next_holding = next_holding.return_on_investment
+        if return_holding == 0:
+            return_holding = 0.0000001
+        return_asset_account = (((return_holding + next_holding) / 100 ) + ((return_holding / 100) * (next_holding / 100))) * 100
+        return_holding = next_holding
+
+
+    account_asset_return = AccountAssetReturn(account=account, asset=asset, return_on_investment=return_asset_account, date=holdings.last().date)
+    account_asset_return.save()
+
+    return account_asset_return
