@@ -21,8 +21,8 @@ class ProfileProvider implements ProviderInterface
 {
     public function __construct(
         private readonly Security $security,
-        #[Autowire('@api_platform.doctrine.orm.state.item_provider')]
-        private readonly ProviderInterface $ormProvider
+        // #[Autowire('@api_platform.doctrine.orm.state.item_provider')]
+        // private readonly ProviderInterface $ormProvider
     ) {
     }
 
@@ -34,8 +34,8 @@ class ProfileProvider implements ProviderInterface
         }
         $uriVariables['id'] = $user->getId()->toRfc4122();
 
-        /** @var User $provide */
-        //$provide = $this->ormProvider->provide($operation, $uriVariables, $context);
+        // /** @var User $provide */
+        // $provide = $this->ormProvider->provide($operation, $uriVariables, $context);
 
         return $user;
     }

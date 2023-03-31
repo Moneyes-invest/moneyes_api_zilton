@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Entity;
 
 use App\Repository\HoldingRepository;
@@ -30,7 +39,7 @@ class Holding
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column]
-    private ?float $return_on_investment = null;
+    private ?float $returnOnInvestment = null;
 
     public function getId(): ?int
     {
@@ -87,12 +96,12 @@ class Holding
 
     public function getReturnOnInvestment(): ?float
     {
-        return $this->return__on_investment;
+        return $this->returnOnInvestment;
     }
 
-    public function setReturnOnInvestment(float $return__on_investment): self
+    public function setReturnOnInvestment(float $returnOnInvestment): self
     {
-        $this->return__on_investment = $return__on_investment;
+        $this->returnOnInvestment = $returnOnInvestment;
 
         return $this;
     }

@@ -573,8 +573,6 @@ class API
         return $this->httpRequest('v3/time');
     }
 
-
-
     /**
      * exchangeInfo Gets the complete exchange info, including limits, currency options etc.
      *

@@ -1,5 +1,14 @@
 <?php
 
+declare(strict_types = 1);
+
+/*
+ * This file is part of the Moneyes API project.
+ * (c) Moneyes
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Entity;
 
 use App\Repository\AssetPricesRepository;
@@ -25,7 +34,7 @@ class AssetPrices
     private ?float $price = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $asset_price = null;
+    private ?string $assetPrice = null;
 
     public function getId(): ?int
     {
@@ -70,12 +79,12 @@ class AssetPrices
 
     public function getAssetPrice(): ?string
     {
-        return $this->asset_price;
+        return $this->assetPrice;
     }
 
-    public function setAssetPrice(string $asset_price): self
+    public function setAssetPrice(string $assetPrice): self
     {
-        $this->asset_price = $asset_price;
+        $this->assetPrice = $assetPrice;
 
         return $this;
     }

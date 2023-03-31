@@ -181,7 +181,7 @@ def save_holding(date, account_id, quantity, asset_id, return_on_investment):
         holding = Holding.objects.get(date=date, account_id=account_id, asset_id=asset_id)
     except Holding.DoesNotExist:
         # Create new holding
-        new_holding = Holding(date=date, account_id=account_id, quantity=quantity, asset_id=asset_id, return_on_investment=return_on_investment)
+        new_holding = Holding(date=date, account_id=account_id, quantity=quantity, asset_id=asset_id, returnOnInvestment=return_on_investment)
         new_holding.save()
 
 def get_price(asset: object, timestamp: int) -> float:
@@ -201,21 +201,21 @@ def account_asset_return(account: object, asset: object):
 
     return_asset_account = 1
     # get first holding.return_on_investment
-    return_holding = holdings.first().return_on_investment
+    return_holding = holdings.first().returnOnInvestment
 
     for holding in holdings:
         # Check if it is the last holding
         if holding == holdings.last():
             break
         next_holding = holdings.filter(date__gt=holding.date).first()
-        next_holding = next_holding.return_on_investment
+        next_holding = next_holding.returnOnInvestment
         if return_holding == 0:
             return_holding = 0.0000001
         return_asset_account = (((return_holding + next_holding) / 100 ) + ((return_holding / 100) * (next_holding / 100))) * 100
         return_holding = next_holding
 
 
-    account_asset_return = AccountAssetReturn(account=account, asset=asset, return_on_investment=return_asset_account, date=holdings.last().date)
+    account_asset_return = AccountAssetReturn(account=account, asset=asset, returnOnInvestment=return_asset_account, date=holdings.last().date)
     account_asset_return.save()
 
     return account_asset_return
