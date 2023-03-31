@@ -139,7 +139,7 @@ VOLUME /srv/app/var
 
 
 COPY ./docker/db/ /tmp/db
-RUN chmod +x /tmp/db/export-tables.sh
+# RUN chmod +x /tmp/db/export-tables.sh
 RUN chmod +x /tmp/db/load-tables.sh
 
 

@@ -43,7 +43,6 @@ class AppFixtures extends Fixture implements FixtureGroupInterface, DependentFix
     {
         return [
             ExchangesFixturesProd::class,
-            SymbolsFixtures::class,
             UsersFixturesProd::class,
         ];
     }
