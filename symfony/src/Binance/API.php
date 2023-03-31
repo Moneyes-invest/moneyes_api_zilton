@@ -582,10 +582,10 @@ class API
      *
      * @return array with error message or exchange info array
      */
-    public function exchangeInfo()
+    public function exchangeInfo(array $params = []): array
     {
         if (!$this->exchangeInfo) {
-            $arr = $this->httpRequest('v3/exchangeInfo');
+            $arr = $this->httpRequest('v3/exchangeInfo', 'GET', $params);
 
             $this->exchangeInfo            = $arr;
             $this->exchangeInfo['symbols'] = null;

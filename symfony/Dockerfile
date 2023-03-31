@@ -137,6 +137,12 @@ FROM php as php_dev
 ENV APP_ENV=dev XDEBUG_MODE=off
 VOLUME /srv/app/var
 
+
+COPY ./docker/db/ /tmp/db
+RUN chmod +x /tmp/db/export-tables.sh
+RUN chmod +x /tmp/db/load-tables.sh
+
+
 RUN mv "$PHP_INI_DIR/php.ini" "$PHP_INI_DIR/php.ini-production"; \
 	mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 

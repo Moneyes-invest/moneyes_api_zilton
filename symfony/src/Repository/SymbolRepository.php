@@ -11,6 +11,7 @@ declare(strict_types = 1);
 
 namespace App\Repository;
 
+use App\Binance\API;
 use App\Entity\Asset;
 use App\Entity\Symbol;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -49,17 +50,28 @@ class SymbolRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function findAsset(string $codeSymbol): ?Asset
     {
-        # for i in 0 len(codeSymbol) - 1
-        for ($i = 0; $i < strlen($codeSymbol) - 1; $i++) {
-            $asset = $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['code' => substr($codeSymbol, 0, $i + 1)]);
+        $base = $this->getAssetAndQuoteFromSymbol($codeSymbol)['base'];
+        $base = strtolower($base);
 
-            if ($asset) {
-                return $asset;
-            }
-        }
-        return null;
+        return $this->getEntityManager()->getRepository(Asset::class)->findOneBy(['code' => $base]);
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function getAssetAndQuoteFromSymbol(string $symbol): array
+    {
+        $api          = new API('', '');
+        $exchangeInfo = $api->exchangeInfo();
+
+        return [
+            'base'  => $exchangeInfo['symbols'][$symbol]['baseAsset'],
+            'quote' => $exchangeInfo['symbols'][$symbol]['quoteAsset'],
+        ];
+    }
 }

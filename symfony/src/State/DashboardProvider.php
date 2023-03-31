@@ -14,9 +14,10 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
+use App\Entity\AccountAssetReturn;
+use App\Entity\Asset;
 use App\Entity\BinanceAccount;
 use App\Entity\Holding;
-use App\Entity\Symbol;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -50,25 +51,50 @@ class DashboardProvider implements ProviderInterface
                 $exchangeLabel = $account->getExchange()->getLabel();
             }
 
+            // Get account return
+            $accountReturnsAssets = $this->manager->getRepository(AccountAssetReturn::class)->findBy(['account' => $account]);
+
             // If account exchangeLabel is Binance
             if ('Binance' === $exchangeLabel) {
-                $balanceBinance = $this->manager->getRepository(BinanceAccount::class)->getAssets($account);
-                $returnArray[]  = [
-                    'exchange' => $exchangeLabel,
-                    'account_name' => 'Binance',
-                    'account_id' => $account->getId(),
-                    'balance'  => $balanceBinance,
-                ];
+                $balance = $this->manager->getRepository(BinanceAccount::class)->getAssets($account);
             } else {
                 // Get recent holdings for this account for each asset
-                //$holdings      = $this->manager->getRepository(Account::class)->getBalance($account);
-                $returnArray[] = [
-                    'exchange' => $exchangeLabel,
-                    'account_name' => $account->getName(),
-                    'account_id' => $account->getId(),
-                    'balance'  => [],
-                ];
+                $balance      = $this->manager->getRepository(Account::class)->getBalance($account);
             }
+
+            // foreach balance, add 'asset_return' => 0
+            foreach ($balance as $key => $value) {
+                $assetCode = $value['asset'];
+                $assetCode = strtolower($assetCode);
+                $assetId   = $this->manager->getRepository(Asset::class)->findOneBy(['code' => $assetCode]);
+                if (!$assetId instanceof Asset) {
+                    $assetId = '';
+                } else {
+                    $assetId = $assetId->getId();
+                }
+                $balance[$key]['asset_id'] = $assetId;
+                // check if asset.code == assetCode in accountReturnsAssets
+                foreach ($accountReturnsAssets as $accountReturnsAsset) {
+                    $balance[$key]['asset_return'] = 0;
+                    if (!$accountReturnsAsset instanceof AccountAssetReturn) {
+                        continue;
+                    }
+                    $assetReturnCode = $accountReturnsAsset->getAsset()->getCode();
+                    $assetReturnCode = strtolower($assetReturnCode);
+                    if ($assetReturnCode === $assetCode) {
+                        $return                        = $accountReturnsAsset->getReturnOnInvestment();
+                        $return                        = round($return, 2);
+                        $balance[$key]['asset_return'] = $return;
+                    }
+                }
+            }
+
+            $returnArray[]  = [
+                'exchange'   => $exchangeLabel,
+                'account_id' => $account->getId(),
+                // 'account_return' => $accountReturn,
+                'balance'  => $balance,
+            ];
 
             /*
             $holdingRepository = $this->manager->getRepository(Holding::class);
@@ -87,7 +113,6 @@ class DashboardProvider implements ProviderInterface
         }
 
         return $returnArray;
-
         /*
         return [
             'accounts' => $accountArray,

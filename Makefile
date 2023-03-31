@@ -230,3 +230,10 @@ load-fixtures-prod:
 
 load-fixtures-dev:
 	$(SYMFONY) doctrine:fixtures:load --group=dev --no-interaction
+
+
+export-tables:
+	$(EXEC_PG) /tmp/db/export-tables.sh
+
+load-tables:
+	$(EXEC_PG) /tmp/db/load-tables.sh

@@ -1,9 +1,11 @@
 from datetime import datetime, time
-from app.models import Transaction, Holding, Transfer, Asset, AssetPrices, AccountAssetReturn
+from app.models import Transaction, Holding, Transfer, Asset, AssetPrices, AccountAssetReturn, Prices
 import pandas as pd
 from pycoingecko import CoinGeckoAPI
 import requests
 from django.db import connection
+import json
+from django.core import serializers
 
 
 # function test with update parameter boolean default to false
@@ -13,6 +15,8 @@ def calculate_holdings(transactions: object, update=False) -> object:
     transactions = transactions.order_by('-date')
     # Get first transaction
     first_transaction = transactions.last()
+
+    # check if last holding exists
 
     last_holding = Holding.objects.filter(account=transactions[0].account, asset=transactions[0].asset).order_by('-date').first()
 
@@ -41,6 +45,7 @@ def calculate_holdings(transactions: object, update=False) -> object:
     index = 0
     price = 0
     previous_return = 0.0000001
+    THd = 0
 
 
     # Find asset with symbol
@@ -82,16 +87,9 @@ def calculate_holdings(transactions: object, update=False) -> object:
         # Calculate Total Holdings last day
         end_date_last_day = end - 86400000
         end_date_last_day = datetime.fromtimestamp(end_date_last_day / 1000)
-        try:
-            THdm1 = Holding.objects.filter(date=end_date_last_day).last()
-            if THdm1 is None:
-                THdm1 = 0
-            else:
-                THdm1 = THdm1.quantity
-        except Holding.DoesNotExist:
-            THdm1 = 0
 
-        # Calculate Total Holdings Day
+
+        THdm1 = THd
         THd = THdm1 + Sqn + Sqm
 
         # ---- Get Price ----
@@ -99,16 +97,16 @@ def calculate_holdings(transactions: object, update=False) -> object:
         price = get_price(asset, end)
 
         PEd = price
-        PEdm1 = price
 
         # Calculate Value Start Day = Value End Day -1
         VSd = VEd
+        """
         if VSd == 0:
             if day_transactions.last() is not None:
                 VSd = day_transactions.last().quantity * day_transactions.last().price
             else:
                 VSd = 0
-
+        """
         VEd = THd * PEd
 
         # ---- Calculate Cash-flow for this day ----
@@ -155,14 +153,14 @@ def calculate_holdings(transactions: object, update=False) -> object:
         save_holding(end_date, first_transaction.account.id, THd, asset.id, r)
 
         return_value.append(
-            asset.code + " -- "+ str(end_date) + " => " + str(VSd) + " : " + str(VEd) + " : " + str(Cd) + " : " + str(r) + "%")
+            asset.code + " -- "+ str(price) + " -- " + str(end_date) + " => VSD " + str(VSd) + " | VED : " + str(VEd) + " : " + str(Cd) + " : " + str(r) + "%")
 
 
         # Save account asset return
-        if r == 0:
-            r = 0.0000001
+        # if r == 0:
+        #    r = 0.0000001
 
-        account_asset_return( first_transaction.account, asset, end_date, r, previous_return)
+        # account_asset_return( first_transaction.account, asset, end_date, r, previous_return)
 
 
         # create_holdings(day_transactions)
@@ -183,51 +181,41 @@ def save_holding(date, account_id, quantity, asset_id, return_on_investment):
         holding = Holding.objects.get(date=date, account_id=account_id, asset_id=asset_id)
     except Holding.DoesNotExist:
         # Create new holding
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                INSERT INTO holding (date, account_id, quantity, asset_id, return_on_investment)
-                VALUES (%s, %s, %s, %s, %s)
-                """,
-                (date, account_id, quantity, asset_id, return_on_investment)
-            )
-
+        new_holding = Holding(date=date, account_id=account_id, quantity=quantity, asset_id=asset_id, returnOnInvestment=return_on_investment)
+        new_holding.save()
 
 def get_price(asset: object, timestamp: int) -> float:
     # Check if price exists in asset_prices
-    timestamp_seconds = int(timestamp / 1000)
-
-    try:
-        asset_price = AssetPrices.objects.get(asset=asset, timestamp=timestamp)
-        return asset_price.price
-    except AssetPrices.DoesNotExist:
-        asset_symbol = asset.code
-        response = requests.get(
-            f'https://min-api.cryptocompare.com/data/v2/histohour?fsym={asset_symbol}&tsym=USD&limit=1&toTs={timestamp_seconds}')
-        data = response.json()
-        if data['Response'] == 'Error':
-            return 0
-        else:
-            price = data['Data']['Data'][0]['close']
-            # Save price in asset_prices
-            asset_price = AssetPrices(asset=asset, timestamp=timestamp, price=price)
-            asset_price.save()
-            return price
+    timestamp = timestamp + 1 # Convert 23:59:59 to 00:00:00 (for CoinGecko)
 
 
-def account_asset_return(account: object, asset: object, date: datetime, return_on_investment: float = 0.0000001, previous_return: float = 0.0000001):
 
-    account_asset_return_value = previous_return / return_on_investment
+    price = Prices([asset])
+    price.start()
+    return price.get_price(asset, timestamp)
 
-    # If AccountAssetReturn exists for this account and asset
-    try:
-        account_asset_return = AccountAssetReturn.objects.get(account=account, asset=asset)
-        account_asset_return.return_on_investment = account_asset_return_value
-        account_asset_return.date = date
-        account_asset_return.save()
-    except AccountAssetReturn.DoesNotExist:
-        # Create new AccountAssetReturn
-        account_asset_return = AccountAssetReturn(account=account, asset=asset, return_on_investment=account_asset_return_value, date=date)
-        account_asset_return.save()
+def account_asset_return(account: object, asset: object):
 
-    return account_asset_return_value
+    # Get all holdings for this account and asset
+    holdings = Holding.objects.filter(account=account, asset=asset).order_by('date')
+
+    return_asset_account = 1
+    # get first holding.return_on_investment
+    return_holding = holdings.first().returnOnInvestment
+
+    for holding in holdings:
+        # Check if it is the last holding
+        if holding == holdings.last():
+            break
+        next_holding = holdings.filter(date__gt=holding.date).first()
+        next_holding = next_holding.returnOnInvestment
+        if return_holding == 0:
+            return_holding = 0.0000001
+        return_asset_account = (((return_holding + next_holding) / 100 ) + ((return_holding / 100) * (next_holding / 100))) * 100
+        return_holding = next_holding
+
+
+    account_asset_return = AccountAssetReturn(account=account, asset=asset, returnOnInvestment=return_asset_account, date=holdings.last().date)
+    account_asset_return.save()
+
+    return account_asset_return
