@@ -97,13 +97,11 @@ class Account
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]
-    #[Assert\NotBlank(groups: ['create:account'])]
-    private string $privateKey;
+    private ?string $privateKey = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]
-    #[Assert\NotBlank(groups: ['create:account'])]
-    private string $publicKey;
+    private?string $publicKey = null;
 
     #[ORM\ManyToOne(inversedBy: 'account')]
     #[ORM\JoinColumn(nullable: false)]
@@ -119,6 +117,7 @@ class Account
     private Collection $transfers;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['get:account', 'create:account'])]
     private ?string $name = null;
 
     public function __construct()
@@ -160,7 +159,7 @@ class Account
         return $this;
     }
 
-    public function getPrivateKey(): string
+    public function getPrivateKey(): ?string
     {
         return $this->privateKey;
     }
@@ -172,7 +171,7 @@ class Account
         return $this;
     }
 
-    public function getPublicKey(): string
+    public function getPublicKey(): ?string
     {
         return $this->publicKey;
     }
