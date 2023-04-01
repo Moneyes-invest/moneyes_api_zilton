@@ -74,8 +74,8 @@ class DashboardProvider implements ProviderInterface
                 }
                 $balance[$key]['asset_id'] = $assetId;
                 // check if asset.code == assetCode in accountReturnsAssets
+                $balance[$key]['asset_return'] = 0;
                 foreach ($accountReturnsAssets as $accountReturnsAsset) {
-                    $balance[$key]['asset_return'] = 0;
                     if (!$accountReturnsAsset instanceof AccountAssetReturn) {
                         continue;
                     }
