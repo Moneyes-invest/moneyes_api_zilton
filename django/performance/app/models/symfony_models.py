@@ -27,7 +27,7 @@ class AccountAssetReturn(models.Model):
     account = models.ForeignKey(Account, models.DO_NOTHING)
     asset = models.ForeignKey('Asset', models.DO_NOTHING)
     date = models.DateTimeField()
-    returnOnInvestment = models.FloatField()
+    return_on_investment = models.FloatField()
 
     class Meta:
         managed = False
@@ -59,7 +59,7 @@ class AssetPrices(models.Model):
     asset = models.ForeignKey(Asset, models.DO_NOTHING)
     timestamp = models.BigIntegerField()
     price = models.FloatField()
-    assetPrice = models.CharField(max_length=255)
+    asset_price = models.CharField(max_length=255)
 
     class Meta:
         managed = False
@@ -130,7 +130,7 @@ class Holding(models.Model):
     asset = models.ForeignKey(Asset, models.DO_NOTHING)
     quantity = models.FloatField()
     date = models.DateTimeField()
-    returnOnInvestment = models.FloatField()
+    return_on_investment = models.FloatField()
 
     class Meta:
         managed = False
