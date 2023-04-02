@@ -29,13 +29,15 @@ class PostAccountProcessor implements ProcessorInterface
         $publicKey  = $data->getPublicKey();
         $privateKey = $data->getPrivateKey();
         $client     = new API($publicKey, $privateKey);
-        try {
-            $client->accountStatus();
-        } catch (\Exception $e) {
-            throw new NotFoundHttpException('Invalid credentials :'.$e->getMessage());
-        }
-        if (!$client->checkApiKeys()) {
-            throw new NotAcceptableHttpException('Invalid restrictions');
+        if ($data->getExchange()->getLabel() === 'Binance') {
+            try {
+                $client->accountStatus();
+            } catch (\Exception $e) {
+                throw new NotFoundHttpException('Invalid credentials :'.$e->getMessage());
+            }
+            if (!$client->checkApiKeys()) {
+                throw new NotAcceptableHttpException('Invalid restrictions');
+            }
         }
 
         return $this->processor->process($data, $operation, $uriVariables, $context);
