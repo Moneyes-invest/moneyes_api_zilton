@@ -1,13 +1,6 @@
 <?php
 
-declare(strict_types = 1);
-
-/*
- * This file is part of the Moneyes API project.
- * (c) Moneyes
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
@@ -17,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230324172221 extends AbstractMigration
+final class Version20230402161159 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -42,8 +35,7 @@ final class Version20230324172221 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_D66BA6549B6B5FBA ON account_asset_return (account_id)');
         $this->addSql('CREATE INDEX IDX_D66BA6545DA1941 ON account_asset_return (asset_id)');
         $this->addSql('COMMENT ON COLUMN account_asset_return.account_id IS \'(DC2Type:uuid)\'');
-        $this->addSql('CREATE TABLE asset (id VARCHAR(255) NOT NULL, code VARCHAR(10) NOT NULL, name VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_2AF5A5C77153098 ON asset (code)');
+        $this->addSql('CREATE TABLE asset (id VARCHAR(255) NOT NULL, code VARCHAR(255) NOT NULL, name VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE asset_exchange (asset_id VARCHAR(255) NOT NULL, exchange_id UUID NOT NULL, PRIMARY KEY(asset_id, exchange_id))');
         $this->addSql('CREATE INDEX IDX_5150AAF95DA1941 ON asset_exchange (asset_id)');
         $this->addSql('CREATE INDEX IDX_5150AAF968AFD1A0 ON asset_exchange (exchange_id)');
