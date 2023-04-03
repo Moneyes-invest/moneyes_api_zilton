@@ -92,6 +92,7 @@ class DashboardProvider implements ProviderInterface
             $returnArray[]  = [
                 'exchange'   => $exchangeLabel,
                 'account_id' => $account->getId(),
+                'name'       => $account->getName(),
                 // 'account_return' => $accountReturn,
                 'balance'  => $balance,
             ];
