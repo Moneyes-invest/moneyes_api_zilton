@@ -16,6 +16,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\Entity\Account;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SyncStatusProvider implements ProviderInterface
 {
@@ -31,7 +32,7 @@ class SyncStatusProvider implements ProviderInterface
         /** @var Account $account */
         $account = $this->ormProvider->provide($operation, $uriVariables, $context);
         if (!$account instanceof Account) {
-            return ['Account not found'];
+            throw new NotFoundHttpException('Account not found');
         }
         $account->checkSynchroStatus();
         $this->entityManager->flush();

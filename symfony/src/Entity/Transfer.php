@@ -11,10 +11,24 @@ declare(strict_types = 1);
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\TransferRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+#[ApiResource(
+    operations: [
+        new GetCollection(normalizationContext: ['groups' => ['get:transfers']], security: 'is_granted("ROLE_ADMIN")'),
+        new Get(normalizationContext: ['groups' => ['get:transfers', 'get:transfer']], security: 'object.getUser() == user or is_granted("ROLE_ADMIN")'),
+        new Post(
+            normalizationContext: ['groups' => ['get:transfers', 'get:transfer']],
+            denormalizationContext: ['groups' => ['post:transfers']],
+            security: 'is_granted("ROLE_ADMIN")',
+        ),
+    ]
+)]
 #[ORM\Entity(repositoryClass: TransferRepository::class)]
 class Transfer
 {

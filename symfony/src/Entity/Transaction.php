@@ -11,6 +11,12 @@ declare(strict_types = 1);
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\TransactionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,7 +25,19 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
-
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['get:transactions']],
+        ),
+        new Get(normalizationContext: ['groups' => ['get:transaction']], security: 'object.getAccount().getUser() == user or is_granted("ROLE_ADMIN")'),
+        new Post(
+            normalizationContext: ['groups' => ['get:transaction']],
+            denormalizationContext: ['groups' => ['create:transaction']],
+        ),
+    ],
+)]
+#[ApiFilter(SearchFilter::class, properties: ['account' => 'exact', 'asset' => 'exact'])]
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 class Transaction
 {
@@ -35,7 +53,7 @@ class Transaction
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private ?\DateTimeInterface $date = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'transactions')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['get:transaction', 'create:transaction'])]
     private Account $account;
@@ -74,6 +92,7 @@ class Transaction
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['get:transaction', 'get:transactions'])]
     private ?Asset $asset = null;
 
     public function getId(): ?Uuid
