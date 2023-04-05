@@ -11,6 +11,8 @@ declare(strict_types = 1);
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -119,6 +121,9 @@ class Account
     #[ORM\OneToMany(mappedBy: 'account', targetEntity: Transfer::class, orphanRemoval: true)]
     private Collection $transfers;
 
+    #[ORM\OneToMany(mappedBy: 'account', targetEntity: Transaction::class, orphanRemoval: true)]
+    private Collection $transactions;
+
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['get:account', 'create:account'])]
     private ?string $name = null;
@@ -210,6 +215,33 @@ class Account
             // set the owning side to null (unless already changed)
             if ($transfer->getAccount() === $this) {
                 $transfer->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transaction $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions->add($transaction);
+            $transaction->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transaction $transaction): self
+    {
+        if ($this->transactions->removeElement($transaction)) {
+            // set the owning side to null (unless already changed)
+            if ($transaction->getAccount() === $this) {
+                $transaction->setAccount(null);
             }
         }
 
