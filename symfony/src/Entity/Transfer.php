@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Post;
 use App\Repository\TransferRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+
 #[ApiResource(
     operations: [
         new GetCollection(normalizationContext: ['groups' => ['get:transfers']], security: 'is_granted("ROLE_ADMIN")'),

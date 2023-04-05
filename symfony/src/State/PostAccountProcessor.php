@@ -29,7 +29,7 @@ class PostAccountProcessor implements ProcessorInterface
         $publicKey  = $data->getPublicKey();
         $privateKey = $data->getPrivateKey();
         $client     = new API($publicKey, $privateKey);
-        if ($data->getExchange() !== null && $data->getExchange()->getLabel() === 'Binance') {
+        if (null !== $data->getExchange() && 'Binance' === $data->getExchange()->getLabel()) {
             try {
                 $client->accountStatus();
             } catch (\Exception $e) {
