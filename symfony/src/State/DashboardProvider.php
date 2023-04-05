@@ -21,6 +21,7 @@ use App\Entity\Holding;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DashboardProvider implements ProviderInterface
 {
@@ -32,11 +33,11 @@ class DashboardProvider implements ProviderInterface
     {
         $user           = $this->security->getUser();
         if (!$user instanceof User) {
-            return ["L'utilisateur n'existe pas"];
+            throw new NotFoundHttpException('User not found');
         }
         $accounts = $this->manager->getRepository(Account::class)->findBy(['user' => $user]);
         if (empty($accounts)) {
-            return ["L'utilisateur n'a pas de compte"];
+            return [];
         }
 
         $returnArray    = [];
