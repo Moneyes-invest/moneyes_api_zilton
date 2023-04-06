@@ -1,35 +1,46 @@
 <?php
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use App\Entity\User;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
-class UserTest extends ApiTestCase
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+final class UserTest extends WebTestCase
 {
-    /**
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     */
     public function testLogin(): void
     {
         $client = static::createClient();
-        $client->request('POST', '/api/login', [
-            'json' => [
+        $client->request(
+            method: 'POST',
+            uri: '/api/login',
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode([
                 'username' => 'admin@moneyes.fr',
                 'password' => 'test',
-            ],
-        ]);
+            ]));
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/json');
-        $this->assertArrayHasKey('token', $client->getResponse()->toArray());
-        $this->assertArrayHasKey('refresh_token', $client->getResponse()->toArray());
+        $this->assertResponseHeaderSame('content-type', 'application/json');
+        $this->assertJson($client->getResponse()->getContent());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('token', $data);
+        $this->assertArrayHasKey('refresh_token', $data);
+    }
+
+    public function testLoginFail(): void
+    {
+        $client = static::createClient();
+        $client->request(
+            method: 'POST',
+            uri: '/api/login',
+            server: ['CONTENT_TYPE' => 'application/json'],
+            content: json_encode([
+                'username' => ' ',
+                'password' => ' ',
+            ]));
+
+        $this->assertResponseStatusCodeSame(401);
+        $this->assertResponseHeaderSame('content-type', 'application/json');
+        $this->assertJson($client->getResponse()->getContent());
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('message', $data);
     }
 }

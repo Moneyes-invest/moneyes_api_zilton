@@ -25,8 +25,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DashboardProvider implements ProviderInterface
 {
-    public function __construct(private readonly EntityManagerInterface $manager, private readonly Security $security)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $manager,
+        private readonly Security $security
+    ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
@@ -45,13 +47,7 @@ class DashboardProvider implements ProviderInterface
             if (!$account instanceof Account) {
                 continue;
             }
-            // Check if account have exchange
-            if (!$account->getExchange()) {
-                $exchangeLabel = 'Unknown';
-            } else {
-                $exchangeLabel = $account->getExchange()->getLabel();
-            }
-
+            $exchangeLabel = !$account->getExchange() ? 'Unknown' : $account->getExchange()->getLabel();
             // Get account return
             $accountReturnsAssets = $this->manager->getRepository(AccountAssetReturn::class)->findBy(['account' => $account]);
 

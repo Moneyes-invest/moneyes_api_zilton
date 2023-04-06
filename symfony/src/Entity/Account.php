@@ -128,6 +128,7 @@ class Account
 
     public function __construct()
     {
+        $this->id        = Uuid::v4();
         $this->transfers = new ArrayCollection();
         $this->synchro   = [
             'status'    => null,

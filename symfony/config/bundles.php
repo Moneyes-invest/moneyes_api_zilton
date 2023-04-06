@@ -25,4 +25,5 @@ return [
     Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class                => ['dev' => true, 'test' => true],
     Gesdinet\JWTRefreshTokenBundle\GesdinetJWTRefreshTokenBundle::class      => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class                        => ['all' => true],
+    \DAMA\DoctrineTestBundle\DAMADoctrineTestBundle::class                   => ['dev' => true, 'test' => true],
 ];

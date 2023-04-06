@@ -118,7 +118,7 @@ class Transaction
         return $this->account;
     }
 
-    public function setAccount(Account $account): self
+    public function setAccount(?Account $account): self
     {
         $this->account = $account;
 

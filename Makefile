@@ -75,6 +75,7 @@ db: vendor
 	$(SYMFONY) doctrine:fixtures:load --group=dev --no-interaction
 	$(SYMFONY) lexik:jwt:generate-keypair --overwrite
 	$(DOCKER_COMPOSE) start django
+	$(EXEC_PG) /tmp/db/load-tables.sh
 
 migration: ## Generate a new doctrine migration
 migration: vendor
@@ -234,6 +235,3 @@ load-fixtures-dev:
 
 export-tables:
 	$(EXEC_PG) /tmp/db/export-tables.sh
-
-load-tables:
-	$(EXEC_PG) /tmp/db/load-tables.sh
