@@ -128,9 +128,10 @@ class Account
 
     public function __construct()
     {
-        $this->id        = Uuid::v4();
-        $this->transfers = new ArrayCollection();
-        $this->synchro   = [
+        $this->id           = Uuid::v4();
+        $this->transfers    = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
+        $this->synchro      = [
             'status'    => null,
             'startedAt' => null,
             'step'      => map(self::STEPS, fn ($step) => [$step => null]),

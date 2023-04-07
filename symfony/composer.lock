@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "74b51fbf0a2106a7ae03e610c6c946c4",
+    "content-hash": "cd4d16fcfdecb2e5d8b0faeea459e45c",
     "packages": [
         {
             "name": "api-platform/core",
@@ -2485,16 +2485,16 @@
         },
         {
             "name": "hyperf/engine",
-            "version": "v2.7.1",
+            "version": "v2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hyperf/engine.git",
-                "reference": "0f19a22b57c5e0b3124abe057d9ab0f60d63207a"
+                "reference": "c27d17b6a754ef11fb66cf02f439c59393a99ebc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hyperf/engine/zipball/0f19a22b57c5e0b3124abe057d9ab0f60d63207a",
-                "reference": "0f19a22b57c5e0b3124abe057d9ab0f60d63207a",
+                "url": "https://api.github.com/repos/hyperf/engine/zipball/c27d17b6a754ef11fb66cf02f439c59393a99ebc",
+                "reference": "c27d17b6a754ef11fb66cf02f439c59393a99ebc",
                 "shasum": ""
             },
             "require": {
@@ -2514,6 +2514,7 @@
                 "swoole/ide-helper": "dev-master"
             },
             "suggest": {
+                "ext-sockets": "*",
                 "ext-swoole": ">=5.0",
                 "hyperf/http-message": "Required to use ResponseEmitter.",
                 "psr/http-message": "Required to use WebSocket Frame."
@@ -2521,7 +2522,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.7-dev"
+                    "dev-master": "2.8-dev"
                 },
                 "hyperf": {
                     "config": "Hyperf\\Engine\\ConfigProvider"
@@ -2548,9 +2549,9 @@
             ],
             "support": {
                 "issues": "https://github.com/hyperf/engine/issues",
-                "source": "https://github.com/hyperf/engine/tree/v2.7.1"
+                "source": "https://github.com/hyperf/engine/tree/v2.8.0"
             },
-            "time": "2023-03-31T02:55:59+00:00"
+            "time": "2023-04-07T07:19:04+00:00"
         },
         {
             "name": "hyperf/engine-contract",
@@ -2667,16 +2668,16 @@
         },
         {
             "name": "hyperf/exception-handler",
-            "version": "v3.0.0",
+            "version": "v3.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hyperf/exception-handler.git",
-                "reference": "2c7506e82f81e8c60a8e83168b5af4b9eed05efd"
+                "reference": "f64b17e200d4364b2c28ebb272b875fe5253f30a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hyperf/exception-handler/zipball/2c7506e82f81e8c60a8e83168b5af4b9eed05efd",
-                "reference": "2c7506e82f81e8c60a8e83168b5af4b9eed05efd",
+                "url": "https://api.github.com/repos/hyperf/exception-handler/zipball/f64b17e200d4364b2c28ebb272b875fe5253f30a",
+                "reference": "f64b17e200d4364b2c28ebb272b875fe5253f30a",
                 "shasum": ""
             },
             "require": {
@@ -2718,20 +2719,20 @@
                 "pull-request": "https://github.com/hyperf/hyperf/pulls",
                 "source": "https://github.com/hyperf/hyperf"
             },
-            "time": "2022-11-01T02:50:54+00:00"
+            "time": "2023-04-01T07:19:29+00:00"
         },
         {
             "name": "hyperf/http-message",
-            "version": "v3.0.14",
+            "version": "v3.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hyperf/http-message.git",
-                "reference": "a6593ec824e2f30a7d99bf4cf7189d0a9ae5c699"
+                "reference": "99ac1e513155ad0475b735a83514b6ce94b4ea25"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hyperf/http-message/zipball/a6593ec824e2f30a7d99bf4cf7189d0a9ae5c699",
-                "reference": "a6593ec824e2f30a7d99bf4cf7189d0a9ae5c699",
+                "url": "https://api.github.com/repos/hyperf/http-message/zipball/99ac1e513155ad0475b735a83514b6ce94b4ea25",
+                "reference": "99ac1e513155ad0475b735a83514b6ce94b4ea25",
                 "shasum": ""
             },
             "require": {
@@ -2739,7 +2740,7 @@
                 "hyperf/utils": "~3.0.0",
                 "laminas/laminas-mime": "^2.7",
                 "php": ">=8.0",
-                "psr/http-message": "^1.0"
+                "psr/http-message": "^1.0|^2.0"
             },
             "suggest": {
                 "psr/container": "Required to replace RequestParserInterface."
@@ -2771,22 +2772,22 @@
             ],
             "support": {
                 "issues": "https://github.com/hyperf/http-message/issues",
-                "source": "https://github.com/hyperf/http-message/tree/v3.0.14"
+                "source": "https://github.com/hyperf/http-message/tree/v3.0.15"
             },
-            "time": "2023-03-26T14:31:08+00:00"
+            "time": "2023-04-04T13:03:06+00:00"
         },
         {
             "name": "hyperf/http-server",
-            "version": "v3.0.14",
+            "version": "v3.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hyperf/http-server.git",
-                "reference": "7978ea816d30eee5984396d7b887cda3c087c2b3"
+                "reference": "ea82fe7902d0c1d62f81676c9c3ab56f1ce14590"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hyperf/http-server/zipball/7978ea816d30eee5984396d7b887cda3c087c2b3",
-                "reference": "7978ea816d30eee5984396d7b887cda3c087c2b3",
+                "url": "https://api.github.com/repos/hyperf/http-server/zipball/ea82fe7902d0c1d62f81676c9c3ab56f1ce14590",
+                "reference": "ea82fe7902d0c1d62f81676c9c3ab56f1ce14590",
                 "shasum": ""
             },
             "require": {
@@ -2838,7 +2839,7 @@
                 "pull-request": "https://github.com/hyperf/hyperf/pulls",
                 "source": "https://github.com/hyperf/hyperf"
             },
-            "time": "2023-03-28T12:16:28+00:00"
+            "time": "2023-04-02T13:17:26+00:00"
         },
         {
             "name": "hyperf/macroable",
@@ -2890,21 +2891,22 @@
         },
         {
             "name": "hyperf/server",
-            "version": "v3.0.8",
+            "version": "v3.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hyperf/server.git",
-                "reference": "6c2680ecdf9ce35b27233fe4cc0c50052920467e"
+                "reference": "56c7fff69e2fb3f5253079b9355e86510b570d8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hyperf/server/zipball/6c2680ecdf9ce35b27233fe4cc0c50052920467e",
-                "reference": "6c2680ecdf9ce35b27233fe4cc0c50052920467e",
+                "url": "https://api.github.com/repos/hyperf/server/zipball/56c7fff69e2fb3f5253079b9355e86510b570d8f",
+                "reference": "56c7fff69e2fb3f5253079b9355e86510b570d8f",
                 "shasum": ""
             },
             "require": {
                 "hyperf/contract": "~3.0.0",
-                "hyperf/engine": "^1.6|^2.4",
+                "hyperf/engine": "^1.10|^2.8",
+                "hyperf/tappable": "~3.0.0",
                 "hyperf/utils": "~3.0.0",
                 "php": ">=8.0",
                 "psr/container": "^1.0|^2.0",
@@ -2948,20 +2950,71 @@
                 "pull-request": "https://github.com/hyperf/hyperf/pulls",
                 "source": "https://github.com/hyperf/hyperf"
             },
-            "time": "2023-02-21T06:42:40+00:00"
+            "time": "2023-04-07T07:31:15+00:00"
         },
         {
-            "name": "hyperf/utils",
-            "version": "v3.0.14",
+            "name": "hyperf/tappable",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/hyperf/utils.git",
-                "reference": "6045cb2e5f97631c7ea1661bb95224d3566ebb48"
+                "url": "https://github.com/hyperf/tappable.git",
+                "reference": "4f90b9026a5bdce5b3e6be29a2ab7a86c54f372a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hyperf/utils/zipball/6045cb2e5f97631c7ea1661bb95224d3566ebb48",
-                "reference": "6045cb2e5f97631c7ea1661bb95224d3566ebb48",
+                "url": "https://api.github.com/repos/hyperf/tappable/zipball/4f90b9026a5bdce5b3e6be29a2ab7a86c54f372a",
+                "reference": "4f90b9026a5bdce5b3e6be29a2ab7a86c54f372a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Functions.php"
+                ],
+                "psr-4": {
+                    "Hyperf\\Tappable\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Hyperf Macroable package which come from illuminate/tappable",
+            "homepage": "https://hyperf.io",
+            "keywords": [
+                "hyperf",
+                "php",
+                "swoole",
+                "tappable"
+            ],
+            "support": {
+                "docs": "https://hyperf.wiki",
+                "issues": "https://github.com/hyperf/hyperf/issues",
+                "pull-request": "https://github.com/hyperf/hyperf/pulls",
+                "source": "https://github.com/hyperf/hyperf"
+            },
+            "time": "2023-03-28T15:02:39+00:00"
+        },
+        {
+            "name": "hyperf/utils",
+            "version": "v3.0.15",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hyperf/utils.git",
+                "reference": "0bcd1db73d70a9b30340d13d53f696f49b733b82"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hyperf/utils/zipball/0bcd1db73d70a9b30340d13d53f696f49b733b82",
+                "reference": "0bcd1db73d70a9b30340d13d53f696f49b733b82",
                 "shasum": ""
             },
             "require": {
@@ -3019,20 +3072,20 @@
                 "pull-request": "https://github.com/hyperf/hyperf/pulls",
                 "source": "https://github.com/hyperf/hyperf"
             },
-            "time": "2023-03-30T05:49:34+00:00"
+            "time": "2023-04-03T05:20:34+00:00"
         },
         {
             "name": "hyperf/websocket-server",
-            "version": "v3.0.7",
+            "version": "v3.0.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hyperf/websocket-server.git",
-                "reference": "1b77bdf477f64d2bd6bd41eaf319489301a33e52"
+                "reference": "bffd2c75298e8efb46459e46cde1787ec0af26b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hyperf/websocket-server/zipball/1b77bdf477f64d2bd6bd41eaf319489301a33e52",
-                "reference": "1b77bdf477f64d2bd6bd41eaf319489301a33e52",
+                "url": "https://api.github.com/repos/hyperf/websocket-server/zipball/bffd2c75298e8efb46459e46cde1787ec0af26b6",
+                "reference": "bffd2c75298e8efb46459e46cde1787ec0af26b6",
                 "shasum": ""
             },
             "require": {
@@ -3076,7 +3129,7 @@
                 "pull-request": "https://github.com/hyperf/hyperf/pulls",
                 "source": "https://github.com/hyperf/hyperf"
             },
-            "time": "2023-02-15T01:42:47+00:00"
+            "time": "2023-04-02T13:17:26+00:00"
         },
         {
             "name": "jaggedsoft/php-binance-api",
@@ -4270,16 +4323,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "1.18.0",
+            "version": "1.18.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "882eabc9b6a12e25c27091a261397f9c8792e722"
+                "reference": "22dcdfd725ddf99583bfe398fc624ad6c5004a0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/882eabc9b6a12e25c27091a261397f9c8792e722",
-                "reference": "882eabc9b6a12e25c27091a261397f9c8792e722",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/22dcdfd725ddf99583bfe398fc624ad6c5004a0f",
+                "reference": "22dcdfd725ddf99583bfe398fc624ad6c5004a0f",
                 "shasum": ""
             },
             "require": {
@@ -4309,9 +4362,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.18.0"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.18.1"
             },
-            "time": "2023-04-06T07:26:43+00:00"
+            "time": "2023-04-07T11:51:11+00:00"
         },
         {
             "name": "phrity/net-uri",
@@ -10588,6 +10641,85 @@
                 "source": "https://github.com/Textalk/websocket-php/tree/1.6.3"
             },
             "time": "2022-11-07T18:59:33+00:00"
+        },
+        {
+            "name": "twig/extra-bundle",
+            "version": "v3.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twigphp/twig-extra-bundle.git",
+                "reference": "a961e553a624eebdbd423ad5ab931497ca6d87cd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twigphp/twig-extra-bundle/zipball/a961e553a624eebdbd423ad5ab931497ca6d87cd",
+                "reference": "a961e553a624eebdbd423ad5ab931497ca6d87cd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.5",
+                "symfony/framework-bundle": "^4.4|^5.0|^6.0",
+                "symfony/twig-bundle": "^4.4|^5.0|^6.0",
+                "twig/twig": "^2.7|^3.0"
+            },
+            "require-dev": {
+                "league/commonmark": "^1.0|^2.0",
+                "symfony/phpunit-bridge": "^4.4.9|^5.0.9|^6.0",
+                "twig/cache-extra": "^3.0",
+                "twig/cssinliner-extra": "^2.12|^3.0",
+                "twig/html-extra": "^2.12|^3.0",
+                "twig/inky-extra": "^2.12|^3.0",
+                "twig/intl-extra": "^2.12|^3.0",
+                "twig/markdown-extra": "^2.12|^3.0",
+                "twig/string-extra": "^2.12|^3.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Twig\\Extra\\TwigExtraBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com",
+                    "homepage": "http://fabien.potencier.org",
+                    "role": "Lead Developer"
+                }
+            ],
+            "description": "A Symfony bundle for extra Twig extensions",
+            "homepage": "https://twig.symfony.com",
+            "keywords": [
+                "bundle",
+                "extra",
+                "twig"
+            ],
+            "support": {
+                "source": "https://github.com/twigphp/twig-extra-bundle/tree/v3.5.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/twig/twig",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-02-08T07:44:55+00:00"
         },
         {
             "name": "twig/twig",

@@ -55,9 +55,9 @@ class Transaction
     private ?\DateTimeInterface $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(['get:transaction', 'create:transaction'])]
-    private Account $account;
+    private ?Account $account;
 
     #[ORM\Column(length: 255)]
     #[Groups(['get:transaction'])]
@@ -113,7 +113,7 @@ class Transaction
         return $this;
     }
 
-    public function getAccount(): Account
+    public function getAccount(): ?Account
     {
         return $this->account;
     }

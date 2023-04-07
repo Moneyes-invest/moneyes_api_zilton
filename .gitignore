@@ -38,3 +38,4 @@ symfonyyarn-error.log
 ###< lexik/jwt-authentication-bundle ###
 
 catch_me.pem
+docker-compose.override.yml
