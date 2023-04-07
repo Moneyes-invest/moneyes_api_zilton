@@ -14,6 +14,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Binance\API;
+use App\Entity\Account;
 use Hyperf\HttpMessage\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -26,6 +27,9 @@ class PostAccountProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
+        if (!$data instanceof Account) {
+            throw new \InvalidArgumentException('Invalid data');
+        }
         $publicKey  = $data->getPublicKey();
         $privateKey = $data->getPrivateKey();
         $client     = new API($publicKey, $privateKey);

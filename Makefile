@@ -40,30 +40,8 @@ clean: kill
 clear-cache: ## Clear cache data
 	-@$(SYMFONY) cache:clear
 
-
 log: start
 	$(DOCKER_COMPOSE) logs -f
-
-.PHONY: restart-php
-restart-php:
-	$(DOCKER_COMPOSE) restart php
-
-.PHONY: enable-xdebug
-enable-xdebug:
-	$(EXEC_APP) sed -i '/xdebug.start_with_request.+/d' /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-	$(EXEC_APP) sh -c "echo \"xdebug.start_with_request = yes\" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
-
-.PHONY: disable-xdebug
-disable-xdebug:
-	$(EXEC_APP) sed -i '/xdebug.start_with_request.+/d' /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-	$(EXEC_APP) sh -c "echo \"xdebug.start_with_request = no\" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"
-
-.PHONY: build kill reset start stop clean clear-cache enable-xdebug disable-xdebug
-
-##
-## Utils
-## -----
-##
 
 db: ## Reset the database and load fixtures
 db: vendor
@@ -75,6 +53,7 @@ db: vendor
 	$(SYMFONY) doctrine:fixtures:load --group=dev --no-interaction
 	$(SYMFONY) lexik:jwt:generate-keypair --overwrite
 	$(DOCKER_COMPOSE) start django
+	#$(EXEC_PG) /tmp/db/init-db.sh
 	$(EXEC_PG) /tmp/db/load-tables.sh
 
 migration: ## Generate a new doctrine migration
@@ -123,6 +102,7 @@ db-test: vendor
 	$(SYMFONY) doctrine:database:drop --force --env test || true
 	$(SYMFONY) doctrine:database:create --env test
 	$(SYMFONY) doctrine:migrations:migrate --no-interaction --allow-no-migration --env test
+	$(SYMFONY) lexik:jwt:generate-keypair --overwrite
 
 test-fixtures: db-test
 	$(SYMFONY) doctrine:fixtures:load --env test --group=dev --append
@@ -194,7 +174,7 @@ phpstan: tools/phpstan/vendor
 
 .PHONY: apply-phpstan
 apply-phpstan:
-	$(MAKE) phpstan arguments="analyse --memory-limit=4G -l 9 -c .phpstan.neon src"
+	$(MAKE) phpstan arguments="analyse --memory-limit=4G -l 9 -c .phpstan.neon src -v"
 
 .PHONY: update-phpstan
 update-phpstan:
@@ -231,7 +211,6 @@ load-fixtures-prod:
 
 load-fixtures-dev:
 	$(SYMFONY) doctrine:fixtures:load --group=dev --no-interaction
-
 
 export-tables:
 	$(EXEC_PG) /tmp/db/export-tables.sh

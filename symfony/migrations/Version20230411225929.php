@@ -17,7 +17,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230402161159 extends AbstractMigration
+final class Version20230411225929 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -73,7 +73,7 @@ final class Version20230402161159 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_1A78D03768AFD1A0 ON symbol_exchange (exchange_id)');
         $this->addSql('COMMENT ON COLUMN symbol_exchange.symbol_id IS \'(DC2Type:uuid)\'');
         $this->addSql('COMMENT ON COLUMN symbol_exchange.exchange_id IS \'(DC2Type:uuid)\'');
-        $this->addSql('CREATE TABLE transaction (id UUID NOT NULL, account_id UUID NOT NULL, symbol_id UUID NOT NULL, asset_fees_id VARCHAR(255) DEFAULT NULL, asset_id VARCHAR(255) DEFAULT NULL, date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, type VARCHAR(255) NOT NULL, order_direction VARCHAR(255) NOT NULL, fees DOUBLE PRECISION NOT NULL, price DOUBLE PRECISION NOT NULL, quantity DOUBLE PRECISION NOT NULL, external_transaction_id VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE transaction (id UUID NOT NULL, account_id UUID DEFAULT NULL, symbol_id UUID NOT NULL, asset_fees_id VARCHAR(255) DEFAULT NULL, asset_id VARCHAR(255) DEFAULT NULL, date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, type VARCHAR(255) NOT NULL, order_direction VARCHAR(255) NOT NULL, fees DOUBLE PRECISION NOT NULL, price DOUBLE PRECISION NOT NULL, quantity DOUBLE PRECISION NOT NULL, external_transaction_id VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_723705D19B6B5FBA ON transaction (account_id)');
         $this->addSql('CREATE INDEX IDX_723705D1C0F75674 ON transaction (symbol_id)');
         $this->addSql('CREATE INDEX IDX_723705D1FF859273 ON transaction (asset_fees_id)');
