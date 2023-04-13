@@ -50,7 +50,7 @@ class Transaction
     private Uuid $id;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Groups(['get:transaction', 'get:transactions', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private ?\DateTimeInterface $date = null;
 
@@ -64,7 +64,7 @@ class Transaction
     private string $type = 'SPOT';
 
     #[ORM\Column(length: 255)]
-    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Groups(['get:transaction', 'get:transactions', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private string $orderDirection = 'BUY';
 
@@ -72,12 +72,12 @@ class Transaction
     private float $fees = 0;
 
     #[ORM\Column]
-    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Groups(['get:transaction', 'get:transactions', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private float $price;
 
     #[ORM\Column]
-    #[Groups(['get:transaction', 'create:transaction'])]
+    #[Groups(['get:transaction', 'get:transactions', 'create:transaction'])]
     #[Assert\NotBlank(groups: ['create:transaction'])]
     private float $quantity;
 
