@@ -60,6 +60,7 @@ services:
   database:
     image: postgres:${POSTGRES_VERSION:-14}-alpine
     container_name: database
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-moneyes}
       # You should definitely change the password in production
@@ -107,6 +108,7 @@ services:
   django:
     build: django/
     container_name: django
+    restart: unless-stopped
     command: python manage.py runserver 0.0.0.0:3333
     volumes:
       - ./django/performance:/usr/src/performance/

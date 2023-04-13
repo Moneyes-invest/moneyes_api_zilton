@@ -15,3 +15,9 @@ services:
     extra_hosts:
       # Ensure that host.docker.internal is correctly defined on Linux
       - host.docker.internal:host-gateway
+
+  caddy:
+    ports:
+      - target: 80
+        published: 8080
+        protocol: tcp
