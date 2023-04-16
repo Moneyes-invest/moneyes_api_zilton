@@ -29,6 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(
+            order: ['date' => 'DESC'],
             normalizationContext: ['groups' => ['get:transactions']],
         ),
         new Get(normalizationContext: ['groups' => ['get:transaction']], security: 'object.getAccount().getUser() == user or is_granted("ROLE_ADMIN")'),
