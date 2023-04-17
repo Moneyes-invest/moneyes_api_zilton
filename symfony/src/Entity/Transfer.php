@@ -20,6 +20,8 @@ use ApiPlatform\Metadata\Post;
 use App\Repository\TransferRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
@@ -27,10 +29,10 @@ use Doctrine\ORM\Mapping as ORM;
             order: ['date' => 'DESC'],
             normalizationContext: ['groups' => ['get:transfers']]
         ),
-        new Get(normalizationContext: ['groups' => ['get:transfers', 'get:transfer']], security: 'object.getUser() == user or is_granted("ROLE_ADMIN")'),
+        new Get(normalizationContext: ['groups' => ['get:transfer']], security: 'object.getUser() == user or is_granted("ROLE_ADMIN")'),
         new Post(
-            normalizationContext: ['groups' => ['get:transfers', 'get:transfer']],
-            denormalizationContext: ['groups' => ['post:transfers']],
+            normalizationContext: ['groups' => ['get:transfer']],
+            denormalizationContext: ['groups' => ['create:transfers']],
         ),
     ]
 )]
@@ -44,13 +46,17 @@ class Transfer
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['get:transfers', 'get:transfer', 'create:transfers'])]
+    #[Assert\NotBlank(groups: ['create:transaction'])]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get:transfers', 'get:transfer', 'create:transfers'])]
     private ?Asset $asset = null;
 
     #[ORM\Column]
+    #[Groups(['get:transfers', 'get:transfer', 'create:transfers'])]
     private ?float $quantity = null;
 
     #[ORM\Column(nullable: true)]
@@ -67,6 +73,7 @@ class Transfer
 
     #[ORM\ManyToOne(inversedBy: 'transfers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get:transfer', 'create:transfers'])]
     private ?Account $account = null;
 
     public function getId(): ?int
