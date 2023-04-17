@@ -11,6 +11,8 @@ declare(strict_types = 1);
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -21,15 +23,18 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(
     operations: [
-        new GetCollection(normalizationContext: ['groups' => ['get:transfers']], security: 'is_granted("ROLE_ADMIN")'),
+        new GetCollection(
+            order: ['date' => 'DESC'],
+            normalizationContext: ['groups' => ['get:transfers']]
+        ),
         new Get(normalizationContext: ['groups' => ['get:transfers', 'get:transfer']], security: 'object.getUser() == user or is_granted("ROLE_ADMIN")'),
         new Post(
             normalizationContext: ['groups' => ['get:transfers', 'get:transfer']],
             denormalizationContext: ['groups' => ['post:transfers']],
-            security: 'is_granted("ROLE_ADMIN")',
         ),
     ]
 )]
+#[ApiFilter(SearchFilter::class, properties: ['account' => 'exact', 'asset' => 'exact'])]
 #[ORM\Entity(repositoryClass: TransferRepository::class)]
 class Transfer
 {

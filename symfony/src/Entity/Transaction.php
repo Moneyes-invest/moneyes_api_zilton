@@ -39,7 +39,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
     ],
 )]
-#[ApiFilter(SearchFilter::class, properties: ['account' => 'exact', 'asset' => 'exact'])]
+#[ApiFilter(SearchFilter::class, strategy: 'exact', properties: ['account' => 'exact', 'asset' => 'exact'])]
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 class Transaction
 {
@@ -94,7 +94,7 @@ class Transaction
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['get:transaction', 'get:transactions'])]
+    #[Groups(['get:transaction', 'get:transactions', 'create:transaction'])]
     private ?Asset $asset = null;
 
     public function getId(): ?Uuid
