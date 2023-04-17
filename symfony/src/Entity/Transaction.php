@@ -86,8 +86,8 @@ class Transaction
     private ?string $externalTransactionId = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private Symbol $symbol;
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Symbol $symbol;
 
     #[ORM\ManyToOne]
     private ?Asset $assetFees = null;
@@ -210,7 +210,7 @@ class Transaction
         return $this;
     }
 
-    public function getSymbol(): Symbol
+    public function getSymbol(): ?Symbol
     {
         return $this->symbol;
     }

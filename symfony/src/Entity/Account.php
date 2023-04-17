@@ -126,7 +126,7 @@ class Account
     private Collection $transactions;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['get:account','get:accounts','create:account'])]
+    #[Groups(['get:account', 'get:accounts', 'create:account'])]
     private ?string $name = null;
 
     public function __construct()
