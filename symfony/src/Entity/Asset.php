@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
     ],
 )]
-#[ApiFilter(SearchFilter::class, properties: ['name' => 'partial'])]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial'])]
 #[ORM\Entity(repositoryClass: AssetRepository::class)]
 class Asset
 {
