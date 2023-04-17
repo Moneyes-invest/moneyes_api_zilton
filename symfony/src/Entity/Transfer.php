@@ -69,6 +69,7 @@ class Transfer
     private ?string $externalTransferId = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['get:transfers', 'get:transfer', 'create:transfers'])]
     private ?string $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'transfers')]
