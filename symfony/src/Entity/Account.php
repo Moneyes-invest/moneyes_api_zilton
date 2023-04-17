@@ -45,7 +45,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 */
 #[ApiResource(
     operations: [
-        new GetCollection(normalizationContext: ['groups' => ['get:accounts']], security: 'is_granted("ROLE_ADMIN")'),
+        new GetCollection(normalizationContext: ['groups' => ['get:accounts']]),
         new Get(normalizationContext: ['groups' => ['get:accounts', 'get:account']], security: 'object.getUser() == user or is_granted("ROLE_ADMIN")'),
         new Get(
             uriTemplate: '/accounts/{id}/detail',
@@ -126,7 +126,7 @@ class Account
     private Collection $transactions;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['get:account', 'create:account'])]
+    #[Groups(['get:account','get:accounts','create:account'])]
     private ?string $name = null;
 
     public function __construct()
